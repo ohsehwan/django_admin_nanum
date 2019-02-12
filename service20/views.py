@@ -184,13 +184,24 @@ class post_user_info_Quest_Serializer(serializers.ModelSerializer):
 class post_user_info_Quest(generics.ListAPIView):
     queryset = com_cdd.objects.all()
     serializer_class = post_user_info_Quest_Serializer
-
     def list(self, request):
-        #question01 = com_cdd.objects.filter(std_grp_code=key1)[0].rmrk
-        l_key1 = request.GET.get('std_grp_code', None)
+        #ms_sub 테이블에서 질문내역 조회
+        key1 = request.GET.get('ms_id', None)           
+        l_exist = ms_sub.objects.filter(ms_id_id=key1).exists()
+        
         queryset = self.get_queryset()
-        queryset = queryset.filter(std_grp_code=l_key1)
-
+        if not l_exist:
+            queryset = queryset.filter(std_grp_code='')
+        else:
+            l_key1 = ms_sub.objects.filter(ms_id_id=key1)[0].att_cdh
+            l_key_query = ms_sub.objects.filter(ms_id_id=key1).values_list('att_cdd_id', flat=True) 
+            #ms_sub 테이블에서 질문내역 조회
+            
+            if not l_key_query:
+                queryset = queryset.filter(std_grp_code=l_key1, std_detl_code__in=l_key_query)
+            else:
+                queryset = queryset.filter(std_grp_code=l_key1)
+            #조회한 질문내역 기준으로 공통코드 조회
 
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(queryset, many=True)
@@ -201,6 +212,133 @@ class post_user_info_Quest(generics.ListAPIView):
             return self.get_paginated_response(serializer.data)
 
         return Response(serializer.data)
+
+# 멘토링 프로그램 질문유형 가져오기
+class post_user_info_persion_Quest_Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = com_cdd
+        fields = ('std_grp_code','std_detl_code','std_detl_code_nm','rmrk','use_indc')
+
+
+# 멘토링 프로그램 질문유형 가져오기
+class post_user_info_persion_Quest(generics.ListAPIView):
+    queryset = com_cdd.objects.all()
+    serializer_class = post_user_info_persion_Quest_Serializer
+    def list(self, request):
+        #mp_sub 테이블에서 질문내역 조회
+        key1 = request.GET.get('mp_id', None)           
+        l_exist = mp_sub.objects.filter(ms_id=key1).exists()
+        
+        queryset = self.get_queryset()
+        if not l_exist:
+            queryset = queryset.filter(std_grp_code='')
+        else:
+            l_key1 = mp_sub.objects.filter(ms_id=key1)[0].att_cdh
+            l_key_query = mp_sub.objects.filter(ms_id=key1).values_list('att_cdd', flat=True) 
+            #mp_sub 테이블에서 질문내역 조회
+            
+            if not l_key_query:
+                queryset = queryset.filter(std_grp_code=l_key1, std_detl_code__in=l_key_query)
+            else:
+                queryset = queryset.filter(std_grp_code=l_key1)
+            #조회한 질문내역 기준으로 공통코드 조회
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
+
+
+@csrf_exempt
+def post_user_info_persion(request):
+    ida = request.POST.get('user_id', None)
+    ms_ida = request.POST.get('ms_id', None)
+    #created,created_flag = vm_nanum_stdt.apl_id.get_or_create(user=request.user)
+    created_flag = vm_nanum_stdt.objects.filter(apl_id=ida).exists()
+    ms_apl_flag = ms_apl.objects.filter(apl_id=ida,ms_id_id=ms_ida).exists()
+    #mp_mtr
+    if not ms_apl_flag:
+        applyYn = 'N'
+    else:
+        applyYn = 'Y'
+
+    #rows = vm_nanum_stdt.objects.filter(apl_id=ida)
+    #rows2 = vm_nanum_stdt.objects.get("apl_nm")
+    if not created_flag:
+        message = "Fail"
+        context = {'message': message}
+    else:
+        
+        message = "Ok"
+        rows = vm_nanum_stdt.objects.filter(apl_id=ida)[0]
+        rows2 = mp_sub.objects.filter(ms_id=ms_ida)
+        rows3 = msch.objects.filter(ms_id=ms_ida)[0]
+
+
+        for val in rows2:
+            key1 = val.att_id
+            #key2 = val.att_cdd
+
+        #question01 = com_cdd.objects.filter(std_grp_code=key1)[0].rmrk
+        #question02 = com_cdd.objects.filter(std_grp_code=key1)[1].rmrk
+        #question03 = com_cdd.objects.filter(std_grp_code=key1)[2].rmrk
+        #question04 = com_cdd.objects.filter(std_grp_code=key1)[3].rmrk
+        #question05 = com_cdd.objects.filter(std_grp_code=key1)[4].rmrk
+
+        context = {'message': message,
+                    'applyYn' : applyYn,
+                    'apl_nm' : rows.apl_nm,
+                    'univ_cd' : rows.univ_cd,
+                    'univ_nm' : rows.univ_nm,
+                    'grad_div_cd' : rows.grad_div_cd,
+                    'grad_div_nm' : rows.grad_div_nm,
+                    'cllg_cd' : rows.cllg_cd,
+                    'cllg_nm' : rows.cllg_nm,
+                    'dept_cd' : rows.dept_cd,
+                    'dept_nm' : rows.dept_nm,
+                    'mjr_cd' : rows.mjr_cd,
+                    'mjr_nm' : rows.mjr_nm,
+                    'brth_dt' : rows.brth_dt,
+                    'gen_cd' : rows.gen_cd,
+                    'gen_nm' : rows.gen_nm,
+                    'yr' : rows.yr,
+                    'sch_yr' : rows.sch_yr,
+                    'term_div' : rows.term_div,
+                    'term_nm' : rows.term_nm,
+                    'stdt_div' : rows.stdt_div,
+                    'stdt_nm' : rows.stdt_nm,
+                    'mob_nm' : rows.mob_nm,
+                    'tel_no' : rows.tel_no,
+                    'tel_no_g' : rows.tel_no_g,
+                    'h_addr' : rows.h_addr,
+                    'post_no' : rows.post_no,
+                    'email_addr' : rows.email_addr,
+                    'bank_acct' : rows.bank_acct,
+                    'bank_cd' : rows.bank_cd,
+                    'bank_nm' : rows.bank_nm,
+                    'bank_dpsr' : rows.bank_dpsr,
+                    'pr_yr' : rows.pr_yr,
+                    'pr_sch_yr' : rows.pr_sch_yr,
+                    'pr_term_div' : rows.pr_term_div,
+                    'score01' : rows.score01,
+                    'score02' : rows.score02,
+                    'score03' : rows.score03,
+                    'score04' : rows.score04,
+                    'score04_tp' : rows.score04_tp,
+                    'score05' : rows.score05,
+                    'ms_id' : rows3.ms_id,
+                    'ms_name' : rows3.ms_name,
+                    }
+    
+
+    #return HttpResponse(json.dumps(context), content_type="application/json")
+    return JsonResponse(context,json_dumps_params={'ensure_ascii': True})
 
 
 
