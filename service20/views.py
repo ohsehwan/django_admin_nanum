@@ -8070,7 +8070,7 @@ def MP0101M_team_upload(request):
     req = request
     DIR = os.getcwd()
     UPLOAD_DIR = str(DIR) + '/media/MP0101M/'
-    UPLOAD_DIR = '/NANUM/www/img/atc/'
+    UPLOAD_DIR = '/NANUM/www/img/atc_team/'
     # UPLOAD_DIR = 'img'
     
     if request.method == 'POST':
@@ -8097,16 +8097,16 @@ def MP0101M_team_upload(request):
 
 
         for i in range(0,int(l_length)):
-            l_att_cdd.append(request.POST.get('att_cdd_up'+str(i), ""))
-            l_service_upload_text.append(request.POST.get('service_upload_text'+str(i), ""))
-            l_service_upload.append(request.POST.get('service_upload'+str(i), ""))
-            l_att_cdh.append(request.POST.get('att_cdh_up'+str(i), ""))
-            l_upload_no.append(request.POST.get('upload_no'+str(i), ""))
+            l_att_cdd.append(request.POST.get('att_cdd_up_team'+str(i), ""))
+            l_service_upload_text.append(request.POST.get('service_team_upload_text'+str(i), ""))
+            l_service_upload.append(request.POST.get('service_team_upload'+str(i), ""))
+            l_att_cdh.append(request.POST.get('att_cdh_up_team'+str(i), ""))
+            l_upload_no.append(request.POST.get('upload_no_team'+str(i), ""))
 
             print("l_upload=====" + str(l_upload_no[i]) + "    i=====" + str(i))
 
             if(str(l_upload_no[i]) == str(i)):
-                file = request.FILES['service_upload' + str(i)]
+                file = request.FILES['service_team_upload' + str(i)]
                 print(file)
                 filename = file._name
                 n_filename = str(l_mp_id) + str(l_apl_id) + str(l_att_cdh[i]) + str(l_att_cdd[i]) + os.path.splitext(filename)[1]
@@ -8120,7 +8120,7 @@ def MP0101M_team_upload(request):
 
                 cursor = connection.cursor()
                 fullFile = str(UPLOAD_DIR) + str(n_filename)
-                fullFile = "/img/atc/"+ str(n_filename)
+                fullFile = "/img/atc_team/"+ str(n_filename)
 
                 query = " insert into service20_mp_team_atc ( "
                 query += "    mp_id "
