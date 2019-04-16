@@ -7957,8 +7957,8 @@ class MP0101M_service_team_apl_no(generics.ListAPIView):
 @csrf_exempt
 def MP0101M_service_team_insert(request):
     l_mp_id = request.POST.get('mp_id', "")    
-    l_apl_no = request.POST.get('apl_no', "")
-    l_length = request.POST.get('over_service_length', "")
+    l_apl_no = request.POST.get('apl_no_team', "")
+    l_length = request.POST.get('over_service_team_length', "")
     l_att_cdd = list()
     l_att_cdh = list()
     l_chc_tp = list()
@@ -7972,18 +7972,18 @@ def MP0101M_service_team_insert(request):
     chk_cnt = 0
     for i in range(0,int(l_length)):
         # l_att_cdd.append(request.POST.get('select_'+str(i), ""))
-        l_att_cdh.append(request.POST.get('att_cdh'+str(i), ""))
-        l_chc_tp.append(request.POST.get('chc_tp'+str(i), ""))
-        l_seq.append(request.POST.get('seq'+str(i), ""))
+        l_att_cdh.append(request.POST.get('att_cdh_team'+str(i), ""))
+        l_chc_tp.append(request.POST.get('chc_tp_team'+str(i), ""))
+        l_seq.append(request.POST.get('seq_team'+str(i), ""))
 
         if l_chc_tp[i] == '1':
-            l_att_cdd.append(request.POST.get('service_combo'+str(com_cnt), ""))
+            l_att_cdd.append(request.POST.get('service_team_combo'+str(com_cnt), ""))
             com_cnt = com_cnt + 1
         elif l_chc_tp[i] == '3':
-            l_att_cdd.append(request.POST.get('service_chkbox'+str(chk_cnt), ""))
+            l_att_cdd.append(request.POST.get('service_team_chkbox'+str(chk_cnt), ""))
             chk_cnt = chk_cnt + 1
         else:
-            l_att_cdd.append(request.POST.get('service_select'+str(sel_cnt), ""))
+            l_att_cdd.append(request.POST.get('service_team_select'+str(sel_cnt), ""))
             sel_cnt = sel_cnt + 1
     
         print("l_att_cdd===" + l_att_cdd[i])
