@@ -8252,7 +8252,7 @@ def MP0101M_team_upload(request):
     
     if request.method == 'POST':
         l_mp_id = request.POST.get("mp_id")
-        l_apl_no = request.POST.get("apl_no")
+        l_apl_no = request.POST.get("apl_no_team")
         l_apl_id = request.POST.get("apl_id") 
         l_length = request.POST.get("upload_team_length")
         ins_id = request.POST.get('ins_id', "")
