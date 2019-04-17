@@ -5889,7 +5889,8 @@ def MP0101M_save(request):
         apl_no = apl_no + 1
 
     
-    query = "select ifnull(max(apl_no),0) as apl_no,ifnull(max(team_id),0) as team_no from service20_mp_mtr where mp_id = '"+mp_id+"'"  
+    # query = "select ifnull(max(apl_no),0) as apl_no,ifnull(max(team_id),0) as team_no from service20_mp_mtr where mp_id = '"+mp_id+"'"  
+    query = "select ifnull( nullif(max(apl_no),0) ,0) as apl_no,ifnull( nullif(max(team_id),0) ,0) as team_no from service20_mp_mtr where mp_id = '"+mp_id+"'"  
     cursor = connection.cursor()
     cursor.execute(query)    
     results = namedtuplefetchall(cursor)    
@@ -6058,7 +6059,7 @@ def MP0101M_save(request):
                     apl_no = apl_no + 1
 
                 
-                query = "select ifnull(max(apl_no),0) as apl_no,ifnull(max(team_id),0) as team_no from service20_mp_mtr where mp_id = '"+mp_id+"'"  
+                query = "select ifnull( nullif(max(apl_no),0) ,0) as apl_no,ifnull( nullif(max(team_id),0) ,0) as team_no from service20_mp_mtr where mp_id = '"+mp_id+"'"  
                 cursor = connection.cursor()
                 cursor.execute(query)    
                 results = namedtuplefetchall(cursor)    
