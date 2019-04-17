@@ -8263,6 +8263,8 @@ def MP0101M_team_upload(request):
         upd_ip = request.POST.get('upd_ip', "")
         upd_dt = request.POST.get('upd_dt', "")
         upd_pgm = request.POST.get('upd_pgm', "")
+        
+        print("==team_upload=="+l_length)
 
         client_ip = request.META['REMOTE_ADDR']
 
