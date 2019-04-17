@@ -6018,7 +6018,7 @@ def MP0101M_save(request):
                     test_div='10', 
                     team_no=team_no,                    
                     ques_no=ques_no,
-                    team_id=team_id,
+                    team_id=team_no,
                     team_nm=team_nm,
                     sort_seq =i+1,
                     ans_t2=anst2,
