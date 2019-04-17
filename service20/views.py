@@ -6066,8 +6066,8 @@ def MP0101M_save(request):
                 apl_no = int(results[0].apl_no)
                 apl_no = apl_no+1
 
-                team_no = int(results[0].team_no)
-                team_no = team_no+1
+                # team_no = int(results[0].team_no)
+                # team_no = team_no+1
 
                 print("::apl_no::")
                 print(apl_no)
