@@ -6038,7 +6038,7 @@ def MP0101M_save(request):
                 #mp_mtr_max = mp_mtr.objects.all().last()
                 #mp_mtr_max = mp_mtr_max + 1
 
-                print("::team_start::")
+                print("::team_start::"+l_team_apl_id)
 
                 apl_no = mp_mtr_max
                 apl_id = l_team_apl_id
