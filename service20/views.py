@@ -8280,7 +8280,7 @@ def MP0101M_team_upload(request):
             l_service_upload_text.append(request.POST.get('service_team_upload_text'+str(i), ""))
             l_service_upload.append(request.POST.get('service_team_upload'+str(i), ""))
             l_att_cdh.append(request.POST.get('att_cdh_up_team'+str(i), ""))
-            l_upload_no.append(request.POST.get('upload_no_team'+str(i), ""))
+            l_upload_no.append(request.POST.get('upload_team_no'+str(i), ""))
 
             print("l_upload=====" + str(l_upload_no[i]) + "    i=====" + str(i))
 
