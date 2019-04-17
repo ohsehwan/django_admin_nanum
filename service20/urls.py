@@ -202,6 +202,8 @@ urlpatterns = [
     path('MP0101M/list/', MP0101M_list.as_view(), name='MP0101M_list'),
     # 멘토링 프로그램 신청내역
     path('MP0101M/list/all/', MP0101M_list_all.as_view(), name='MP0101M_list_all'),
+    # 멘토링 프로그램 신청내역
+    path('MP0101M/list/all/mypage/', MP0101M_list_all_mypage.as_view(), name='MP0101M_list_all_mypage'),
     # 멘토링 프로그램 질문유형 가져오기
     path('MP0101M/quest/', MP0101M_quest.as_view(), name='MP0101M_quest'), 
     # 멘토링 프로그램 신청
