@@ -5850,6 +5850,7 @@ def MP0101M_save(request):
     que4 = request.POST.get('que4', None)
     que5 = request.POST.get('que5', None)
     indv_div = request.POST.get('indv_div', None)
+    mentoTeamMax = request.POST.get('mentoTeamMax', 0)
     team_nm = request.POST.get('Team_memberNo', None)
 
     ms_ida = request.POST.get('ms_id', None)
@@ -5859,6 +5860,8 @@ def MP0101M_save(request):
     
     print("::ida::")
     print(ida)
+    print("::mentoTeamMax::")
+    print(mentoTeamMax)
     #created,created_flag = vw_nanum_stdt.apl_id.get_or_create(user=request.user)
     mp_id = programId
     mp_mtr_max = mp_mtr.objects.all().aggregate(vlMax=Max('apl_no'))
@@ -6028,6 +6031,154 @@ def MP0101M_save(request):
                     ins_dt=datetime.datetime.today()
                     )
                 model_instance2.save()
+
+            for i in range(0,int(mentoTeamMax)):
+                l_team_apl_id = request.POST.get('mentoTeam'+str(i+1), None)
+                rows = vw_nanum_stdt.objects.filter(apl_id=l_team_apl_id)[0]
+                #mp_mtr_max = mp_mtr.objects.all().last()
+                #mp_mtr_max = mp_mtr_max + 1
+
+                print("::team_start::")
+
+                apl_no = mp_mtr_max
+                apl_id = l_team_apl_id
+                v_gen = ""
+                if str(rows.gen_cd) == "1":
+                    v_gen = "M"
+                else:
+                    v_gen = "F"
+                
+                max_no = mp_mtr_max['vlMax']    
+                print("::max_no::")
+                print(max_no)
+                if max_no == None:
+                    apl_no = 0
+                else:
+                    apl_no = mp_mtr_max['vlMax']
+                    apl_no = apl_no + 1
+
+                
+                query = "select ifnull(max(apl_no),0) as apl_no,ifnull(max(team_id),0) as team_no from service20_mp_mtr where mp_id = '"+mp_id+"'"  
+                cursor = connection.cursor()
+                cursor.execute(query)    
+                results = namedtuplefetchall(cursor)    
+                apl_no = int(results[0].apl_no)
+                apl_no = apl_no+1
+
+                team_no = int(results[0].team_no)
+                team_no = team_no+1
+
+                print("::apl_no::")
+                print(apl_no)
+                
+                if rows.unv_cd == None:
+                    v_unv_cd = ''
+                else:
+                    v_unv_cd = rows.unv_cd 
+
+                if rows.unv_nm == None:
+                    v_unv_nm = ''
+                else:
+                    v_unv_nm = rows.unv_nm
+
+
+                query = " select t2.mp_id,t2.yr FROM service20_mpgm t2  WHERE 1=1 "
+                query += " AND t2.mp_id          = '"+mp_id+"'"
+                queryset = mpgm.objects.raw(query)[0]
+
+
+                
+                rowsChk = mp_mtr.objects.filter(apl_id=apl_id,mp_id=mp_id).exists()
+
+                if rowsChk == True:
+                    context = {'message': 'duplicate'}
+                else:
+                    print("::rows.tel_no::")
+                    print(rows.tel_no)
+                    if rows.tel_no == None:
+                        v_tel_no = ''
+                    else:
+                        v_tel_no = rows.tel_no.replace('-', '')
+
+
+                    if rows.mob_no == None:
+                        v_mob_no = ''
+                    else:
+                        v_mob_no = rows.mob_no.replace('-', '')
+                        
+                    if rows.tel_no_g == None:
+                        v_tel_no_g = ''
+                    else:
+                        v_tel_no_g = rows.tel_no_g.replace('-', '')   
+
+                    model_instance = mp_mtr(
+                        mp_id=mp_id, 
+                        apl_no=apl_no, 
+                        mntr_id=ida,
+                        apl_id=apl_id,
+                        apl_nm=rows.apl_nm,
+                        unv_cd=str(v_unv_cd),
+                        unv_nm=str(v_unv_nm),
+                        cllg_cd=rows.cllg_cd,
+                        cllg_nm=rows.cllg_nm,
+                        dept_cd=rows.dept_cd,
+                        dept_nm=rows.dept_nm,
+                        brth_dt=rows.brth_dt,
+                        gen=v_gen,
+                        yr=queryset.yr,
+                        term_div=rows.term_div,
+                        sch_yr=rows.sch_yr,
+                        mob_no=v_mob_no,
+                        tel_no=v_tel_no,
+                        tel_no_g=v_tel_no_g,
+                        h_addr=rows.h_addr,
+                        email_addr=rows.email_addr,
+                        bank_acct=rows.bank_acct,
+                        bank_cd=rows.bank_cd,
+                        bank_nm=rows.bank_nm,
+                        score1=rows.score01,
+                        score2=rows.score02,
+                        score3=rows.score03,
+                        score4=rows.score04,
+                        score5=rows.score05,
+                        score6=rows.score06,
+                        cmp_term=rows.cmp_term,
+                        pr_yr=rows.pr_yr,
+                        pr_sch_yr=rows.pr_sch_yr,
+                        pr_term_div=rows.pr_term_div,
+                        inv_agr_div = 'Y',
+                        inv_agr_dt = datetime.datetime.today(),
+                        status='00', # 저장
+                        mjr_cd=rows.mjr_cd,
+                        mjr_nm=rows.mjr_nm,
+                        ins_id=apl_id,
+                        ins_ip=str(client_ip),
+                        ins_dt=datetime.datetime.today()
+                        )
+                    model_instance.save()
+                    
+                    apl_max = int(apl_max)
+
+                    for i in range(0,apl_max):
+                        anst2 = request.POST.get('que'+str(i+1), None)
+                        ques_no = request.POST.get('ques_no'+str(i+1), None)
+
+                        model_instance2 = mp_ans(
+                            mp_id=mp_id, 
+                            test_div='10', 
+                            apl_no=apl_no,
+                            ques_no=ques_no,
+                            apl_id=apl_id,
+                            apl_nm=rows.apl_nm,
+                            sort_seq =i+1,
+                            ans_t2='', # 내용
+                            ans_div='2',
+                            ins_id=apl_id,
+                            ins_ip=str(client_ip),
+                            ins_dt=datetime.datetime.today()
+                            )
+                        model_instance2.save()
+        # 팀단위 종료
 
 
         # mp_mntr/ms_apl  -> mp_id만 조건 걸어서 count(*)
