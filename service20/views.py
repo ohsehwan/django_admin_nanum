@@ -6041,7 +6041,7 @@ def MP0101M_save(request):
 
                 print("::team_start::"+l_team_apl_id)
 
-                apl_no = mp_mtr_max
+                team_apl_no = mp_mtr_max
                 apl_id = l_team_apl_id
                 v_gen = ""
                 if str(rows.gen_cd) == "1":
@@ -6053,24 +6053,24 @@ def MP0101M_save(request):
                 print("::max_no::")
                 print(max_no)
                 if max_no == None:
-                    apl_no = 0
+                    team_apl_no = 0
                 else:
-                    apl_no = mp_mtr_max['vlMax']
-                    apl_no = apl_no + 1
+                    team_apl_no = mp_mtr_max['vlMax']
+                    team_apl_no = team_apl_no + 1
 
                 
                 query = "select ifnull( nullif(max(apl_no),0) ,0) as apl_no,ifnull( nullif(max(team_id),0) ,0) as team_no from service20_mp_mtr where mp_id = '"+mp_id+"'"  
                 cursor = connection.cursor()
                 cursor.execute(query)    
                 results = namedtuplefetchall(cursor)    
-                apl_no = int(results[0].apl_no)
-                apl_no = apl_no+1
+                team_apl_no = int(results[0].apl_no)
+                team_apl_no = apl_no+1
 
                 # team_no = int(results[0].team_no)
                 # team_no = team_no+1
 
                 print("::apl_no::")
-                print(apl_no)
+                print(team_apl_no)
                 
                 if rows.unv_cd == None:
                     v_unv_cd = ''
@@ -6114,7 +6114,7 @@ def MP0101M_save(request):
 
                     model_instance = mp_mtr(
                         mp_id=mp_id, 
-                        apl_no=apl_no, 
+                        apl_no=team_apl_no, 
                         mntr_id=ida,
                         apl_id=apl_id,
                         apl_nm=rows.apl_nm,
@@ -6167,7 +6167,7 @@ def MP0101M_save(request):
                         model_instance2 = mp_ans(
                             mp_id=mp_id, 
                             test_div='10', 
-                            apl_no=apl_no,
+                            apl_no=team_apl_no,
                             ques_no=ques_no,
                             apl_id=apl_id,
                             apl_nm=rows.apl_nm,
