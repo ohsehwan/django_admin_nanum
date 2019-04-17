@@ -6009,7 +6009,7 @@ def MP0101M_save(request):
 
         # 팀단위 추가.
         if indv_div == 'T':
-            for i in range(0,apl_max_team):
+            for i in range(0,int(apl_max_team)):
                 anst2 = request.POST.get('que_team'+str(i+1), None)
                 ques_no = request.POST.get('ques_no_team'+str(i+1), None)
 
