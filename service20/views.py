@@ -5628,6 +5628,7 @@ class MP0101M_list_all(generics.ListAPIView):
         query += "               ON ( A.mp_id = B.mp_id  "
         # query += "                    AND A.yr = B.yr  "
         query += "                    AND B.apl_id = '"+str(ida)+"' )  "
+        query += "                    AND B.fnl_rslt = 'P' )  "
         query += "        LEFT JOIN service20_com_cdd c1 ON (c1.std_grp_code  = 'MP0004' AND c1.std_detl_code = A.sup_org) "
         query += "        LEFT JOIN service20_com_cdd c2 ON (c2.std_grp_code = 'MP0003' AND c2.std_detl_code = A.mng_org)"
         query += " WHERE  B.apl_id = '"+str(ida)+"'  "
