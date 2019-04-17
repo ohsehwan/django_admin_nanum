@@ -5849,9 +5849,12 @@ def MP0101M_save(request):
     que3 = request.POST.get('que3', None)
     que4 = request.POST.get('que4', None)
     que5 = request.POST.get('que5', None)
+    indv_div = request.POST.get('indv_div', None)
+    team_nm = request.POST.get('Team_memberNo', None)
 
     ms_ida = request.POST.get('ms_id', None)
     apl_max = request.POST.get('aplMax', 0)
+    apl_max_team = request.POST.get('aplMaxTeam', 0)
     client_ip = request.META['REMOTE_ADDR']
     
     print("::ida::")
@@ -6003,6 +6006,28 @@ def MP0101M_save(request):
                 ins_dt=datetime.datetime.today()
                 )
             model_instance2.save()
+
+        # 팀단위 추가.
+        if indv_div == 'T':
+            for i in range(0,apl_max_team):
+                anst2 = request.POST.get('que_team'+str(i+1), None)
+                ques_no = request.POST.get('ques_no_team'+str(i+1), None)
+
+                model_instance2 = mp_team_ans(
+                    mp_id=mp_id, 
+                    test_div='10', 
+                    team_no=team_no,                    
+                    ques_no=ques_no,
+                    team_id=team_id,
+                    team_nm=team_nm,
+                    sort_seq =i+1,
+                    ans_t2=anst2,
+                    ans_div='2',
+                    ins_id=apl_id,
+                    ins_ip=str(client_ip),
+                    ins_dt=datetime.datetime.today()
+                    )
+                model_instance2.save()
 
 
         # mp_mntr/ms_apl  -> mp_id만 조건 걸어서 count(*)
