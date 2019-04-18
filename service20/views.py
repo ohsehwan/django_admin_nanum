@@ -8987,7 +8987,7 @@ class MP0101M_adm_team_quest(generics.ListAPIView):
         l_user_id = request.GET.get('user_id', None)           
         l_exist = mp_sub.objects.filter(mp_id=key1).exists()
         
-        query = "select B.std_detl_code,B.std_detl_code_nm,B.rmrk,A.* from service20_mp_team_ans A, service20_com_cdd B where A.ques_no = B.std_detl_code and B.use_indc = 'Y' and B.std_grp_code in (select att_cdh from service20_mp_sub where att_id='MS0026' and mp_id = '"+str(key1)+"') and A.mp_id = '"+str(key1)+"' and apl_id = '"+str(l_user_id)+"'"
+        query = "select B.std_detl_code,B.std_detl_code_nm,B.rmrk,A.* from service20_mp_team_ans A, service20_com_cdd B where A.ques_no = B.std_detl_code and B.use_indc = 'Y' and B.std_grp_code in (select att_cdh from service20_mp_sub where att_id='MS0026' and mp_id = '"+str(key1)+"') and A.mp_id = '"+str(key1)+"' and A.team_no in (select team_id from service20_mp_mtr where apl_id = '"+str(l_user_id)+"' and mp_id = '"+str(key1)+"')"
         queryset = mp_ans.objects.raw(query)
 
         
