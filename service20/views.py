@@ -6864,6 +6864,7 @@ def MP0101M_adm_update(request):
     mp_id = request.POST.get('mp_id', "")
     apl_id = request.POST.get('apl_id', "")
     apl_no = request.POST.get('apl_no', "")
+    team_no = request.POST.get('team_no', "")
     acpt_cncl_rsn = request.POST.get('acpt_cncl_rsn', "")
 
     ins_id = request.POST.get('ins_id', "")
@@ -6876,9 +6877,11 @@ def MP0101M_adm_update(request):
     upd_pgm = request.POST.get('upd_pgm', "")
 
     maxRow = request.POST.get('maxRow', 0)
+    maxTeamRow = request.POST.get('maxTeamRow', 0)
     client_ip = request.META['REMOTE_ADDR']
 
     apl_max = int(maxRow)
+    apl_team_max = int(maxTeamRow)
     
 
     # update_text = " update service20_mp_mtr a "
@@ -6930,6 +6933,24 @@ def MP0101M_adm_update(request):
         # query_result = cursor.execute(update_text)
 
         mp_ans.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no),ques_no=str(ques_no)).update(ans_t2=str(ans_t2))
+
+
+    for i in range(0,apl_team_max):
+        anst2 = request.POST.get('que_team'+str(i+1), None)
+        ques_no = request.POST.get('ques_no_team'+str(i+1), None)
+        ans_t2 = request.POST.get('team_ans_t2_'+str(i+1), None)
+
+        # update_text = " update service20_mp_ans a "
+        # update_text += ' SET a.ans_t2 = " '+str(ans_t2)+' " ' 
+        # update_text += " WHERE 1=1 "
+        # update_text += " AND a.mp_id = '"+str(mp_id)+"' "
+        # update_text += " AND a.apl_no = '"+str(apl_no)+"' "
+        # update_text += " AND a.ques_no = '"+str(ques_no)+"' "
+        
+        # cursor = connection.cursor()
+        # query_result = cursor.execute(update_text)
+
+        mp_team_ans.objects.filter(mp_id=str(mp_id),team_no=str(team_no),ques_no=str(ques_no)).update(ans_t2=str(ans_t2))
 
 
     delete_text = "delete from service20_mp_mtr_fe where mp_id = '"+str(mp_id)+"' and apl_no = '"+str(apl_no)+"'"
@@ -7118,6 +7139,7 @@ def MP0101M_adm_update(request):
     context = {'message': 'Ok'}
 
     return JsonResponse(context,json_dumps_params={'ensure_ascii': True}) 
+
 
 # 멘토링 프로그램 cancle
 @csrf_exempt
@@ -8652,7 +8674,7 @@ class MP0101M_admin_service_team_atc(generics.ListAPIView):
 @csrf_exempt
 def MP0101M_service_team_update(request):
     l_mp_id = request.POST.get('mp_id', "")    
-    l_apl_no = request.POST.get('apl_no', "")
+    l_apl_no = request.POST.get('apl_no_team', "")
     l_length = request.POST.get('over_service_length', "")
     l_att_cdd = list()
     l_att_cdh = list()
@@ -8667,19 +8689,19 @@ def MP0101M_service_team_update(request):
     chk_cnt = 0
     for i in range(0,int(l_length)):
         # l_att_cdd.append(request.POST.get('select_'+str(i), ""))
-        l_att_cdh.append(request.POST.get('att_cdh'+str(i), ""))
-        l_chc_tp.append(request.POST.get('chc_tp'+str(i), ""))
-        l_chc_no.append(request.POST.get('chc_no'+str(i), ""))
-        l_seq.append(request.POST.get('seq'+str(i), ""))
+        l_att_cdh.append(request.POST.get('att_cdh_team'+str(i), ""))
+        l_chc_tp.append(request.POST.get('chc_tp_team'+str(i), ""))
+        l_chc_no.append(request.POST.get('chc_no_team'+str(i), ""))
+        l_seq.append(request.POST.get('seq_team'+str(i), ""))
 
         if l_chc_tp[i] == '1':
-            l_att_cdd.append(request.POST.get('service_combo'+str(com_cnt), ""))
+            l_att_cdd.append(request.POST.get('service_team_combo'+str(com_cnt), ""))
             com_cnt = com_cnt + 1
         elif l_chc_tp[i] == '3':
-            l_att_cdd.append(request.POST.get('service_chkbox'+str(chk_cnt), ""))
+            l_att_cdd.append(request.POST.get('service_team_chkbox'+str(chk_cnt), ""))
             chk_cnt = chk_cnt + 1
         else:
-            l_att_cdd.append(request.POST.get('service_select'+str(sel_cnt), ""))
+            l_att_cdd.append(request.POST.get('service_team_select'+str(sel_cnt), ""))
             sel_cnt = sel_cnt + 1
     
         print("l_att_cdd===" + l_att_cdd[i])
@@ -8739,14 +8761,14 @@ def MP0101M_team_upload_update(request):
     req = request
     DIR = os.getcwd()
     UPLOAD_DIR = str(DIR) + '/media/MP0101M/'
-    UPLOAD_DIR = '/NANUM/www/img/atc/'
+    UPLOAD_DIR = '/NANUM/www/img/atc_team/'
     # UPLOAD_DIR = 'img'
     
     if request.method == 'POST':
         l_mp_id = request.POST.get("mp_id")
-        l_apl_no = request.POST.get("apl_no")
+        l_apl_no = request.POST.get("apl_no_team")
         l_apl_id = request.POST.get("apl_id") 
-        l_length = request.POST.get("upload_length")
+        l_length = request.POST.get("upload_team_length")
         ins_id = request.POST.get('ins_id', "")
         ins_ip = request.POST.get('ins_ip', "")
         ins_dt = request.POST.get('ins_dt', "")
@@ -8766,17 +8788,17 @@ def MP0101M_team_upload_update(request):
         l_upload_no = list()
 
         for i in range(0,int(l_length)):
-            l_att_cdd.append(request.POST.get('att_cdd_up'+str(i), ""))
-            l_service_upload_text.append(request.POST.get('service_upload_text'+str(i), ""))
-            l_service_upload.append(request.POST.get('service_upload'+str(i), ""))
-            l_att_cdh.append(request.POST.get('att_cdh_up'+str(i), ""))
-            l_atc_seq.append(request.POST.get('atc_seq'+str(i), ""))
-            l_upload_no.append(request.POST.get('upload_no'+str(i), ""))
+            l_att_cdd.append(request.POST.get('att_cdd_up_team'+str(i), ""))
+            l_service_upload_text.append(request.POST.get('service_team_upload_text'+str(i), ""))
+            l_service_upload.append(request.POST.get('service_team_upload'+str(i), ""))
+            l_att_cdh.append(request.POST.get('att_cdh_up_team'+str(i), ""))
+            l_atc_seq.append(request.POST.get('atc_seq_team'+str(i), ""))
+            l_upload_no.append(request.POST.get('upload_no_team'+str(i), ""))
 
             print("l_upload=====" + str(l_upload_no[i]) + "    i=====" + str(i))
 
             if(str(l_upload_no[i]) == str(i)):
-                file = request.FILES['service_upload' + str(i)]
+                file = request.FILES['service_team_upload' + str(i)]
                 print(file)
                 filename = file._name
                 n_filename = str(l_mp_id) + str(l_apl_id) + str(l_att_cdh[i]) + str(l_att_cdd[i]) + os.path.splitext(filename)[1]
@@ -8790,7 +8812,7 @@ def MP0101M_team_upload_update(request):
 
                 cursor = connection.cursor()
                 fullFile = str(UPLOAD_DIR) + str(n_filename)
-                fullFile = "/img/atc/"+ str(n_filename)
+                fullFile = "/img/atc_team/"+ str(n_filename)
 
                 # atc_flag = mp_mtr_atc.objects.filter(mp_id=l_mp_id,apl_no=l_apl_no,atc_cdd=l_att_cdd[i]).exists()
                 query = " select * from service20_mp_team_atc where mp_id = '" + str(l_mp_id) + "' and team_no = '" + str(l_apl_no) + "' and atc_cdh = '" + str(l_att_cdh[i]) + "' and atc_cdd = '" + str(l_att_cdd[i]) + "'"
