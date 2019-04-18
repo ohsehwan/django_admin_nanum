@@ -12327,6 +12327,7 @@ class MP0107_list(generics.ListAPIView):
         l_yr = request.GET.get('yr', "")
         l_apl_term = request.GET.get('apl_term', "")
         l_mp_id = request.GET.get('mp_id', "")
+        l_status = request.GET.get('status', "")
 
         queryset = self.get_queryset()
 
@@ -12371,10 +12372,12 @@ class MP0107_list(generics.ListAPIView):
         query += "   and t2.yr = '"+l_yr+"' "
         query += "   and t2.apl_term = '"+l_apl_term+"' "
         query += "   and t1.mp_id like Ifnull(Nullif('" + str(l_mp_id) + "', ''), '%%')  "
+        query += "   and t1.status = '"+l_status+"' "
         query += " order by t2.yr desc "
         query += "     , t2.apl_term desc "
         query += "     , t2.status "
 
+        print(query)
         queryset = mp_mtr.objects.raw(query)
 
         serializer_class = self.get_serializer_class()
