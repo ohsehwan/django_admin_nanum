@@ -288,6 +288,8 @@ urlpatterns = [
     path('MP0101M/service/team/sub/', MP0101M_service_team_sub.as_view(), name='MP0101M_service_team_sub'),
     # 멘토링 프로그램 - 해외봉사활동 프로그램 (콤보)
     path('MP0101M/service/team/combo/', MP0101M_service_team_combo.as_view(), name='MP0101M_service_team_combo'),
+    # 멘토링 프로그램(관리자) - 질문
+    path('MP0101M/admin/team/quest/', MP0101M_adm_team_quest.as_view(), name='MP0101M_adm_team_quest'),
     ########################################################################################
     # 멘토링 프로그램(MP0101M - END )
     #
