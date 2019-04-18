@@ -8675,7 +8675,7 @@ class MP0101M_admin_service_team_atc(generics.ListAPIView):
 def MP0101M_service_team_update(request):
     l_mp_id = request.POST.get('mp_id', "")    
     l_apl_no = request.POST.get('team_no', "")
-    l_length = request.POST.get('over_service_length', "")
+    l_length = request.POST.get('over_service_team_length', "")
     l_att_cdd = list()
     l_att_cdh = list()
     l_chc_tp = list()
