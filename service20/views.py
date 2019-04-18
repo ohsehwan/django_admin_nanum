@@ -8514,6 +8514,7 @@ class MP0101M_admin_service_team_chc(generics.ListAPIView):
     def list(self, request):
         l_mp_id = request.GET.get('mp_id', "")
         l_apl_no = request.GET.get('apl_no', "")
+        l_team_no = request.GET.get('team_no', "")
 
         query = " select id as id "
         query += "     , mp_id as mp_id "
@@ -8528,7 +8529,7 @@ class MP0101M_admin_service_team_chc(generics.ListAPIView):
         query += "     , ques_no as ques_no "
         query += "  from service20_mp_team_chc "
         query += " where mp_id = '" + l_mp_id + "' "
-        query += "   and team_no = '"+ l_apl_no + "'"
+        query += "   and team_no = '"+ l_team_no + "'"
         query += " order by chc_no, chc_seq "
 
         queryset = mp_chc.objects.raw(query)
@@ -8558,6 +8559,7 @@ class MP0101M_admin_service_team_atc(generics.ListAPIView):
     def list(self, request):
         l_mp_id = request.GET.get('mp_id', "")
         l_apl_no = request.GET.get('apl_no', "")
+        l_team_no = request.GET.get('team_no', "")
 
         query = " select id as id "
         query += "     , mp_id as mp_id "
@@ -8570,7 +8572,7 @@ class MP0101M_admin_service_team_atc(generics.ListAPIView):
         query += "     , atc_file_url as atc_file_url "
         query += "  from service20_mp_team_atc "
         query += " where mp_id = '" + l_mp_id + "' "
-        query += "   and team_no = '" + l_apl_no + "' "
+        query += "   and team_no = '" + l_team_no + "' "
         query += "   and atc_cdh = 'MP0105' "
         query += " order by atc_seq "
 
