@@ -8674,7 +8674,7 @@ class MP0101M_admin_service_team_atc(generics.ListAPIView):
 @csrf_exempt
 def MP0101M_service_team_update(request):
     l_mp_id = request.POST.get('mp_id', "")    
-    l_apl_no = request.POST.get('apl_no_team', "")
+    l_apl_no = request.POST.get('team_no', "")
     l_length = request.POST.get('over_service_length', "")
     l_att_cdd = list()
     l_att_cdh = list()
@@ -8766,7 +8766,7 @@ def MP0101M_team_upload_update(request):
     
     if request.method == 'POST':
         l_mp_id = request.POST.get("mp_id")
-        l_apl_no = request.POST.get("apl_no_team")
+        l_apl_no = request.POST.get("team_no")
         l_apl_id = request.POST.get("apl_id") 
         l_length = request.POST.get("upload_team_length")
         ins_id = request.POST.get('ins_id', "")
