@@ -6598,6 +6598,7 @@ class MP0101M_adm_list_Serializer(serializers.ModelSerializer):
     statusCode = serializers.SerializerMethodField()
     status_nm = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
+    indv_div = serializers.SerializerMethodField()
     acpt_dt = serializers.DateTimeField(format='%Y-%m-%d')
     intv_dt = serializers.DateTimeField(format='%Y-%m-%d')
 
@@ -6625,6 +6626,8 @@ class MP0101M_adm_list_Serializer(serializers.ModelSerializer):
         return obj.status_nm
     def get_status(self,obj):
         return obj.status
+    def get_indv_div(self,obj):
+        return obj.indv_div
 
 class MP0101M_adm_list(generics.ListAPIView):
     queryset = mp_mtr.objects.all()
@@ -6647,6 +6650,7 @@ class MP0101M_adm_list(generics.ListAPIView):
         query += " std_grp_code = 'MP0001'  "
         query += " and use_indc = 'y'  "
         query += " and std_detl_code = C.status)) as status_nm,  "
+        query += " (select indv_div from service20_mpgm where mp_id = A.mp_id) indv_div, "
 
         query += " C.mp_name,B.pr_yr,B.pr_sch_yr,B.pr_term_div,A.* from service20_mp_mtr A left join service20_vw_nanum_stdt B on (A.apl_id = B.apl_id),service20_mpgm C where A.mp_id = C.mp_id and A.mp_id = '"+mp_ida+"' and A.apl_id='"+ida+"'"
         queryset = mp_mtr.objects.raw(query)
