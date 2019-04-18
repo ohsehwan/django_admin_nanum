@@ -58,7 +58,6 @@ urlpatterns = [
     path('com/combo/mnteCnclRsn/', com_combo_mnteCnclRsn.as_view(), name='com_combo_mnteCnclRsn'),   
     path('com/combo/repdiv/', com_combo_repdiv.as_view(), name='com_combo_repdiv'), 
     path('com/combo/com_cdd/', com_combo_com_cdd.as_view(), name='com_combo_com_cdd'), 
-    path('com/combo/program2/', com_combo_program2.as_view(), name='com_combo_program2'), 
     # 보호자승인 콤보박스
     path('com/combo/appr/', com_combo_appr.as_view(), name='com_combo_appr'),
     # 관리자승인 콤보박스
@@ -69,6 +68,10 @@ urlpatterns = [
     path('com/list/my_mentee/', com_list_my_mentee.as_view(), name='com_list_my_mentee'),
     # 프로그램 찾기
     path('com/combo/program/', com_combo_program.as_view(), name='com_combo_program'),
+    # 프로그램의 상태에 따른 프로그램 콤보박스
+    path('com/combo/program2/', com_combo_program2.as_view(), name='com_combo_program2'), 
+    # 멘토,멘티 의 상태가 활동 중인 프로그램 콤보박스
+    path('com/combo/program3/', com_combo_program3.as_view(), name='com_combo_program3'), 
 
     # 어학점수
     path('com/user/fe/', com_user_fe.as_view(), name='com_user_fe'),
