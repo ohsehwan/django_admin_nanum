@@ -5851,7 +5851,7 @@ def MP0101M_save(request):
     que5 = request.POST.get('que5', None)
     indv_div = request.POST.get('indv_div', None)
     mentoTeamMax = request.POST.get('mentoTeamMax', 0)
-    team_nm = request.POST.get('Team_memberNo', None)
+    team_nm = request.POST.get('Team_memberNo', "")
 
     ms_ida = request.POST.get('ms_id', None)
     apl_max = request.POST.get('aplMax', 0)
@@ -5899,6 +5899,9 @@ def MP0101M_save(request):
 
     team_no = int(results[0].team_no)
     team_no = team_no+1
+    # 팀단위 추가.
+    if indv_div != 'T':
+        team_no = ''
 
     print("::apl_no::")
     print(apl_no)
@@ -5947,6 +5950,7 @@ def MP0101M_save(request):
             mp_id=mp_id, 
             apl_no=apl_no, 
             mntr_id=ida,
+            team_id=str(team_no),
             apl_id=apl_id,
             apl_nm=rows.apl_nm,
             unv_cd=str(v_unv_cd),
@@ -6042,7 +6046,7 @@ def MP0101M_save(request):
                 print("::team_start::"+l_team_apl_id)
 
                 team_apl_no = mp_mtr_max
-                apl_id = l_team_apl_id
+                team_apl_id = l_team_apl_id
                 v_gen = ""
                 if str(rows.gen_cd) == "1":
                     v_gen = "M"
@@ -6064,7 +6068,7 @@ def MP0101M_save(request):
                 cursor.execute(query)    
                 results = namedtuplefetchall(cursor)    
                 team_apl_no = int(results[0].apl_no)
-                team_apl_no = apl_no+1
+                team_apl_no = team_apl_no+1
 
                 # team_no = int(results[0].team_no)
                 # team_no = team_no+1
@@ -6089,7 +6093,7 @@ def MP0101M_save(request):
 
 
                 
-                rowsChk = mp_mtr.objects.filter(apl_id=apl_id,mp_id=mp_id).exists()
+                rowsChk = mp_mtr.objects.filter(apl_id=team_apl_id,mp_id=mp_id).exists()
 
                 if rowsChk == True:
                     context = {'message': 'duplicate'}
@@ -6116,7 +6120,8 @@ def MP0101M_save(request):
                         mp_id=mp_id, 
                         apl_no=team_apl_no, 
                         mntr_id=ida,
-                        apl_id=apl_id,
+                        apl_id=team_apl_id,
+                        team_id=str(team_no),
                         apl_nm=rows.apl_nm,
                         unv_cd=str(v_unv_cd),
                         unv_nm=str(v_unv_nm),
@@ -6174,7 +6179,7 @@ def MP0101M_save(request):
                             sort_seq =i+1,
                             ans_t2='', # 내용
                             ans_div='2',
-                            ins_id=apl_id,
+                            ins_id=team_apl_id,
                             ins_ip=str(client_ip),
                             ins_dt=datetime.datetime.today()
                             )
@@ -8951,6 +8956,51 @@ class MP0101M_team_quest(generics.ListAPIView):
             return self.get_paginated_response(serializer.data)
 
         return Response(serializer.data)
+
+# 멘토링 프로그램(관리자) - 질문2
+class MP0101M_adm_team_quest_Serializer2(serializers.ModelSerializer):
+
+    std_detl_code = serializers.SerializerMethodField()
+    std_detl_code_nm = serializers.SerializerMethodField()
+    rmrk = serializers.SerializerMethodField()
+
+    class Meta:
+        model = mp_ans
+        fields = ('id','mp_id','test_div','apl_no','ques_no','apl_id','apl_nm','sort_seq','ans_t1','ans_t2','ans_t3','score','std_detl_code','std_detl_code_nm','rmrk')
+
+    def get_std_detl_code(self,obj):
+        return obj.std_detl_code
+
+    def get_std_detl_code_nm(self,obj):
+        return obj.std_detl_code_nm    
+
+    def get_rmrk(self,obj):
+        return obj.rmrk
+
+# 멘토링 프로그램(관리자) - 질문
+class MP0101M_adm_team_quest(generics.ListAPIView):
+    queryset = com_cdd.objects.all()
+    serializer_class = MP0101M_adm_team_quest_Serializer2
+    def list(self, request):
+        #mp_sub 테이블에서 질문내역 조회
+        key1 = request.GET.get('mp_id', None) 
+        l_user_id = request.GET.get('user_id', None)           
+        l_exist = mp_sub.objects.filter(mp_id=key1).exists()
+        
+        query = "select B.std_detl_code,B.std_detl_code_nm,B.rmrk,A.* from service20_mp_team_ans A, service20_com_cdd B where A.ques_no = B.std_detl_code and B.use_indc = 'Y' and B.std_grp_code in (select att_cdh from service20_mp_sub where att_id='MS0026' and mp_id = '"+str(key1)+"') and A.mp_id = '"+str(key1)+"' and apl_id = '"+str(l_user_id)+"'"
+        queryset = mp_ans.objects.raw(query)
+
+        
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)        
 #팀단위 추가!!!
 #####################################################################################
 # MP0101M - END 
