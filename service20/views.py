@@ -1898,6 +1898,60 @@ class com_combo_program2(generics.ListAPIView):
 
         return Response(serializer.data)  
 
+class com_combo_program3_Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = mpgm
+        fields = ('mp_id','status','mp_name','yr','mnt_term')
+
+
+class com_combo_program3(generics.ListAPIView):
+    queryset = com_cdd.objects.all()
+    serializer_class = com_combo_program3_Serializer
+
+    def list(self, request):
+        yr = request.GET.get('yr', "")
+        mnt_term = request.GET.get('apl_term', "")
+        user_id = request.GET.get('user_id', "")
+        status = request.GET.get('status', "")
+        login_gubun_code = request.GET.get('login_gubun_code', "")
+        queryset = self.get_queryset()
+        
+        
+        query = "select distinct"
+        query += "       t1.mp_id         /* 멘토링 프로그램id */"
+        query += "     , t1.status        /* 상태(mp0001) */"
+        query += "     , t1.mp_name       /* 멘토링 프로그램 명 */"
+        query += "     , t1.yr            /* 연도 */"
+        query += "     , t1.mnt_term      /* 활동시기 */"
+        query += "  from service20_mpgm t1"
+        query += "  left join service20_mp_mtr    t3 on (t3.mp_id     = t1.mp_id)"
+        query += "  left join service20_mp_mte    t4 on (t4.mp_id     = t3.mp_id"
+        query += "                                   and t4.apl_no    = t3.apl_no )"
+        query += " where t1.yr       = '"+str(yr)+"'"
+        query += "   and t1.mnt_term = '"+str(mnt_term)+"'"
+        query += "   and (('" + login_gubun_code + "' = 'M' and t3.status = '" + str(status) + "') "
+        query += "      or (('" + login_gubun_code + "' = 'T' or '" + login_gubun_code + "' = 'G' or '" + login_gubun_code + "' = 'E') and t4.status = '" + str(status) + "')) "
+        # query += "   and t3.status = '" + str(status) + "' "
+        query += "   and ( t4.tchr_id = '"+str(user_id)+"'"
+        query += "       or t4.grd_id  = '"+str(user_id)+"'"
+        query += "       or t4.mnte_id = '"+str(user_id)+"'"
+        query += "       or t3.apl_id = '"+str(user_id)+"' )"
+
+        print(query)
+
+        queryset = mpgm.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)  
+
 class com_list_my_mentee_Serializer(serializers.ModelSerializer):
 
     mp_plc_nm = serializers.SerializerMethodField()
