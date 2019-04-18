@@ -2148,7 +2148,7 @@ class com_combo_program(generics.ListAPIView):
         
 
         queryset = self.get_queryset()
-        
+
         query = " select A.mp_id "
         query += " , A.apl_no "
         query += " , B.mp_name "
@@ -2157,8 +2157,9 @@ class com_combo_program(generics.ListAPIView):
         query += " WHERE apl_id = '"+str(apl_id)+"' "
         query += " AND mntr_id IS NOT null "
         query += " AND A.mp_id = B.mp_id "
-        query += " AND B.status >= "+status
+        query += " AND A.status = '" + str(status) + "' "
 
+        print(query)
         queryset = mpgm.objects.raw(query)
 
         serializer_class = self.get_serializer_class()
