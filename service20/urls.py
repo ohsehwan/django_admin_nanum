@@ -58,7 +58,6 @@ urlpatterns = [
     path('com/combo/mnteCnclRsn/', com_combo_mnteCnclRsn.as_view(), name='com_combo_mnteCnclRsn'),   
     path('com/combo/repdiv/', com_combo_repdiv.as_view(), name='com_combo_repdiv'), 
     path('com/combo/com_cdd/', com_combo_com_cdd.as_view(), name='com_combo_com_cdd'), 
-    path('com/combo/program2/', com_combo_program2.as_view(), name='com_combo_program2'), 
     # 보호자승인 콤보박스
     path('com/combo/appr/', com_combo_appr.as_view(), name='com_combo_appr'),
     # 관리자승인 콤보박스
