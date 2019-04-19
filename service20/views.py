@@ -5063,6 +5063,20 @@ class MP0101M_list_chk_2_Serializer(serializers.ModelSerializer):
     def get_code(self, obj):
         return obj.code
 
+class MP0101M_list_chk_2_Serializer(serializers.ModelSerializer):
+
+    
+    name = serializers.SerializerMethodField()
+    code = serializers.SerializerMethodField()
+    class Meta:
+        model = vw_nanum_stdt
+        fields = ('name','code')
+
+    def get_name(self, obj):
+        return obj.name    
+    def get_code(self, obj):
+        return obj.code
+
 class MP0101M_list_chk_2(generics.ListAPIView):
     queryset = mpgm.objects.all()
     serializer_class = MP0101M_list_chk_2_Serializer
@@ -5081,13 +5095,12 @@ class MP0101M_list_chk_2(generics.ListAPIView):
         query += "         select IFNULL(max(cast(att_val as unsigned)),3) att_val "
         query += "           FROM service20_mp_sub t3 "
         query += "          WHERE t3.mp_id   = '"+mp_id+"' "
-        query += "            AND t3.att_id  = 'MP0071' "
-        query += "            AND t3.att_cdh = 'MP0071' "
-        query += "            AND t3.att_cdd = '10' "
+        query += "            AND t3.att_id  = 'MS0013' "
+        query += "            AND t3.att_cdh = 'MS0013' "
+        query += "            AND t3.att_cdd = '40' "
         query += "       ) t3 "
         query += "   WHERE t2.apl_id = '"+apl_id+"' "
 
-        
         queryset = vw_nanum_stdt.objects.raw(query)
         
 
@@ -8675,7 +8688,7 @@ class MP0101M_admin_service_team_atc(generics.ListAPIView):
 def MP0101M_service_team_update(request):
     l_mp_id = request.POST.get('mp_id', "")    
     l_apl_no = request.POST.get('team_no', "")
-    l_length = request.POST.get('over_service_team_length', "")
+    l_length = request.POST.get('over_service_length', "")
     l_att_cdd = list()
     l_att_cdh = list()
     l_chc_tp = list()
@@ -8695,13 +8708,13 @@ def MP0101M_service_team_update(request):
         l_seq.append(request.POST.get('seq_team'+str(i), ""))
 
         if l_chc_tp[i] == '1':
-            l_att_cdd.append(request.POST.get('service_combo_team'+str(com_cnt), ""))
+            l_att_cdd.append(request.POST.get('service_team_combo'+str(com_cnt), ""))
             com_cnt = com_cnt + 1
         elif l_chc_tp[i] == '3':
-            l_att_cdd.append(request.POST.get('service_chkbox_team'+str(chk_cnt), ""))
+            l_att_cdd.append(request.POST.get('service_team_chkbox'+str(chk_cnt), ""))
             chk_cnt = chk_cnt + 1
         else:
-            l_att_cdd.append(request.POST.get('service_select_team'+str(sel_cnt), ""))
+            l_att_cdd.append(request.POST.get('service_team_select'+str(sel_cnt), ""))
             sel_cnt = sel_cnt + 1
     
         print("l_att_cdd===" + l_att_cdd[i])
@@ -12327,7 +12340,6 @@ class MP0107_list(generics.ListAPIView):
         l_yr = request.GET.get('yr', "")
         l_apl_term = request.GET.get('apl_term', "")
         l_mp_id = request.GET.get('mp_id', "")
-        l_status = request.GET.get('status', "")
 
         queryset = self.get_queryset()
 
@@ -12372,12 +12384,10 @@ class MP0107_list(generics.ListAPIView):
         query += "   and t2.yr = '"+l_yr+"' "
         query += "   and t2.apl_term = '"+l_apl_term+"' "
         query += "   and t1.mp_id like Ifnull(Nullif('" + str(l_mp_id) + "', ''), '%%')  "
-        query += "   and t1.status = '"+l_status+"' "
         query += " order by t2.yr desc "
         query += "     , t2.apl_term desc "
         query += "     , t2.status "
 
-        print(query)
         queryset = mp_mtr.objects.raw(query)
 
         serializer_class = self.get_serializer_class()
