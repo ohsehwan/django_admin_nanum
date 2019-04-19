@@ -6071,6 +6071,31 @@ def MP0101M_save(request):
 
         # 팀단위 추가.
         if indv_div == 'T':
+            ################################## 팀 단위 mp_team 생성
+            model_instance2 = mp_team(
+                mp_id=mp_id, 
+                team_no=team_no,
+                team_nm=team_nm,
+                team_id=team_no,
+                ldr_id=apl_id,
+                apl_dt=datetime.datetime.today(),
+                status='00',
+                score1=rows.score01,
+                score2=rows.score02,
+                score3=rows.score03,
+                score4=rows.score04,
+                score5=rows.score05,
+                score6=rows.score06,
+                ins_id=apl_id,
+                ins_ip=str(client_ip),
+                ins_dt=datetime.datetime.today(),
+                upd_id=apl_id,
+                upd_ip=str(client_ip),
+                upd_dt=datetime.datetime.today()
+                )
+            model_instance2.save()
+            #######################################################
+
             for i in range(0,int(apl_max_team)):
                 anst2 = request.POST.get('que_team'+str(i+1), None)
                 ques_no = request.POST.get('ques_no_team'+str(i+1), None)
@@ -8998,6 +9023,89 @@ class MP0101M_service_team_combo(generics.ListAPIView):
             return self.get_paginated_response(serializer.data)
 
         return Response(serializer.data)
+
+# 멘토링 프로그램 리스트에서 팀 단위 status 가져오기
+class MP0101M_team_status_Serializer(serializers.ModelSerializer):
+    indv_div = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = mp_mtr
+        fields = '__all__'
+
+    def get_indv_div(self,obj):
+        return obj.indv_div
+
+
+# 멘토링 프로그램 리스트에서 팀 단위 status 가져오기
+class MP0101M_team_status(generics.ListAPIView):
+    queryset = mp_mtr.objects.all()
+    serializer_class = MP0101M_team_status_Serializer
+    def list(self, request):       
+        l_mp_id = request.GET.get('mp_id', '') 
+        l_apl_id = request.GET.get('apl_id', '')           
+
+        query = "select t1.id as id, t1.status as status "
+        query += "     , t2.indv_div as indv_div "
+        query += "  from service20_mp_mtr t1 "
+        query += "  left join service20_mpgm t2 on (t2.mp_id = t1.mp_id) "
+        query += " where t1.mp_id = '" + l_mp_id + "' "
+        query += "   and apl_id = '" + l_apl_id + "'; "
+
+        print(query)
+        queryset = mp_mtr.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
+
+# 멘토링 프로그램 팀단위 로그인id 가져오기
+class MP0101M_team_logininfo_Serializer(serializers.ModelSerializer):
+    id = serializers.SerializerMethodField()
+    user_id = serializers.SerializerMethodField()
+    user_nm = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = com_cdd
+        fields = ('id', 'user_id', 'user_nm')
+
+    def get_id(self,obj):
+        return obj.id
+    def get_user_id(self,obj):
+        return obj.user_id
+    def get_user_nm(self,obj):
+        return obj.user_nm
+
+
+# 멘토링 프로그램 팀단위 로그인id 가져오기
+class MP0101M_team_logininfo(generics.ListAPIView):
+    queryset = com_cdd.objects.all()
+    serializer_class = MP0101M_team_logininfo_Serializer
+    def list(self, request):       
+        
+        query = " select 0 as id, user_id "
+        query += "      , user_nm "
+        query += "  from vw_nanum_login "
+        query += " where user_div in ('M','S') "
+
+        print(query)
+        queryset = com_cdd.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
+
 # 멘토링 프로그램 질문유형 가져오기
 class MP0101M_team_quest_Serializer(serializers.ModelSerializer):
 
