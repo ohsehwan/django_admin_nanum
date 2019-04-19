@@ -5063,20 +5063,6 @@ class MP0101M_list_chk_2_Serializer(serializers.ModelSerializer):
     def get_code(self, obj):
         return obj.code
 
-class MP0101M_list_chk_2_Serializer(serializers.ModelSerializer):
-
-    
-    name = serializers.SerializerMethodField()
-    code = serializers.SerializerMethodField()
-    class Meta:
-        model = vw_nanum_stdt
-        fields = ('name','code')
-
-    def get_name(self, obj):
-        return obj.name    
-    def get_code(self, obj):
-        return obj.code
-
 class MP0101M_list_chk_2(generics.ListAPIView):
     queryset = mpgm.objects.all()
     serializer_class = MP0101M_list_chk_2_Serializer
