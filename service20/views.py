@@ -1930,8 +1930,12 @@ class com_combo_program3(generics.ListAPIView):
         query += "                                   and t4.apl_no    = t3.apl_no )"
         query += " where t1.yr       = '"+str(yr)+"'"
         query += "   and t1.mnt_term = '"+str(mnt_term)+"'"
-        query += "   and (('" + login_gubun_code + "' = 'M' and t3.status = '" + str(status) + "') "
-        query += "      or (('" + login_gubun_code + "' = 'T' or '" + login_gubun_code + "' = 'G' or '" + login_gubun_code + "' = 'E') and t4.status = '" + str(status) + "')) "
+        # query += "   and (('" + login_gubun_code + "' = 'M' and t3.status = '" + str(status) + "') "
+        # query += "      or (('" + login_gubun_code + "' = 'T' or '" + login_gubun_code + "' = 'G' or '" + login_gubun_code + "' = 'E') and t4.status = '" + str(status) + "')) "
+
+        query += "   and (('" + login_gubun_code + "' = 'M' and t3.status = '50') "
+        query += "      or (('" + login_gubun_code + "' = 'T' or '" + login_gubun_code + "' = 'G' or '" + login_gubun_code + "' = 'E') and t4.status = '40')) "
+
         # query += "   and t3.status = '" + str(status) + "' "
         query += "   and ( t4.tchr_id = '"+str(user_id)+"'"
         query += "       or t4.grd_id  = '"+str(user_id)+"'"
