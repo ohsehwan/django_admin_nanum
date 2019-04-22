@@ -9069,10 +9069,12 @@ class MP0101M_team_logininfo_Serializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     user_id = serializers.SerializerMethodField()
     user_nm = serializers.SerializerMethodField()
-    
+    user_brth_dt = serializers.SerializerMethodField()
+    user_sch_nm1 = serializers.SerializerMethodField()
+    user_sch_nm2 = serializers.SerializerMethodField()
     class Meta:
         model = com_cdd
-        fields = ('id', 'user_id', 'user_nm')
+        fields = ('id', 'user_id', 'user_nm','user_brth_dt','user_sch_nm1','user_sch_nm2')
 
     def get_id(self,obj):
         return obj.id
@@ -9080,7 +9082,12 @@ class MP0101M_team_logininfo_Serializer(serializers.ModelSerializer):
         return obj.user_id
     def get_user_nm(self,obj):
         return obj.user_nm
-
+    def get_user_brth_dt(self,obj):
+        return obj.user_brth_dt
+    def get_user_sch_nm1(self,obj):
+        return obj.user_sch_nm1
+    def get_user_sch_nm2(self,obj):
+        return obj.user_sch_nm2
 
 # 멘토링 프로그램 팀단위 로그인id 가져오기
 class MP0101M_team_logininfo(generics.ListAPIView):
@@ -9090,6 +9097,9 @@ class MP0101M_team_logininfo(generics.ListAPIView):
         
         query = " select 0 as id, user_id "
         query += "      , user_nm "
+        query += "      , user_brth_dt "
+        query += "      , user_sch_nm1 "
+        query += "      , user_sch_nm2 "
         query += "  from vw_nanum_login "
         query += " where user_div in ('M','S') "
 
