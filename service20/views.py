@@ -10041,6 +10041,9 @@ def MP0103M_Insert(request):
         cursor = connection.cursor()
         query_result = cursor.execute(insert_text)    
 
+
+        mp_plnd.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no),pln_no=str(pln_no)).update(mtr_desc=str(mtr_desc))
+
     context = {'message': 'Ok'}
 
     return JsonResponse(context,json_dumps_params={'ensure_ascii': True})
@@ -10126,6 +10129,8 @@ def MP0103M_Update(request):
         ####################################
         # 2번쿼리
         ####################################
+        
+        mp_plnd.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no),pln_no=str(pln_no)).update(mtr_desc=str(mtr_desc))        
 
     context = {'message': 'Ok'}
 
