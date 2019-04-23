@@ -370,7 +370,7 @@ def post_login(request):
 		query += " from service20_oth_std t1     /* 부산대학교 학생 정보 */ "              
 		query += " where t1.std_id='"+ida+"'" 
 		V_OTH_GUBUN = 'F'
-		queryset2 = oth_std.objects.raw(query2)
+		queryset2 = oth_std.objects.raw(query)
 		for var2 in queryset2:
 			print(var2.std_id)
 			# vl_cscore1 = var2.fin_scr
