@@ -94,7 +94,7 @@ def post_login(request):
 		########################################################################
 
 		# 로그인처리 - 시작                
-		query = "select t1.std_id        /* 타대생 id(학교코드+학번) */ ";
+		query = "select t1.id,t1.std_id        /* 타대생 id(학교코드+학번) */ ";
 		query += "     , t1.std_nm        /* 타대생 명 */ ";
 		query += "     , t1.std_nm_e      /* 타대생 영문명 */ ";
 		query += "     , t1.ms_id         /* 멘토스쿨id */ ";
