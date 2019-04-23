@@ -182,7 +182,7 @@ def post_login(request):
 			v_login_gubun = str(results[0].std_detl_code_nm)
 			v_user_div =  str(results[0].user_div)
 
-
+		print("::v_user_div::"+v_user_div)
 		if v_user_div == "M" or v_user_div == "S":
 			# 멘토/학생
 			context = {'message': message,
