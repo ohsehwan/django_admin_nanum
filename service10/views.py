@@ -372,7 +372,7 @@ def post_login(request):
 		V_OTH_GUBUN = 'F'
 		queryset2 = oth_std.objects.raw(query2)
 		for var2 in queryset2:
-			#print(var2.fin_scr)
+			print(var2.std_id)
 			# vl_cscore1 = var2.fin_scr
 			V_OTH_GUBUN = 'T'
 			message = "Ok"
