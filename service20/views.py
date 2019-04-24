@@ -3512,9 +3512,9 @@ class MS0101M_list_chk_2(generics.ListAPIView):
         query += "         select IFNULL(max(cast(att_val as unsigned)),3) att_val "
         query += "           FROM service20_ms_sub t3 "
         query += "          WHERE t3.ms_id   = '"+ms_id+"' "
-        query += "            AND t3.att_id  = 'MP0071' "
-        query += "            AND t3.att_cdh = 'MP0071' "
-        query += "            AND t3.att_cdd = '10' "
+        query += "            AND t3.att_id  = 'MS0013' "
+        query += "            AND t3.att_cdh = 'MS0013' "
+        query += "            AND t3.att_cdd = '40' "
         query += "       ) t3 "
         query += "   WHERE t2.apl_id = '"+apl_id+"' "
 
