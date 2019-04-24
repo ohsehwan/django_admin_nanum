@@ -3738,6 +3738,35 @@ class MS0101M_list_chk_7(generics.ListAPIView):
 
         return Response(serializer.data)
 
+class MS0101M_list_chk_8_Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = msch
+        fields = ('ms_id', 'apl_fr_dt','apl_to_dt')
+
+class MS0101M_list_chk_8(generics.ListAPIView):
+    queryset = msch.objects.all()
+    serializer_class = MS0101M_list_chk_8_Serializer
+
+    def list(self, request):
+
+        ms_id = request.GET.get('ms_id', "")
+
+        # 모집기간 체크
+        query = " SELECT ms_id, apl_fr_dt, apl_to_dt FROM service20_msch WHERE ms_id = '" + ms_id + "'"
+
+        queryset = msch.objects.raw(query)
+        
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, context={'request': request}, many=True)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
+
 class MS0101M_list_Serializer(serializers.ModelSerializer):
 
     applyFlag = serializers.SerializerMethodField()
@@ -5461,6 +5490,35 @@ class MP0101M_list_chk_7(generics.ListAPIView):
 
         return Response(serializer.data)
 
+class MP0101M_list_chk_8_Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = mpgm
+        fields = ('mp_id', 'apl_fr_dt','apl_to_dt')
+
+class MP0101M_list_chk_8(generics.ListAPIView):
+    queryset = mpgm.objects.all()
+    serializer_class = MP0101M_list_chk_8_Serializer
+
+    def list(self, request):
+
+        mp_id = request.GET.get('mp_id', "")
+
+        # 모집기간 체크
+        query = " SELECT mp_id, apl_fr_dt, apl_to_dt FROM service20_mpgm WHERE mp_id = '" + mp_id + "'"
+
+        queryset = mpgm.objects.raw(query)
+        
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, context={'request': request}, many=True)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
+
 class MP0101M_list_Serializer(serializers.ModelSerializer):
 
     applyFlag = serializers.SerializerMethodField()
@@ -6135,6 +6193,19 @@ def MP0101M_save(request):
             )
         model_instance.save()
         
+        model_instance_team_mem = mp_team_mem(
+            mp_id=mp_id, 
+            team_id=str(team_no),
+            apl_no=apl_no,
+            ins_id=apl_id,
+            ins_ip=str(client_ip),
+            ins_dt=datetime.datetime.today(),
+            upd_id=apl_id,
+            upd_ip=str(client_ip),
+            upd_dt=datetime.datetime.today(),
+            )
+        model_instance_team_mem.save()
+
         apl_max = int(apl_max)
 
         for i in range(0,apl_max):
@@ -6329,7 +6400,176 @@ def MP0101M_save(request):
                         ins_dt=datetime.datetime.today()
                         )
                     model_instance.save()
-                    
+
+                    model_instance_team_mem = mp_team_mem(
+                        mp_id=mp_id, 
+                        team_id=str(team_no),
+                        apl_no=team_apl_no,
+                        ins_id=apl_id,
+                        ins_ip=str(client_ip),
+                        ins_dt=datetime.datetime.today(),
+                        upd_id=apl_id,
+                        upd_ip=str(client_ip),
+                        upd_dt=datetime.datetime.today(),
+                        )
+                    model_instance_team_mem.save()
+
+                    # -- 생성_어학(mp_mtr_fe)_FROM_vw_nanum_foreign_exam
+
+                    update_text = " insert into service20_mp_mtr_fe     /* 프로그램 지원자(멘토) 어학 리스트 */ "
+                    update_text += "      ( mp_id          /* 멘토링 프로그램id */ "
+                    update_text += "      , apl_no         /* 지원 no */ "
+                    update_text += "      , fe_no          /* 어학점수 no */ "
+                    update_text += "      , apl_id         /* 학번 */ "
+                    update_text += "      , apl_nm         /* 성명 */ "
+                    update_text += "      , lang_kind_cd   /* 어학종류코드 */ "
+                    update_text += "      , lang_kind_nm   /* 어학종류명 */ "
+                    update_text += "      , lang_cd        /* 어학상위코드 */ "
+                    update_text += "      , lang_nm        /* 어학상위코드명 */ "
+                    update_text += "      , lang_detail_cd /* 어학하위코드 */ "
+                    update_text += "      , lang_detail_nm /* 어학하위코드명 */ "
+                    update_text += "      , frexm_cd       /* 외국어시험 코드 */ "
+                    update_text += "      , frexm_nm       /* 외국어시험명 */ "
+                    update_text += "      , score          /* 시험점수 */ "
+                    update_text += "      , grade          /* 시험등급 */ "
+                    update_text += "      , ins_id         /* 입력자id */ "
+                    update_text += "      , ins_ip         /* 입력자ip */ "
+                    update_text += "      , ins_dt         /* 입력일시 */ "
+                    update_text += "      , ins_pgm        /* 입력프로그램id */ "
+                    update_text += " ) "
+                    update_text += " select '"+str(mp_id)+"' AS mp_id "
+                    update_text += "      , '"+str(team_apl_no)+"' apl_no         /* 지원 no */ "
+                    update_text += "      , @curRank := @curRank +1 AS fe_no  "
+                    update_text += "      , t1.apl_id         /* 학번 */ "
+                    update_text += "      , t1.apl_nm         /* 성명 */ "
+                    update_text += "      , t1.lang_kind_cd   /* 어학종류코드 */ "
+                    update_text += "      , t1.lang_kind_nm   /* 어학종류명 */ "
+                    update_text += "      , t1.lang_cd        /* 어학상위코드 */ "
+                    update_text += "      , t1.lang_nm        /* 어학상위코드명 */ "
+                    update_text += "      , t1.lang_detail_cd /* 어학하위코드 */ "
+                    update_text += "      , t1.lang_detail_nm /* 어학하위코드명 */ "
+                    update_text += "      , '0' frexm_cd       /* 외국어시험 코드 */ "
+                    update_text += "      , t1.frexm_nm       /* 외국어시험명 */ "
+                    update_text += "      , t1.score          /* 시험점수 */ "
+                    update_text += "      , t1.grade          /* 시험등급 */ "
+                    update_text += "      , '"+team_apl_id+"' ins_id         /* 입력자id */ "
+                    update_text += "      , '"+str(client_ip)+"' ins_ip         /* 입력자ip */ "
+                    update_text += "      , NOW() ins_dt         /* 입력일시 */ "
+                    update_text += "      , 'c' ins_pgm        /* 입력프로그램id */ "
+                    update_text += "   FROM service20_vw_nanum_foreign_exam t1     /* 유효한 외국어 성적 리스트 view(임시) */ "
+                    update_text += "      , (SELECT @curRank := 0) r "
+                    update_text += "  WHERE 1=1 "
+                    update_text += "    AND t1.apl_id = '"+team_apl_id+"' "
+                    print("::_FROM_vw_nanum_foreign_exam::")
+                    print(update_text) 
+                    cursor = connection.cursor()
+                    query_result = cursor.execute(update_text)    
+
+
+                    # -- 생성_봉사(mp_mtr_sa)_FROM_vw_nanum_foreign_exam
+
+                    update_text = "insert into service20_mp_mtr_sa     /* 프로그램 지원자(멘토) 봉사 리스트 */ "
+                    update_text += "     ( mp_id           /* 멘토링 프로그램id */ "
+                    update_text += "     , apl_no          /* 지원 no */ "
+                    update_text += "     , sa_no           /* 어학점수 no */ "
+                    update_text += "     , apl_id          /* 학번 */ "
+                    update_text += "     , apl_nm          /* 성명 */ "
+                    update_text += "     , nation_inout_cd /* 국내외구분코드 */ "
+                    update_text += "     , nation_inout_nm /* 국내외구분명 */ "
+                    update_text += "     , sch_inout_cd    /* 교내외구분코드 */ "
+                    update_text += "     , sch_inout_nm    /* 교내외구분명 */ "
+                    update_text += "     , activity_nm     /* 봉사명 */ "
+                    update_text += "     , manage_org_nm   /* 주관기관명 */ "
+                    update_text += "     , start_date      /* 시작일자 */ "
+                    update_text += "     , start_time      /* 시작시간 */ "
+                    update_text += "     , end_date        /* 종료일자 */ "
+                    update_text += "     , end_time        /* 종료시간 */ "
+                    update_text += "     , tot_time        /* 총시간 */ "
+                    update_text += "     , ins_id          /* 입력자id */ "
+                    update_text += "     , ins_ip          /* 입력자ip */ "
+                    update_text += "     , ins_dt          /* 입력일시 */ "
+                    update_text += "     , ins_pgm         /* 입력프로그램id */ "
+                    update_text += ") "
+                    update_text += "select '"+str(mp_id)+"' AS mp_id "
+                    update_text += "     , '"+str(team_apl_no)+"' apl_no         /* 지원 no */ "
+                    update_text += "     , @curRank := @curRank +1 AS sa_no "
+                    update_text += "     , t1.apl_id          /* 학번 */ "
+                    update_text += "     , t1.apl_nm          /* 성명 */ "
+                    update_text += "     , t1.nation_inout_cd /* 국내외구분코드 */ "
+                    update_text += "     , t1.nation_inout_nm /* 국내외구분명 */ "
+                    update_text += "     , t1.sch_inout_cd    /* 교내외구분코드 */ "
+                    update_text += "     , t1.sch_inout_nm    /* 교내외구분명 */ "
+                    update_text += "     , t1.activity_nm     /* 봉사명 */ "
+                    update_text += "     , t1.manage_org_nm   /* 주관기관명 */ "
+                    update_text += "     , t1.start_date      /* 시작일자 */ "
+                    update_text += "     , t1.start_time      /* 시작시간 */ "
+                    update_text += "     , t1.end_date        /* 종료일자 */ "
+                    update_text += "     , t1.end_time        /* 종료시간 */ "
+                    update_text += "     , t1.tot_time        /* 총시간 */ "
+                    update_text += "     , '"+team_apl_id+"' ins_id         /* 입력자id */ "
+                    update_text += "     , '"+str(client_ip)+"' ins_ip         /* 입력자ip */ "
+                    update_text += "     , NOW() ins_dt         /* 입력일시 */ "
+                    update_text += "     , 'c' ins_pgm        /* 입력프로그램id */ "
+                    update_text += "  FROM service20_vw_nanum_service_activ t1     /* 학생 봉사 시간 view(임시) */ "
+                    update_text += "     , (SELECT @curRank := 0) r "
+                    update_text += " WHERE 1=1 "
+                    update_text += "   AND t1.apl_id = '"+team_apl_id+"' "
+                    print("::_FROM_vw_nanum_foreign_exam::")
+                    print(update_text) 
+                    cursor = connection.cursor()
+                    query_result = cursor.execute(update_text)    
+
+                    # query = " select b.* from service20_vw_nanum_stdt a where a.apl_id = '"+apl_id+"' "
+                    # cursor = connection.cursor()
+                    # query_result = cursor.execute(query)  
+                    # results_st = namedtuplefetchall(cursor)  
+                    # v_dept_cd = results_st[0].dept_cd
+                    # v_mjr_cd = results_st[0].mjr_cd
+
+
+                    # -- 생성_자격증(mp_mtr_lc)_FROM_service20_vw_nanum_license
+
+                    update_text = "insert into service20_mp_mtr_lc      "
+                    update_text += "     ( mp_id           /* 멘토링 프로그램id */ "
+                    update_text += "     , apl_no          /* 지원 no */ "
+                    update_text += "     , lc_no           /* 자격 no */ "
+                    update_text += "     , apl_id          /* 학번 */ "
+                    update_text += "     , apl_nm          /* 성명 */ "
+                    update_text += "     , license_large_cd  "
+                    update_text += "     , license_large_nm  "
+                    update_text += "     , license_small_cd     "
+                    update_text += "     , license_small_nm     "
+                    update_text += "     , license_cd      "
+                    update_text += "     , license_nm    "        
+                    update_text += "     , ins_id          /* 입력자id */ "
+                    update_text += "     , ins_ip          /* 입력자ip */ "
+                    update_text += "     , ins_dt          /* 입력일시 */ "
+                    update_text += "     , ins_pgm         /* 입력프로그램id */ "
+                    update_text += ") "
+                    update_text += "select '"+str(mp_id)+"' AS mp_id "
+                    update_text += "     , '"+str(team_apl_no)+"' apl_no         /* 지원 no */ "
+                    update_text += "     , @curRank := @curRank +1 AS lc_no "
+                    update_text += "     , t1.apl_id          /* 학번 */ "
+                    update_text += "     , t1.apl_nm          /* 성명 */ "
+                    update_text += "     , t1.license_large_cd  "
+                    update_text += "     , t1.license_large_nm  "
+                    update_text += "     , t1.license_small_cd     "
+                    update_text += "     , t1.license_small_nm     "
+                    update_text += "     , t1.license_cd      "
+                    update_text += "     , t1.license_nm    "        
+                    update_text += "     , '"+team_apl_id+"' ins_id         /* 입력자id */ "
+                    update_text += "     , '"+str(client_ip)+"' ins_ip         /* 입력자ip */ "
+                    update_text += "     , NOW() ins_dt         /* 입력일시 */ "
+                    update_text += "     , 'c' ins_pgm        /* 입력프로그램id */ "
+                    update_text += "  FROM service20_vw_nanum_license t1      "
+                    update_text += "     , (SELECT @curRank := 0) r "
+                    update_text += " WHERE 1=1 "
+                    update_text += "   AND t1.apl_id = '"+team_apl_id+"' "
+                    print("::_FROM_service20_vw_nanum_license::")
+                    print(update_text) 
+                    cursor = connection.cursor()
+                    query_result = cursor.execute(update_text)  
+
                     apl_max = int(apl_max)
 
                     for i in range(0,apl_max):
@@ -7989,34 +8229,109 @@ def MP0101M_service_update(request):
 
     client_ip = request.META['REMOTE_ADDR']
     
-    for i in range(0,int(l_length)):
-        query = "  update service20_mp_chc "
-        query += "     set att_cdd = '" + str(l_att_cdd[i]) + "' "
-        query += "       , chc_val = (select t1.att_val  "
-        query += "                      from service20_mp_sub t1 "
-        query += "                     where t1.mp_id = '" + str(l_mp_id) + "' "
-        query += "                       and t1.att_id = 'MP0090' "
-        query += "                       and t1.att_cdh = '" + str(l_att_cdh[i]) + "' "
-        query += "                       and t1.att_cdd = '" + str(l_att_cdd[i]) + "' "
-        query += "                       and t1.use_yn = 'Y') "
-        query += "       , chc_seq = '" + l_seq[i] + "' "
-        query += "       , ques_no = (select t2.sort_seq  "
-        query += "                      from service20_mp_sub t2 "
-        query += "                     where t2.mp_id = '" + str(l_mp_id) + "' "
-        query += "                       and t2.att_id = 'MP0090' "
-        query += "                       and t2.att_cdh = '" + str(l_att_cdh[i]) + "' "
-        query += "                       and t2.att_cdd = '" + str(l_att_cdd[i]) + "' "
-        query += "                       and t2.use_yn = 'Y') "
-        query += "       , upd_id = '" + str(upd_id) + "' "
-        query += "       , upd_ip = '" + str(client_ip) + "' "
-        query += "       , upd_dt = now() "
-        query += "       , upd_pgm = '" + str(upd_pgm) + "' "
-        query += "   where mp_id = '" + str(l_mp_id) + "' "
-        query += "     and apl_no = '" + str(l_apl_no) + "' "
-        query += "     and chc_no = '" + str(l_chc_no[i]) + "' "
-        
+    query = " SELECT count(0) as up_cnt FROM service20_mp_chc WHERE mp_id = '" + l_mp_id + "' AND apl_no = '" + l_apl_no + "'"
+    cursor = connection.cursor()
+    cursor.execute(query)    
+    results = namedtuplefetchall(cursor)    
+    up_cnt = int(results[0].up_cnt)
+
+    # 저장된 선택사항과 mp_sub에 관리되는 선택사항의 개수가 일치할 때는 update
+    if l_length == up_cnt:
+        # update
+        for i in range(0,int(l_length)):
+            query = "  update service20_mp_chc "
+            query += "     set att_cdd = '" + str(l_att_cdd[i]) + "' "
+            query += "       , chc_val = (select t1.att_val  "
+            query += "                      from service20_mp_sub t1 "
+            query += "                     where t1.mp_id = '" + str(l_mp_id) + "' "
+            query += "                       and t1.att_id = 'MP0090' "
+            query += "                       and t1.att_cdh = '" + str(l_att_cdh[i]) + "' "
+            query += "                       and t1.att_cdd = '" + str(l_att_cdd[i]) + "' "
+            query += "                       and t1.use_yn = 'Y') "
+            query += "       , chc_seq = '" + l_seq[i] + "' "
+            query += "       , ques_no = (select t2.sort_seq  "
+            query += "                      from service20_mp_sub t2 "
+            query += "                     where t2.mp_id = '" + str(l_mp_id) + "' "
+            query += "                       and t2.att_id = 'MP0090' "
+            query += "                       and t2.att_cdh = '" + str(l_att_cdh[i]) + "' "
+            query += "                       and t2.att_cdd = '" + str(l_att_cdd[i]) + "' "
+            query += "                       and t2.use_yn = 'Y') "
+            query += "       , upd_id = '" + str(upd_id) + "' "
+            query += "       , upd_ip = '" + str(client_ip) + "' "
+            query += "       , upd_dt = now() "
+            query += "       , upd_pgm = '" + str(upd_pgm) + "' "
+            query += "   where mp_id = '" + str(l_mp_id) + "' "
+            query += "     and apl_no = '" + str(l_apl_no) + "' "
+            query += "     and chc_no = '" + str(l_chc_no[i]) + "' "
+            
+            print(query)
+            cursor = connection.cursor()
+            query_result = cursor.execute(query)
+    # 저장된 선택사항과 mp_sub에 관리되는 선택사항의 개수가 일치하지 않을 때는 기존꺼 전체 0delete 후 전체 isnert
+    else:
+        # delete
+        query = " delete FROM service20_mp_chc WHERE mp_id = '" + l_mp_id + "' AND apl_no = '" + l_apl_no + "'"
         cursor = connection.cursor()
-        query_result = cursor.execute(query) 
+        cursor.execute(query)    
+
+        # insert
+        for i in range(0,int(l_length)):
+            query = " insert "
+            query += "    into "
+            query += "        service20_mp_chc(mp_id "
+            query += "        , apl_no "
+            query += "        , chc_no "
+            query += "        , att_id "
+            query += "        , att_cdh "
+            query += "        , att_cdd "
+            query += "        , chc_tp "
+            query += "        , chc_val "
+            query += "        , chc_seq "
+            query += "        , ques_no "
+            query += "        , ins_id "
+            query += "        , ins_ip "
+            query += "        , ins_dt "
+            query += "        , ins_pgm "
+            query += "        , upd_id "
+            query += "        , upd_ip "
+            query += "        , upd_dt "
+            query += "        , upd_pgm) "
+            query += "    values ( "
+            query += "    '" + str(l_mp_id) + "'"
+            query += "    , '" + str(l_apl_no) + "'"
+            query += "    , (select ifnull(max(t1.chc_no), 0) + 1 from service20_mp_chc t1 where t1.mp_id = '" + str(l_mp_id) + "' and t1.apl_no = '" + str(l_apl_no) + "')"
+            query += "    , 'MP0090' "
+            query += "    , '" + str(l_att_cdh[i]) + "'"
+            query += "    , '" + str(l_att_cdd[i]) + "'"
+            query += "    , '" + str(l_chc_tp[i]) + "'"
+            query += "    , (select t2.att_val  /* 선택형 답변 가능수      */ "
+            query += "          from service20_mp_sub t2 "
+            query += "         where t2.mp_id   = '" + str(l_mp_id) + "'"
+            query += "           and t2.att_id  = 'MP0090' /* 선택형 질문             */ "
+            query += "           and t2.att_cdh = '" + str(l_att_cdh[i]) + "' /* 선택형 질문 유형        */ "
+            query += "           and t2.att_cdd = '" + str(l_att_cdd[i]) + "'"
+            query += "           and t2.use_yn  = 'Y') "
+            query += "    , '" + str(l_seq[i]) + "' "
+            query += "    , (select t3.sort_seq  /* 답변 NO      */ "
+            query += "          from service20_mp_sub t3 "
+            query += "         where t3.mp_id   = '" + str(l_mp_id) + "'"
+            query += "           and t3.att_id  = 'MP0090' /* 선택형 질문             */ "
+            query += "           and t3.att_cdh = '" + str(l_att_cdh[i]) + "' /* 선택형 질문 유형        */ "
+            query += "           and t3.att_cdd = '" + str(l_att_cdd[i]) + "'"
+            query += "           and t3.use_yn  = 'Y') "
+            query += "    , '" + str(ins_id) + "'"
+            query += "    , '" + str(client_ip) + "'"
+            query += "    , now() "
+            query += "    , '" + str(ins_pgm) + "'"
+            query += "    , '" + str(upd_id) + "'"
+            query += "    , '" + str(client_ip) + "'"
+            query += "    , now() "
+            query += "    , '" + str(upd_pgm) + "'"
+            query += " ) "
+
+            print(query)
+            cursor = connection.cursor()
+            query_result = cursor.execute(query)
 
     context = {'message': 'Ok'}
 
