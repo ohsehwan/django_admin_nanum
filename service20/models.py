@@ -1050,7 +1050,8 @@ class mpgm(models.Model):
   upd_dt = models.DateTimeField(null=True, blank=True, verbose_name='수정일시' )
   upd_pgm = models.CharField(max_length=20, null=True, blank=True, verbose_name='수정프로그램ID' )
   indv_div = models.CharField(max_length=1, default='N', verbose_name='개인/팀여부(MP0057)' )
-  mem_cnt = models.PositiveIntegerField(default=1, verbose_name='팀원수(팀인 경우)' )
+  mem_cnt = models.PositiveIntegerField(default=1, verbose_name='팀원수(팀인 경우)-최대' )
+  mem_min = models.PositiveIntegerField(default=1, verbose_name='팀원수(팀인 경우)-최소' )
 
 
 
