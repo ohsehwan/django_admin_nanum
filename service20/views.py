@@ -6572,25 +6572,25 @@ def MP0101M_save(request):
 
                     apl_max = int(apl_max)
 
-                    for i in range(0,apl_max):
-                        anst2 = request.POST.get('que'+str(i+1), None)
-                        ques_no = request.POST.get('ques_no'+str(i+1), None)
+                    # for i in range(0,apl_max):
+                    #     anst2 = request.POST.get('que'+str(i+1), None)
+                    #     ques_no = request.POST.get('ques_no'+str(i+1), None)
 
-                        model_instance2 = mp_ans(
-                            mp_id=mp_id, 
-                            test_div='10', 
-                            apl_no=team_apl_no,
-                            ques_no=ques_no,
-                            apl_id=apl_id,
-                            apl_nm=rows.apl_nm,
-                            sort_seq =i+1,
-                            ans_t2='', # 내용
-                            ans_div='2',
-                            ins_id=team_apl_id,
-                            ins_ip=str(client_ip),
-                            ins_dt=datetime.datetime.today()
-                            )
-                        model_instance2.save()
+                    #     model_instance2 = mp_ans(
+                    #         mp_id=mp_id, 
+                    #         test_div='10', 
+                    #         apl_no=team_apl_no,
+                    #         ques_no=ques_no,
+                    #         apl_id=apl_id,
+                    #         apl_nm=rows.apl_nm,
+                    #         sort_seq =i+1,
+                    #         ans_t2='', # 내용
+                    #         ans_div='2',
+                    #         ins_id=team_apl_id,
+                    #         ins_ip=str(client_ip),
+                    #         ins_dt=datetime.datetime.today()
+                    #         )
+                    #     model_instance2.save()
         # 팀단위 종료
 
 
@@ -6937,6 +6937,7 @@ def MP0101M_detail(request):
                         'dateAplYn' : v_dateAplYn,
                         'indv_div' : rows3.indv_div,
                         'mem_cnt' : rows3.mem_cnt,
+                        'mem_min' : rows3.mem_min,
                         }
         
 
