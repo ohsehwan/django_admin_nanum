@@ -130,6 +130,90 @@ def login_login(request):
                     cursor_log = connection.cursor()
                     query_result = cursor_log.execute(query)           
                     print("login_200_error => " + str(id))
+
+                    ########################################################################
+                    # 타대학생 로그인처리 - 시작
+                    ########################################################################
+
+                    # 로그인처리 - 시작                
+                    query = "select t1.id,t1.std_id        /* 타대생 id(학교코드+학번) */ ";
+                    query += "     , t1.std_nm        /* 타대생 명 */ ";
+                    query += "     , t1.std_nm_e      /* 타대생 영문명 */ ";
+                    query += "     , t1.ms_id         /* 멘토스쿨id */ ";
+                    query += "     , t1.apl_no        /* 지원 no */ ";
+                    query += "     , t1.apl_id        /* 지원자id(학번) */ ";
+                    query += "     , t1.reg_dt        /* 등록일 */ ";
+                    query += "     , t1.unv_cd        /* 타대생 대학교 코드(mp0044) */ ";
+                    query += "     , t1.unv_nm        /* 타대생 대학교 명 */ ";
+                    query += "     , t1.cllg_cd       /* 타대생 대학 코드 */ ";
+                    query += "     , t1.cllg_nm       /* 타대생 대학 명 */ ";
+                    query += "     , t1.dept_cd       /* 타대생 학부/학과 코드 */ ";
+                    query += "     , t1.dept_nm       /* 타대생 학부/학과 명 */ ";
+                    query += "     , t1.brth_dt       /* 생년월일 */ ";
+                    query += "     , t1.gen           /* 성별 */ ";
+                    query += "     , t1.yr            /* 학년도 */ ";
+                    query += "     , t1.term_div      /* 학기 */ ";
+                    query += "     , t1.sch_yr        /* 학년 */ ";
+                    query += "     , t1.exp_dt        /* 자격 박탈일 */ ";
+                    query += "     , t1.exp_rsn       /* 박탈 사유 */ ";
+                    query += "     , t1.mob_no        /* 휴대전화 */ ";
+                    query += "     , t1.tel_no        /* 집전화 */ ";
+                    query += "     , t1.tel_no_g      /* 보호자 연락처 */ ";
+                    query += "     , t1.h_addr        /* 집주소 */ ";
+                    query += "     , t1.post_no       /* 우편번호 */ ";
+                    query += "     , t1.email_addr    /* 이메일 주소 */ ";
+                    query += "     , t1.bank_acct     /* 은행 계좌 번호 */ ";
+                    query += "     , t1.bank_cd       /* 은행 코드 */ ";
+                    query += "     , t1.bank_nm       /* 은행 명 */ ";
+                    query += "     , t1.bank_dpsr     /* 예금주 */ ";
+                    query += "     , t1.cnt_mp_a      /* 멘토링 지원 경력 */ ";
+                    query += "     , t1.cnt_mp_p      /* 멘토링 수행 경력 */ ";
+                    query += "     , t1.cnt_mp_c      /* 멘토링 완료 경력 */ ";
+                    query += "     , t1.cnt_mp_g      /* 멘토링 중도포기 경력 */ ";
+                    query += "     , t1.inv_agr_div   /* 개인정보 동의 여부 */ ";
+                    query += "     , t1.inv_agr_dt    /* 개인정보 동의 일시 */ ";
+                    query += "     , t1.dept_chr_id   /* 학과장 id */ ";
+                    query += "     , t1.dept_chr_nm   /* 학과장 명 */ ";
+                    query += "     , t1.ast_id        /* 조교 id */ ";
+                    query += "     , t1.ast_nm        /* 조교 명 */ ";
+                    query += "     , t1.dept_appr_div /* 학과 승인 여부 */ ";
+                    query += "     , t1.dept_appr_dt  /* 학과 승인 날짜 */ ";
+                    query += "     , t1.dept_retn_rsn /* 학과 반려 사유 */ ";
+                    query += "     , t1.ins_id        /* 입력자id */ ";
+                    query += "     , t1.ins_ip        /* 입력자ip */ ";
+                    query += "     , t1.ins_dt        /* 입력일시 */ ";
+                    query += "     , t1.ins_pgm       /* 입력프로그램id */ ";
+                    query += "     , t1.upd_id        /* 수정자id */ ";
+                    query += "     , t1.upd_ip        /* 수정자ip */ ";
+                    query += "     , t1.upd_dt        /* 수정일시 */ ";
+                    query += "     , t1.upd_pgm       /* 수정프로그램id */ ";
+                    query += "     , t1.mjr_cd        /* 전공코드 */ ";
+                    query += "     , t1.mjr_nm        /* 전공명 */ ";
+                    query += "     , t1.pwd           /* 비밀번호 */ ";    
+                    query += " from service20_oth_std t1     /* 부산대학교 학생 정보 */ "              
+                    query += " where t1.std_id='"+str(id)+"'" 
+                    V_OTH_GUBUN = 'F'
+                    queryset2 = oth_std.objects.raw(query)
+                    for var2 in queryset2:
+                        #print(var2.fin_scr)
+                        # vl_cscore1 = var2.fin_scr
+                        V_OTH_GUBUN = 'T'
+                        message = "Ok"
+                        context = {'message': message,
+                            'apl_id' : str(var2.std_id),
+                            'apl_nm' : str(var2.std_nm),
+                            'univ_cd' : str(var2.unv_cd),
+                            'univ_nm' : str(var2.unv_nm),
+                            'brth_dt' : str(var2.brth_dt),
+                            'gen_cd' : str(var2.gen),
+                            'gen_nm' : str(var2.gen),
+                            'login_gubun_code' : 'OTH',
+                            'login_gubun' : '타대학생'
+                            }
+                    
+                    ########################################################################
+                    # 타대학생 로그인처리 - 종료
+                    ########################################################################                    
                 else:
                     soup = bs(html, 'html.parser')
                     gbn = soup.find('input', {'name': 'gbn'}) # input태그 중에서 name이 _csrf인 것을 찾습니다.
@@ -417,6 +501,274 @@ def login_login(request):
                         # 자격증 - 종료
                         ########################################################################
 
+
+                        # 로그인처리 - 시작                
+                        query = "select t3.apl_id      /* 학번 */ "
+                        query += "     , t3.apl_nm      /* 성명 */ "
+                        query += "     , t3.apl_nm_e    /* 성명_영문 */ "
+                        query += "     , t3.unv_cd      /* 대학교코드 */ "
+                        query += "     , t3.unv_nm      /* 대학교명 */ "
+                        query += "     , t3.grad_div_cd /* 대학원구분코드 */ "
+                        query += "     , t3.grad_div_nm /* 대학원구분명 */ "
+                        query += "     , t3.cllg_cd     /* 대학코드 */ "
+                        query += "     , t3.cllg_nm     /* 대학명 */ "
+                        query += "     , t3.dept_cd     /* 학과코드 */ "
+                        query += "     , t3.dept_nm     /* 학과명 */ "
+                        query += "     , t3.mjr_cd      /* 전공코드 */ "
+                        query += "     , t3.mjr_nm      /* 전공명 */ "
+                        query += "     , t3.brth_dt     /* 생년월일 */ "
+                        query += "     , t3.gen_cd      /* 성별코드 */ "
+                        query += "     , t3.gen_nm      /* 성별명 */ "
+                        query += "     , t3.yr          /* 학년도 */ "
+                        query += "     , t3.sch_yr      /* 학년 */ "
+                        query += "     , t3.term_div    /* 학기코드 */ "
+                        query += "     , t3.term_nm     /* 학기명 */ "
+                        query += "     , t3.stds_div    /* 학적상태코드 */ "
+                        query += "     , t3.stds_nm     /* 학적상태명 */ "
+                        query += "     , t3.mob_no      /* 휴대전화번호 */ "
+                        query += "     , t3.tel_no      /* 집전화 */ "
+                        query += "     , t3.tel_no_g    /* 보호자연락처 */ "
+                        query += "     , t3.h_addr      /* 집주소 */ "
+                        query += "     , t3.post_no     /* 우편번호 */ "
+                        query += "     , t3.email_addr  /* 이메일주소 */ "
+                        query += "     , t3.bank_acct   /* 은행계좌번호 */ "
+                        query += "     , t3.bank_cd     /* 은행코드 */ "
+                        query += "     , t3.bank_nm     /* 은행명 */ "
+                        query += "     , t3.bank_dpsr   /* 예금주 */ "
+                        query += "     , t3.pr_yr       /* 직전 학년도 */ "
+                        query += "     , t3.pr_sch_yr   /* 직전 학년 */ "
+                        query += "     , t3.pr_term_div /* 직전학기코드 */ "
+                        query += "     , t3.score01     /* 직전학기 석차 */ "
+                        query += "     , t3.score02     /* 직전학기 총원 */ "
+                        query += "     , t3.score03     /* 직전학기 학점 */ "
+                        query += "     , t3.score04     /* 봉사점수합계 */ "
+                        query += "     , t3.score05     /* 자격증 개수 */ "
+                        query += "     , t3.score06     /* 직전학기 이수학점 */ "
+                        query += "     , t3.cmp_term     /* 전체 이수학기 */ "
+                        query += " from vw_nanum_stdt t3     /* 부산대학교 학생 정보 */ "              
+                        query += " where t3.apl_id='"+v_userid+"'" 
+                        # query += " where t3.apl_id='201866148'"                 
+                        conn = pymssql.connect(server='192.168.2.124', user='nanum', password='n@num*!@', database='hakjuk', port='1221')
+                        cursor = conn.cursor()   
+                        cursor.execute(query)  
+                        row = cursor.fetchone()  
+                        print(row)
+                        if row == None:
+                            context = {'loginStudent': 'fail',}
+                        else:    
+                            message = "login_notFound"
+                            while row:
+                                message = "Ok"
+                                # 삭제
+                                delete_query = " delete from service20_vw_nanum_stdt where apl_id = '"+str(row[0])+"' "
+                                cursor_delete = connection.cursor()
+                                delete_query_result = cursor_delete.execute(delete_query)                       
+                                # 삭제
+                                 
+                                # 편입생 임시처리 
+                                l_score03 = str(row[37])
+                                # if str(row[0]) == "201714544 ":
+                                #     l_score03 = "3.43"
+                                # elif str(row[0]) == "201733176 ":
+                                #     l_score03 = "3.81"
+                                # elif str(row[0]) == "201705230 ":
+                                #     l_score03 = "3.76"
+                                # 편입생 임시처리
+                                
+                                # insert
+                                insert_query = " insert into service20_vw_nanum_stdt (apl_id      /* 학번 */ "
+                                insert_query += " , apl_nm      /* 성명 */ "
+                                insert_query += " , apl_nm_e    /* 성명_영문 */ "
+                                insert_query += " , unv_cd      /* 대학교코드 */ "
+                                insert_query += " , unv_nm      /* 대학교명 */ "
+                                insert_query += " , grad_div_cd /* 대학원구분코드 */ "
+                                insert_query += " , grad_div_nm /* 대학원구분명 */ "
+                                insert_query += " , cllg_cd     /* 대학코드 */ "
+                                insert_query += " , cllg_nm     /* 대학명 */ "
+                                insert_query += " , dept_cd     /* 학과코드 */ "
+                                insert_query += " , dept_nm     /* 학과명 */ "
+                                insert_query += " , mjr_cd      /* 전공코드 */ "
+                                insert_query += " , mjr_nm      /* 전공명 */ "
+                                insert_query += " , brth_dt     /* 생년월일 */ "
+                                insert_query += " , gen_cd      /* 성별코드 */ "
+                                insert_query += " , gen_nm      /* 성별명 */ "
+                                insert_query += " , yr          /* 학년도 */ "
+                                insert_query += " , sch_yr      /* 학년 */ "
+                                insert_query += " , term_div    /* 학기코드 */ "
+                                insert_query += " , term_nm     /* 학기명 */ "
+                                insert_query += " , stds_div    /* 학적상태코드 */ "
+                                insert_query += " , stds_nm     /* 학적상태명 */ "
+                                insert_query += " , mob_no      /* 휴대전화번호 */ "
+                                insert_query += " , tel_no      /* 집전화 */ "
+                                insert_query += " , tel_no_g    /* 보호자연락처 */ "
+                                insert_query += " , h_addr      /* 집주소 */ "
+                                insert_query += " , post_no     /* 우편번호 */ "
+                                insert_query += " , email_addr  /* 이메일주소 */ "
+                                insert_query += " , bank_acct   /* 은행계좌번호 */ "
+                                insert_query += " , bank_cd     /* 은행코드 */ "
+                                insert_query += " , bank_nm     /* 은행명 */ "
+                                insert_query += " , bank_dpsr   /* 예금주 */ "
+                                insert_query += " , pr_yr       /* 직전 학년도 */ "
+                                insert_query += " , pr_sch_yr   /* 직전 학년 */ "
+                                insert_query += " , pr_term_div /* 직전학기코드 */ "
+                                insert_query += " , score01     /* 직전학기 석차 */ "
+                                insert_query += " , score02     /* 직전학기 총원 */ "
+                                insert_query += " , score03     /* 직전학기 학점 */ "
+                                insert_query += " , score04     /* 봉사점수합계 */ "
+                                insert_query += " , score05     /* 자격증 개수 */ "
+                                insert_query += " , score06     /* 직전학기 이수학점 */ "
+                                insert_query += " , cmp_term     /* 전체 이수학기 */ "
+                                insert_query += " ) values ("
+            #                   insert_query += " (select ifnull(max(id)+1,1) from service20_vw_nanum_stdt)  "
+                                insert_query += " CASE WHEN '"+str(row[0])+"' =  'None' THEN NULL ELSE '"+str(row[0])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[1])+"' =  'None' THEN NULL ELSE '"+str(row[1])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[2])+"' =  'None' THEN NULL ELSE '"+str(row[2])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[3])+"' =  'None' THEN NULL ELSE '"+str(row[3])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[4])+"' =  'None' THEN NULL ELSE '"+str(row[4])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[5])+"' =  'None' THEN NULL ELSE '"+str(row[5])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[6])+"' =  'None' THEN NULL ELSE '"+str(row[6])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[7])+"' =  'None' THEN NULL ELSE '"+str(row[7])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[8])+"' =  'None' THEN NULL ELSE '"+str(row[8])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[9])+"' =  'None' THEN NULL ELSE '"+str(row[9])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[10])+"' =  'None' THEN NULL ELSE '"+str(row[10])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[11])+"' =  'None' THEN NULL ELSE '"+str(row[11])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[12])+"' =  'None' THEN NULL ELSE '"+str(row[12])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[13])+"' =  'None' THEN NULL ELSE '"+str(row[13])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[14])+"' =  'None' THEN NULL ELSE '"+str(row[14])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[15])+"' =  'None' THEN NULL ELSE '"+str(row[15])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[16])+"' =  'None' THEN NULL ELSE '"+str(row[16])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[17])+"' =  'None' THEN NULL ELSE '"+str(row[17])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[18])+"' =  'None' THEN NULL ELSE '"+str(row[18])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[19])+"' =  'None' THEN NULL ELSE '"+str(row[19])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[20])+"' =  'None' THEN NULL ELSE '"+str(row[20])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[21])+"' =  'None' THEN NULL ELSE '"+str(row[21])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[22])+"' =  'None' THEN NULL ELSE '"+str(row[22])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[23])+"' =  'None' THEN NULL ELSE '"+str(row[23])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[24])+"' =  'None' THEN NULL ELSE '"+str(row[24])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[25])+"' =  'None' THEN NULL ELSE '"+str(row[25])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[26])+"' =  'None' THEN NULL ELSE '"+str(row[26])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[27])+"' =  'None' THEN NULL ELSE '"+str(row[27])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[28])+"' =  'None' THEN NULL ELSE '"+str(row[28])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[29])+"' =  'None' THEN NULL ELSE '"+str(row[29])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[30])+"' =  'None' THEN NULL ELSE '"+str(row[30])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[31])+"' =  'None' THEN NULL ELSE '"+str(row[31])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[32])+"' =  'None' THEN NULL ELSE '"+str(row[32])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[33])+"' =  'None' THEN NULL ELSE '"+str(row[33])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[34])+"' =  'None' THEN NULL ELSE '"+str(row[34])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[35])+"' =  'None' THEN NULL ELSE '"+str(row[35])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[36])+"' =  'None' THEN NULL ELSE '"+str(row[36])+"' END"
+                                insert_query += " , CASE WHEN '"+str(l_score03)+"' =  'None' THEN NULL ELSE '"+str(l_score03)+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[38])+"' =  'None' THEN NULL ELSE '"+str(row[38])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[39])+"' =  'None' THEN NULL ELSE '"+str(row[39])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[40])+"' =  'None' THEN NULL ELSE '"+str(row[40])+"' END"
+                                insert_query += " , CASE WHEN '"+str(row[41])+"' =  'None' THEN NULL ELSE '"+str(row[41])+"' END"
+                                insert_query += " )"                    
+                                cursor2 = connection.cursor()
+                                query_result = cursor2.execute(insert_query)    
+                                # insert
+
+                                mentor_query = " select mntr_id from service20_mentor where apl_id = '"+str(row[0])+"'"
+                                mentor_cursor = connection.cursor()
+                                query_result = mentor_cursor.execute(mentor_query)    
+
+                                if query_result == 0:
+                                    v_mntr_id = ''
+                                else:
+                                    #mentor_query
+                                    rows_mentor = mentor.objects.filter(apl_id=str(row[0]))[0]
+                                    
+                                    v_mntr_id = str(rows_mentor.mntr_id)  
+
+                                query = " select distinct A.user_id,A.user_div,B.std_detl_code_nm from vw_nanum_login as A left join service20_com_cdd as B on (B.std_grp_code = 'CM0001' and A.user_div = B.std_detl_code) "
+                                query += " where user_id = '"+str(row[0])+"'"
+                                cursor = connection.cursor()
+                                query_result = cursor.execute(query)  
+                                results = namedtuplefetchall(cursor) 
+
+                                if query_result == 0:
+                                    v_login_gubun = ''
+                                else:
+                                    v_login_gubun_code = str(results[0].user_div)
+                                    v_login_gubun = str(results[0].std_detl_code_nm)
+
+
+                                                    
+                                context = {'message': message,
+                                'apl_id' : str(row[0]),
+                                'apl_nm' : str(row[1]),
+                                'univ_cd' : str(row[3]),
+                                'univ_nm' : str(row[4]),
+                                'grad_div_cd' : str(row[5]),
+                                'grad_div_nm' : str(row[6]),
+                                'cllg_cd' : str(row[7]),
+                                'cllg_nm' : str(row[8]),
+                                'dept_cd' : str(row[9]),
+                                'dept_nm' : str(row[10]),
+                                'mjr_cd' : str(row[11]),
+                                'mjr_nm' : str(row[12]),
+                                'brth_dt' : str(row[13]),
+                                'gen_cd' : str(row[14]),
+                                'gen_nm' : str(row[15]),
+                                'yr' : str(row[16]),
+                                'sch_yr' : str(row[17]),
+                                'term_div' : str(row[18]),
+                                'term_nm' : str(row[19]),
+                                'stdt_div' : str(row[20]),
+                                'stdt_nm' : str(row[21]),
+                                'mob_nm' : str(row[22]),
+                                'tel_no' : str(row[23]),
+                                'tel_no_g' : str(row[24]),
+                                'h_addr' : str(row[25]),
+                                'post_no' : str(row[26]),
+                                'email_addr' : str(row[27]),
+                                'bank_acct' : str(row[28]),
+                                'bank_cd' : str(row[29]),
+                                'bank_nm' : str(row[30]),
+                                'bank_dpsr' : str(row[31]),
+                                'pr_yr' : str(row[32]),
+                                'pr_sch_yr' : str(row[33]),
+                                'pr_term_div' : str(row[34]),
+                                'score01' : str(row[35]),
+                                'score02' : str(row[36]),
+                                'score03' : str(row[37]),
+                                'score04' : str(row[38]),
+                                'score05' : str(row[39]),
+                                'score06' : str(row[40]),
+                                'cmp_term' : str(row[41]),
+                                'mntr_id' : v_mntr_id,
+                                'login_gubun_code' : v_login_gubun_code,
+                                'login_gubun' : v_login_gubun
+                                }
+                                row = cursor.fetchone()                                                                     
+                            # 로그인처리 - 종료   
+                    elif gbn['value'] == 'False':
+                        print("login_false => " + str(id))
+                        message = "login_fail"
+                        context = {'login': 'fail',}
+
+                        query = " insert into service20_com_evt     /* 이벤트로그 */ "
+                        query += "      ( evt_gb     /* 이벤트구분 */ "
+                        query += "     , evt_userid /* 이벤트사용자id */ "
+                        query += "     , evt_ip     /* 이벤트발생 ip */ "
+                        query += "     , evt_dat    /* 이벤트일시 */ "
+                        query += "     , evt_desc   /* 이벤트 내용 */ "
+                        query += "     , ins_id     /* 입력자id */ "
+                        query += "     , ins_ip     /* 입력자ip */ "
+                        query += "     , ins_dt     /* 입력일시 */ "
+                        query += "     , ins_pgm    /* 입력프로그램id */ "
+                        query += ") "
+                        query += " select 'EVT001'  AS evt_gb     /* 이벤트구분 - 로그인 */ "
+                        query += "     , '"+id+"' AS evt_userid /* 이벤트사용자id */ "
+                        query += "     , '"+str(client_ip)+"' AS evt_ip     /* 이벤트발생 ip */ "
+                        query += "     , REPLACE(REPLACE(REPLACE(SUBSTRING(NOW(),1, 19), '-',''),':',''),' ', '')        AS evt_dat    /* 이벤트일시 */ "
+                        query += "     , CONCAT('','notPass') evt_desc   /* 이벤트 내용 */ "
+                        query += "     , '"+id+"' AS ins_id     /* 입력자id */ "
+                        query += "     , '"+str(client_ip)+"' AS ins_ip     /* 입력자ip */ "
+                        query += "     , NOW()     AS ins_dt     /* 입력일시 */ "
+                        query += "     , 'LOGIN'   AS ins_pgm    /* 입력프로그램id */ "
+                        cursor_log = connection.cursor()
+                        query_result = cursor_log.execute(query)    
+
                         ########################################################################
                         # 타대학생 로그인처리 - 시작
                         ########################################################################
@@ -477,7 +829,7 @@ def login_login(request):
                         query += "     , t1.mjr_nm        /* 전공명 */ ";
                         query += "     , t1.pwd           /* 비밀번호 */ ";    
                         query += " from service20_oth_std t1     /* 부산대학교 학생 정보 */ "              
-                        query += " where t1.std_id='"+v_userid+"'" 
+                        query += " where t1.std_id='"+str(id)+"'" 
                         V_OTH_GUBUN = 'F'
                         queryset2 = oth_std.objects.raw(query)
                         for var2 in queryset2:
@@ -499,274 +851,7 @@ def login_login(request):
                         
                         ########################################################################
                         # 타대학생 로그인처리 - 종료
-                        ########################################################################
-                        if V_OTH_GUBUN == 'F':
-                            # 로그인처리 - 시작                
-                            query = "select t3.apl_id      /* 학번 */ "
-                            query += "     , t3.apl_nm      /* 성명 */ "
-                            query += "     , t3.apl_nm_e    /* 성명_영문 */ "
-                            query += "     , t3.unv_cd      /* 대학교코드 */ "
-                            query += "     , t3.unv_nm      /* 대학교명 */ "
-                            query += "     , t3.grad_div_cd /* 대학원구분코드 */ "
-                            query += "     , t3.grad_div_nm /* 대학원구분명 */ "
-                            query += "     , t3.cllg_cd     /* 대학코드 */ "
-                            query += "     , t3.cllg_nm     /* 대학명 */ "
-                            query += "     , t3.dept_cd     /* 학과코드 */ "
-                            query += "     , t3.dept_nm     /* 학과명 */ "
-                            query += "     , t3.mjr_cd      /* 전공코드 */ "
-                            query += "     , t3.mjr_nm      /* 전공명 */ "
-                            query += "     , t3.brth_dt     /* 생년월일 */ "
-                            query += "     , t3.gen_cd      /* 성별코드 */ "
-                            query += "     , t3.gen_nm      /* 성별명 */ "
-                            query += "     , t3.yr          /* 학년도 */ "
-                            query += "     , t3.sch_yr      /* 학년 */ "
-                            query += "     , t3.term_div    /* 학기코드 */ "
-                            query += "     , t3.term_nm     /* 학기명 */ "
-                            query += "     , t3.stds_div    /* 학적상태코드 */ "
-                            query += "     , t3.stds_nm     /* 학적상태명 */ "
-                            query += "     , t3.mob_no      /* 휴대전화번호 */ "
-                            query += "     , t3.tel_no      /* 집전화 */ "
-                            query += "     , t3.tel_no_g    /* 보호자연락처 */ "
-                            query += "     , t3.h_addr      /* 집주소 */ "
-                            query += "     , t3.post_no     /* 우편번호 */ "
-                            query += "     , t3.email_addr  /* 이메일주소 */ "
-                            query += "     , t3.bank_acct   /* 은행계좌번호 */ "
-                            query += "     , t3.bank_cd     /* 은행코드 */ "
-                            query += "     , t3.bank_nm     /* 은행명 */ "
-                            query += "     , t3.bank_dpsr   /* 예금주 */ "
-                            query += "     , t3.pr_yr       /* 직전 학년도 */ "
-                            query += "     , t3.pr_sch_yr   /* 직전 학년 */ "
-                            query += "     , t3.pr_term_div /* 직전학기코드 */ "
-                            query += "     , t3.score01     /* 직전학기 석차 */ "
-                            query += "     , t3.score02     /* 직전학기 총원 */ "
-                            query += "     , t3.score03     /* 직전학기 학점 */ "
-                            query += "     , t3.score04     /* 봉사점수합계 */ "
-                            query += "     , t3.score05     /* 자격증 개수 */ "
-                            query += "     , t3.score06     /* 직전학기 이수학점 */ "
-                            query += "     , t3.cmp_term     /* 전체 이수학기 */ "
-                            query += " from vw_nanum_stdt t3     /* 부산대학교 학생 정보 */ "              
-                            query += " where t3.apl_id='"+v_userid+"'" 
-                            # query += " where t3.apl_id='201866148'"                 
-                            conn = pymssql.connect(server='192.168.2.124', user='nanum', password='n@num*!@', database='hakjuk', port='1221')
-                            cursor = conn.cursor()   
-                            cursor.execute(query)  
-                            row = cursor.fetchone()  
-                            print(row)
-                            if row == None:
-                                context = {'loginStudent': 'fail',}
-                            else:    
-                                message = "login_notFound"
-                                while row:
-                                    message = "Ok"
-                                    # 삭제
-                                    delete_query = " delete from service20_vw_nanum_stdt where apl_id = '"+str(row[0])+"' "
-                                    cursor_delete = connection.cursor()
-                                    delete_query_result = cursor_delete.execute(delete_query)                       
-                                    # 삭제
-                                     
-                                    # 편입생 임시처리 
-                                    l_score03 = str(row[37])
-                                    # if str(row[0]) == "201714544 ":
-                                    #     l_score03 = "3.43"
-                                    # elif str(row[0]) == "201733176 ":
-                                    #     l_score03 = "3.81"
-                                    # elif str(row[0]) == "201705230 ":
-                                    #     l_score03 = "3.76"
-                                    # 편입생 임시처리
-                                    
-                                    # insert
-                                    insert_query = " insert into service20_vw_nanum_stdt (apl_id      /* 학번 */ "
-                                    insert_query += " , apl_nm      /* 성명 */ "
-                                    insert_query += " , apl_nm_e    /* 성명_영문 */ "
-                                    insert_query += " , unv_cd      /* 대학교코드 */ "
-                                    insert_query += " , unv_nm      /* 대학교명 */ "
-                                    insert_query += " , grad_div_cd /* 대학원구분코드 */ "
-                                    insert_query += " , grad_div_nm /* 대학원구분명 */ "
-                                    insert_query += " , cllg_cd     /* 대학코드 */ "
-                                    insert_query += " , cllg_nm     /* 대학명 */ "
-                                    insert_query += " , dept_cd     /* 학과코드 */ "
-                                    insert_query += " , dept_nm     /* 학과명 */ "
-                                    insert_query += " , mjr_cd      /* 전공코드 */ "
-                                    insert_query += " , mjr_nm      /* 전공명 */ "
-                                    insert_query += " , brth_dt     /* 생년월일 */ "
-                                    insert_query += " , gen_cd      /* 성별코드 */ "
-                                    insert_query += " , gen_nm      /* 성별명 */ "
-                                    insert_query += " , yr          /* 학년도 */ "
-                                    insert_query += " , sch_yr      /* 학년 */ "
-                                    insert_query += " , term_div    /* 학기코드 */ "
-                                    insert_query += " , term_nm     /* 학기명 */ "
-                                    insert_query += " , stds_div    /* 학적상태코드 */ "
-                                    insert_query += " , stds_nm     /* 학적상태명 */ "
-                                    insert_query += " , mob_no      /* 휴대전화번호 */ "
-                                    insert_query += " , tel_no      /* 집전화 */ "
-                                    insert_query += " , tel_no_g    /* 보호자연락처 */ "
-                                    insert_query += " , h_addr      /* 집주소 */ "
-                                    insert_query += " , post_no     /* 우편번호 */ "
-                                    insert_query += " , email_addr  /* 이메일주소 */ "
-                                    insert_query += " , bank_acct   /* 은행계좌번호 */ "
-                                    insert_query += " , bank_cd     /* 은행코드 */ "
-                                    insert_query += " , bank_nm     /* 은행명 */ "
-                                    insert_query += " , bank_dpsr   /* 예금주 */ "
-                                    insert_query += " , pr_yr       /* 직전 학년도 */ "
-                                    insert_query += " , pr_sch_yr   /* 직전 학년 */ "
-                                    insert_query += " , pr_term_div /* 직전학기코드 */ "
-                                    insert_query += " , score01     /* 직전학기 석차 */ "
-                                    insert_query += " , score02     /* 직전학기 총원 */ "
-                                    insert_query += " , score03     /* 직전학기 학점 */ "
-                                    insert_query += " , score04     /* 봉사점수합계 */ "
-                                    insert_query += " , score05     /* 자격증 개수 */ "
-                                    insert_query += " , score06     /* 직전학기 이수학점 */ "
-                                    insert_query += " , cmp_term     /* 전체 이수학기 */ "
-                                    insert_query += " ) values ("
-                #                   insert_query += " (select ifnull(max(id)+1,1) from service20_vw_nanum_stdt)  "
-                                    insert_query += " CASE WHEN '"+str(row[0])+"' =  'None' THEN NULL ELSE '"+str(row[0])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[1])+"' =  'None' THEN NULL ELSE '"+str(row[1])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[2])+"' =  'None' THEN NULL ELSE '"+str(row[2])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[3])+"' =  'None' THEN NULL ELSE '"+str(row[3])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[4])+"' =  'None' THEN NULL ELSE '"+str(row[4])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[5])+"' =  'None' THEN NULL ELSE '"+str(row[5])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[6])+"' =  'None' THEN NULL ELSE '"+str(row[6])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[7])+"' =  'None' THEN NULL ELSE '"+str(row[7])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[8])+"' =  'None' THEN NULL ELSE '"+str(row[8])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[9])+"' =  'None' THEN NULL ELSE '"+str(row[9])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[10])+"' =  'None' THEN NULL ELSE '"+str(row[10])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[11])+"' =  'None' THEN NULL ELSE '"+str(row[11])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[12])+"' =  'None' THEN NULL ELSE '"+str(row[12])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[13])+"' =  'None' THEN NULL ELSE '"+str(row[13])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[14])+"' =  'None' THEN NULL ELSE '"+str(row[14])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[15])+"' =  'None' THEN NULL ELSE '"+str(row[15])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[16])+"' =  'None' THEN NULL ELSE '"+str(row[16])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[17])+"' =  'None' THEN NULL ELSE '"+str(row[17])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[18])+"' =  'None' THEN NULL ELSE '"+str(row[18])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[19])+"' =  'None' THEN NULL ELSE '"+str(row[19])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[20])+"' =  'None' THEN NULL ELSE '"+str(row[20])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[21])+"' =  'None' THEN NULL ELSE '"+str(row[21])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[22])+"' =  'None' THEN NULL ELSE '"+str(row[22])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[23])+"' =  'None' THEN NULL ELSE '"+str(row[23])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[24])+"' =  'None' THEN NULL ELSE '"+str(row[24])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[25])+"' =  'None' THEN NULL ELSE '"+str(row[25])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[26])+"' =  'None' THEN NULL ELSE '"+str(row[26])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[27])+"' =  'None' THEN NULL ELSE '"+str(row[27])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[28])+"' =  'None' THEN NULL ELSE '"+str(row[28])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[29])+"' =  'None' THEN NULL ELSE '"+str(row[29])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[30])+"' =  'None' THEN NULL ELSE '"+str(row[30])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[31])+"' =  'None' THEN NULL ELSE '"+str(row[31])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[32])+"' =  'None' THEN NULL ELSE '"+str(row[32])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[33])+"' =  'None' THEN NULL ELSE '"+str(row[33])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[34])+"' =  'None' THEN NULL ELSE '"+str(row[34])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[35])+"' =  'None' THEN NULL ELSE '"+str(row[35])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[36])+"' =  'None' THEN NULL ELSE '"+str(row[36])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(l_score03)+"' =  'None' THEN NULL ELSE '"+str(l_score03)+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[38])+"' =  'None' THEN NULL ELSE '"+str(row[38])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[39])+"' =  'None' THEN NULL ELSE '"+str(row[39])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[40])+"' =  'None' THEN NULL ELSE '"+str(row[40])+"' END"
-                                    insert_query += " , CASE WHEN '"+str(row[41])+"' =  'None' THEN NULL ELSE '"+str(row[41])+"' END"
-                                    insert_query += " )"                    
-                                    cursor2 = connection.cursor()
-                                    query_result = cursor2.execute(insert_query)    
-                                    # insert
-
-                                    mentor_query = " select mntr_id from service20_mentor where apl_id = '"+str(row[0])+"'"
-                                    mentor_cursor = connection.cursor()
-                                    query_result = mentor_cursor.execute(mentor_query)    
-
-                                    if query_result == 0:
-                                        v_mntr_id = ''
-                                    else:
-                                        #mentor_query
-                                        rows_mentor = mentor.objects.filter(apl_id=str(row[0]))[0]
-                                        
-                                        v_mntr_id = str(rows_mentor.mntr_id)  
-
-                                    query = " select distinct A.user_id,A.user_div,B.std_detl_code_nm from vw_nanum_login as A left join service20_com_cdd as B on (B.std_grp_code = 'CM0001' and A.user_div = B.std_detl_code) "
-                                    query += " where user_id = '"+str(row[0])+"'"
-                                    cursor = connection.cursor()
-                                    query_result = cursor.execute(query)  
-                                    results = namedtuplefetchall(cursor) 
-
-                                    if query_result == 0:
-                                        v_login_gubun = ''
-                                    else:
-                                        v_login_gubun_code = str(results[0].user_div)
-                                        v_login_gubun = str(results[0].std_detl_code_nm)
-
-
-                                                        
-                                    context = {'message': message,
-                                    'apl_id' : str(row[0]),
-                                    'apl_nm' : str(row[1]),
-                                    'univ_cd' : str(row[3]),
-                                    'univ_nm' : str(row[4]),
-                                    'grad_div_cd' : str(row[5]),
-                                    'grad_div_nm' : str(row[6]),
-                                    'cllg_cd' : str(row[7]),
-                                    'cllg_nm' : str(row[8]),
-                                    'dept_cd' : str(row[9]),
-                                    'dept_nm' : str(row[10]),
-                                    'mjr_cd' : str(row[11]),
-                                    'mjr_nm' : str(row[12]),
-                                    'brth_dt' : str(row[13]),
-                                    'gen_cd' : str(row[14]),
-                                    'gen_nm' : str(row[15]),
-                                    'yr' : str(row[16]),
-                                    'sch_yr' : str(row[17]),
-                                    'term_div' : str(row[18]),
-                                    'term_nm' : str(row[19]),
-                                    'stdt_div' : str(row[20]),
-                                    'stdt_nm' : str(row[21]),
-                                    'mob_nm' : str(row[22]),
-                                    'tel_no' : str(row[23]),
-                                    'tel_no_g' : str(row[24]),
-                                    'h_addr' : str(row[25]),
-                                    'post_no' : str(row[26]),
-                                    'email_addr' : str(row[27]),
-                                    'bank_acct' : str(row[28]),
-                                    'bank_cd' : str(row[29]),
-                                    'bank_nm' : str(row[30]),
-                                    'bank_dpsr' : str(row[31]),
-                                    'pr_yr' : str(row[32]),
-                                    'pr_sch_yr' : str(row[33]),
-                                    'pr_term_div' : str(row[34]),
-                                    'score01' : str(row[35]),
-                                    'score02' : str(row[36]),
-                                    'score03' : str(row[37]),
-                                    'score04' : str(row[38]),
-                                    'score05' : str(row[39]),
-                                    'score06' : str(row[40]),
-                                    'cmp_term' : str(row[41]),
-                                    'mntr_id' : v_mntr_id,
-                                    'login_gubun_code' : v_login_gubun_code,
-                                    'login_gubun' : v_login_gubun
-                                    }
-                                    row = cursor.fetchone()                                                                     
-                                # 로그인처리 - 종료   
-                    elif gbn['value'] == 'False':
-                        print("login_false => " + str(id))
-                        message = "login_fail"
-                        context = {'login': 'fail',}
-
-                        query = " insert into service20_com_evt     /* 이벤트로그 */ "
-                        query += "      ( evt_gb     /* 이벤트구분 */ "
-                        query += "     , evt_userid /* 이벤트사용자id */ "
-                        query += "     , evt_ip     /* 이벤트발생 ip */ "
-                        query += "     , evt_dat    /* 이벤트일시 */ "
-                        query += "     , evt_desc   /* 이벤트 내용 */ "
-                        query += "     , ins_id     /* 입력자id */ "
-                        query += "     , ins_ip     /* 입력자ip */ "
-                        query += "     , ins_dt     /* 입력일시 */ "
-                        query += "     , ins_pgm    /* 입력프로그램id */ "
-                        query += ") "
-                        query += " select 'EVT001'  AS evt_gb     /* 이벤트구분 - 로그인 */ "
-                        query += "     , '"+id+"' AS evt_userid /* 이벤트사용자id */ "
-                        query += "     , '"+str(client_ip)+"' AS evt_ip     /* 이벤트발생 ip */ "
-                        query += "     , REPLACE(REPLACE(REPLACE(SUBSTRING(NOW(),1, 19), '-',''),':',''),' ', '')        AS evt_dat    /* 이벤트일시 */ "
-                        query += "     , CONCAT('','notPass') evt_desc   /* 이벤트 내용 */ "
-                        query += "     , '"+id+"' AS ins_id     /* 입력자id */ "
-                        query += "     , '"+str(client_ip)+"' AS ins_ip     /* 입력자ip */ "
-                        query += "     , NOW()     AS ins_dt     /* 입력일시 */ "
-                        query += "     , 'LOGIN'   AS ins_pgm    /* 입력프로그램id */ "
-                        cursor_log = connection.cursor()
-                        query_result = cursor_log.execute(query)            
+                        ########################################################################         
 
         elif v_user_div == "G":
             # 학부모
