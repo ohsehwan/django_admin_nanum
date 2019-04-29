@@ -2678,6 +2678,19 @@ class mentoMypage_list(generics.ListAPIView):
         query += "  from service20_vw_nanum_stdt t1 "
         query += " where 1=1 "
         query += "   and t1.apl_id = '"+l_user_id+"' "
+        query += " union all"
+        query += " select  t2.id "
+        query += "       , t2.apl_id as apl_id"
+        query += "      , t2.std_nm as apl_nm"
+        query += "      , t2.brth_dt         /* 생년월일 */  "
+        query += "      , case when t2.gen = '1' then '남'             /* 성별 */  "
+        query += "             else '여' end as gen_nm             /* 성별 */  "
+        query += "      , t2.cllg_nm         /* 지원자 대학 명 */  "
+        query += "      , t2.dept_nm         /* 지원자 학부/학과 명 */  "
+        query += "      , t2.mob_no          /* 휴대전화 */  "
+        query += "      , t2.email_addr      /* 이메일 주소 */  "
+        query += "   from service20_oth_std t2 "
+        query += "  where t2.std_id = '"+l_user_id+"'  "
 
         queryset = vw_nanum_stdt.objects.raw(query)
 
