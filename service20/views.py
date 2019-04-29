@@ -190,8 +190,12 @@ def login_login(request):
                     query += "     , t1.mjr_cd        /* 전공코드 */ ";
                     query += "     , t1.mjr_nm        /* 전공명 */ ";
                     query += "     , t1.pwd           /* 비밀번호 */ ";    
-                    query += " from service20_oth_std t1     /* 부산대학교 학생 정보 */ "              
-                    query += " where t1.std_id='"+str(id)+"'" 
+                    query += " from service20_oth_std t1     /* 부산대학교 학생 정보 */ "    
+                    if super_flag == 'Y':          
+                        query += " where t1.std_id='"+str(id)+"'" 
+                    else:
+                        query += " where t1.std_id='"+str(id)+"'" 
+                        query += " and t1.pwd = '"+str(pswd)+"'"    
                     V_OTH_GUBUN = 'F'
                     queryset2 = oth_std.objects.raw(query)
                     for var2 in queryset2:
@@ -829,7 +833,11 @@ def login_login(request):
                         query += "     , t1.mjr_nm        /* 전공명 */ ";
                         query += "     , t1.pwd           /* 비밀번호 */ ";    
                         query += " from service20_oth_std t1     /* 부산대학교 학생 정보 */ "              
-                        query += " where t1.std_id='"+str(id)+"'" 
+                        if super_flag == 'Y':          
+                            query += " where t1.std_id='"+str(id)+"'" 
+                        else:
+                            query += " where t1.std_id='"+str(id)+"'" 
+                            query += " and t1.pwd = '"+str(pswd)+"'"    
                         V_OTH_GUBUN = 'F'
                         queryset2 = oth_std.objects.raw(query)
                         for var2 in queryset2:
