@@ -136,60 +136,60 @@ def login_login(request):
                     ########################################################################
 
                     # 로그인처리 - 시작                
-                    query = "select t1.id,t1.std_id        /* 타대생 id(학교코드+학번) */ ";
-                    query += "     , t1.std_nm        /* 타대생 명 */ ";
-                    query += "     , t1.std_nm_e      /* 타대생 영문명 */ ";
-                    query += "     , t1.ms_id         /* 멘토스쿨id */ ";
-                    query += "     , t1.apl_no        /* 지원 no */ ";
-                    query += "     , t1.apl_id        /* 지원자id(학번) */ ";
-                    query += "     , t1.reg_dt        /* 등록일 */ ";
-                    query += "     , t1.unv_cd        /* 타대생 대학교 코드(mp0044) */ ";
-                    query += "     , t1.unv_nm        /* 타대생 대학교 명 */ ";
-                    query += "     , t1.cllg_cd       /* 타대생 대학 코드 */ ";
-                    query += "     , t1.cllg_nm       /* 타대생 대학 명 */ ";
-                    query += "     , t1.dept_cd       /* 타대생 학부/학과 코드 */ ";
-                    query += "     , t1.dept_nm       /* 타대생 학부/학과 명 */ ";
-                    query += "     , t1.brth_dt       /* 생년월일 */ ";
-                    query += "     , t1.gen           /* 성별 */ ";
-                    query += "     , t1.yr            /* 학년도 */ ";
-                    query += "     , t1.term_div      /* 학기 */ ";
-                    query += "     , t1.sch_yr        /* 학년 */ ";
-                    query += "     , t1.exp_dt        /* 자격 박탈일 */ ";
-                    query += "     , t1.exp_rsn       /* 박탈 사유 */ ";
-                    query += "     , t1.mob_no        /* 휴대전화 */ ";
-                    query += "     , t1.tel_no        /* 집전화 */ ";
-                    query += "     , t1.tel_no_g      /* 보호자 연락처 */ ";
-                    query += "     , t1.h_addr        /* 집주소 */ ";
-                    query += "     , t1.post_no       /* 우편번호 */ ";
-                    query += "     , t1.email_addr    /* 이메일 주소 */ ";
-                    query += "     , t1.bank_acct     /* 은행 계좌 번호 */ ";
-                    query += "     , t1.bank_cd       /* 은행 코드 */ ";
-                    query += "     , t1.bank_nm       /* 은행 명 */ ";
-                    query += "     , t1.bank_dpsr     /* 예금주 */ ";
-                    query += "     , t1.cnt_mp_a      /* 멘토링 지원 경력 */ ";
-                    query += "     , t1.cnt_mp_p      /* 멘토링 수행 경력 */ ";
-                    query += "     , t1.cnt_mp_c      /* 멘토링 완료 경력 */ ";
-                    query += "     , t1.cnt_mp_g      /* 멘토링 중도포기 경력 */ ";
-                    query += "     , t1.inv_agr_div   /* 개인정보 동의 여부 */ ";
-                    query += "     , t1.inv_agr_dt    /* 개인정보 동의 일시 */ ";
-                    query += "     , t1.dept_chr_id   /* 학과장 id */ ";
-                    query += "     , t1.dept_chr_nm   /* 학과장 명 */ ";
-                    query += "     , t1.ast_id        /* 조교 id */ ";
-                    query += "     , t1.ast_nm        /* 조교 명 */ ";
-                    query += "     , t1.dept_appr_div /* 학과 승인 여부 */ ";
-                    query += "     , t1.dept_appr_dt  /* 학과 승인 날짜 */ ";
-                    query += "     , t1.dept_retn_rsn /* 학과 반려 사유 */ ";
-                    query += "     , t1.ins_id        /* 입력자id */ ";
-                    query += "     , t1.ins_ip        /* 입력자ip */ ";
-                    query += "     , t1.ins_dt        /* 입력일시 */ ";
-                    query += "     , t1.ins_pgm       /* 입력프로그램id */ ";
-                    query += "     , t1.upd_id        /* 수정자id */ ";
-                    query += "     , t1.upd_ip        /* 수정자ip */ ";
-                    query += "     , t1.upd_dt        /* 수정일시 */ ";
-                    query += "     , t1.upd_pgm       /* 수정프로그램id */ ";
-                    query += "     , t1.mjr_cd        /* 전공코드 */ ";
-                    query += "     , t1.mjr_nm        /* 전공명 */ ";
-                    query += "     , t1.pwd           /* 비밀번호 */ ";    
+                    query = "select t1.id,t1.std_id        /* 타대생 id(학교코드+학번) */ "
+                    query += "     , t1.std_nm        /* 타대생 명 */ "
+                    query += "     , t1.std_nm_e      /* 타대생 영문명 */ "
+                    query += "     , t1.ms_id         /* 멘토스쿨id */ "
+                    query += "     , t1.apl_no        /* 지원 no */ "
+                    query += "     , t1.apl_id        /* 지원자id(학번) */ "
+                    query += "     , t1.reg_dt        /* 등록일 */ "
+                    query += "     , t1.unv_cd        /* 타대생 대학교 코드(mp0044) */ "
+                    query += "     , t1.unv_nm        /* 타대생 대학교 명 */ "
+                    query += "     , t1.cllg_cd       /* 타대생 대학 코드 */ "
+                    query += "     , t1.cllg_nm       /* 타대생 대학 명 */ "
+                    query += "     , t1.dept_cd       /* 타대생 학부/학과 코드 */ "
+                    query += "     , t1.dept_nm       /* 타대생 학부/학과 명 */ "
+                    query += "     , t1.brth_dt       /* 생년월일 */ "
+                    query += "     , t1.gen           /* 성별 */ "
+                    query += "     , t1.yr            /* 학년도 */ "
+                    query += "     , t1.term_div      /* 학기 */ "
+                    query += "     , t1.sch_yr        /* 학년 */ "
+                    query += "     , t1.exp_dt        /* 자격 박탈일 */ "
+                    query += "     , t1.exp_rsn       /* 박탈 사유 */ "
+                    query += "     , t1.mob_no        /* 휴대전화 */ "
+                    query += "     , t1.tel_no        /* 집전화 */ "
+                    query += "     , t1.tel_no_g      /* 보호자 연락처 */ "
+                    query += "     , t1.h_addr        /* 집주소 */ "
+                    query += "     , t1.post_no       /* 우편번호 */ "
+                    query += "     , t1.email_addr    /* 이메일 주소 */ "
+                    query += "     , t1.bank_acct     /* 은행 계좌 번호 */ "
+                    query += "     , t1.bank_cd       /* 은행 코드 */ "
+                    query += "     , t1.bank_nm       /* 은행 명 */ "
+                    query += "     , t1.bank_dpsr     /* 예금주 */ "
+                    query += "     , t1.cnt_mp_a      /* 멘토링 지원 경력 */ "
+                    query += "     , t1.cnt_mp_p      /* 멘토링 수행 경력 */ "
+                    query += "     , t1.cnt_mp_c      /* 멘토링 완료 경력 */ "
+                    query += "     , t1.cnt_mp_g      /* 멘토링 중도포기 경력 */ "
+                    query += "     , t1.inv_agr_div   /* 개인정보 동의 여부 */ "
+                    query += "     , t1.inv_agr_dt    /* 개인정보 동의 일시 */ "
+                    query += "     , t1.dept_chr_id   /* 학과장 id */ "
+                    query += "     , t1.dept_chr_nm   /* 학과장 명 */ "
+                    query += "     , t1.ast_id        /* 조교 id */ "
+                    query += "     , t1.ast_nm        /* 조교 명 */ "
+                    query += "     , t1.dept_appr_div /* 학과 승인 여부 */ "
+                    query += "     , t1.dept_appr_dt  /* 학과 승인 날짜 */ "
+                    query += "     , t1.dept_retn_rsn /* 학과 반려 사유 */ "
+                    query += "     , t1.ins_id        /* 입력자id */ "
+                    query += "     , t1.ins_ip        /* 입력자ip */ "
+                    query += "     , t1.ins_dt        /* 입력일시 */ "
+                    query += "     , t1.ins_pgm       /* 입력프로그램id */ "
+                    query += "     , t1.upd_id        /* 수정자id */ "
+                    query += "     , t1.upd_ip        /* 수정자ip */ "
+                    query += "     , t1.upd_dt        /* 수정일시 */ "
+                    query += "     , t1.upd_pgm       /* 수정프로그램id */ "
+                    query += "     , t1.mjr_cd        /* 전공코드 */ "
+                    query += "     , t1.mjr_nm        /* 전공명 */ "
+                    query += "     , t1.pwd           /* 비밀번호 */ "
                     query += " from service20_oth_std t1     /* 부산대학교 학생 정보 */ "    
                     if super_flag == 'Y':          
                         query += " where t1.std_id='"+str(id)+"'" 
@@ -203,14 +203,43 @@ def login_login(request):
                         # vl_cscore1 = var2.fin_scr
                         V_OTH_GUBUN = 'T'
                         message = "Ok"
+                        # context = {'message': message,
+                        #     'apl_id' : str(var2.std_id),
+                        #     'apl_nm' : str(var2.std_nm),
+                        #     'univ_cd' : str(var2.unv_cd),
+                        #     'univ_nm' : str(var2.unv_nm),
+                        #     'brth_dt' : str(var2.brth_dt),
+                        #     'gen_cd' : str(var2.gen),
+                        #     'gen_nm' : str(var2.gen),
+                        #     'login_gubun_code' : 'OTH',
+                        #     'login_gubun' : '타대학생'
+                        #     }
                         context = {'message': message,
-                            'apl_id' : str(var2.std_id),
                             'apl_nm' : str(var2.std_nm),
+                            'apl_id' : str(var2.std_id),
+                            'ms_id' : str(var2.ms_id),
                             'univ_cd' : str(var2.unv_cd),
                             'univ_nm' : str(var2.unv_nm),
+                            'cllg_cd' : str(var2.cllg_cd),
+                            'cllg_nm' : str(var2.cllg_nm),
+                            'dept_cd' : str(var2.dept_cd),
+                            'dept_nm' : str(var2.dept_nm.replace('\'','')),
+                            'mjr_cd' : str(var2.mjr_cd),
+                            'mjr_nm' : str(var2.mjr_nm),
                             'brth_dt' : str(var2.brth_dt),
                             'gen_cd' : str(var2.gen),
-                            'gen_nm' : str(var2.gen),
+                            'yr' : str(var2.yr),
+                            'sch_yr' : str(var2.sch_yr),
+                            'term_div' : str(var2.term_div),
+                            'tel_no' : str(var2.tel_no),
+                            'tel_no_g' : str(var2.tel_no_g),
+                            'h_addr' : str(var2.h_addr),
+                            'post_no' : str(var2.post_no),
+                            'email_addr' : str(var2.email_addr),
+                            'bank_acct' : str(var2.bank_acct),
+                            'bank_cd' : str(var2.bank_cd),
+                            'bank_nm' : str(var2.bank_nm),
+                            'bank_dpsr' : str(var2.bank_dpsr),
                             'login_gubun_code' : 'OTH',
                             'login_gubun' : '타대학생'
                             }
@@ -778,60 +807,60 @@ def login_login(request):
                         ########################################################################
 
                         # 로그인처리 - 시작                
-                        query = "select t1.id,t1.std_id        /* 타대생 id(학교코드+학번) */ ";
-                        query += "     , t1.std_nm        /* 타대생 명 */ ";
-                        query += "     , t1.std_nm_e      /* 타대생 영문명 */ ";
-                        query += "     , t1.ms_id         /* 멘토스쿨id */ ";
-                        query += "     , t1.apl_no        /* 지원 no */ ";
-                        query += "     , t1.apl_id        /* 지원자id(학번) */ ";
-                        query += "     , t1.reg_dt        /* 등록일 */ ";
-                        query += "     , t1.unv_cd        /* 타대생 대학교 코드(mp0044) */ ";
-                        query += "     , t1.unv_nm        /* 타대생 대학교 명 */ ";
-                        query += "     , t1.cllg_cd       /* 타대생 대학 코드 */ ";
-                        query += "     , t1.cllg_nm       /* 타대생 대학 명 */ ";
-                        query += "     , t1.dept_cd       /* 타대생 학부/학과 코드 */ ";
-                        query += "     , t1.dept_nm       /* 타대생 학부/학과 명 */ ";
-                        query += "     , t1.brth_dt       /* 생년월일 */ ";
-                        query += "     , t1.gen           /* 성별 */ ";
-                        query += "     , t1.yr            /* 학년도 */ ";
-                        query += "     , t1.term_div      /* 학기 */ ";
-                        query += "     , t1.sch_yr        /* 학년 */ ";
-                        query += "     , t1.exp_dt        /* 자격 박탈일 */ ";
-                        query += "     , t1.exp_rsn       /* 박탈 사유 */ ";
-                        query += "     , t1.mob_no        /* 휴대전화 */ ";
-                        query += "     , t1.tel_no        /* 집전화 */ ";
-                        query += "     , t1.tel_no_g      /* 보호자 연락처 */ ";
-                        query += "     , t1.h_addr        /* 집주소 */ ";
-                        query += "     , t1.post_no       /* 우편번호 */ ";
-                        query += "     , t1.email_addr    /* 이메일 주소 */ ";
-                        query += "     , t1.bank_acct     /* 은행 계좌 번호 */ ";
-                        query += "     , t1.bank_cd       /* 은행 코드 */ ";
-                        query += "     , t1.bank_nm       /* 은행 명 */ ";
-                        query += "     , t1.bank_dpsr     /* 예금주 */ ";
-                        query += "     , t1.cnt_mp_a      /* 멘토링 지원 경력 */ ";
-                        query += "     , t1.cnt_mp_p      /* 멘토링 수행 경력 */ ";
-                        query += "     , t1.cnt_mp_c      /* 멘토링 완료 경력 */ ";
-                        query += "     , t1.cnt_mp_g      /* 멘토링 중도포기 경력 */ ";
-                        query += "     , t1.inv_agr_div   /* 개인정보 동의 여부 */ ";
-                        query += "     , t1.inv_agr_dt    /* 개인정보 동의 일시 */ ";
-                        query += "     , t1.dept_chr_id   /* 학과장 id */ ";
-                        query += "     , t1.dept_chr_nm   /* 학과장 명 */ ";
-                        query += "     , t1.ast_id        /* 조교 id */ ";
-                        query += "     , t1.ast_nm        /* 조교 명 */ ";
-                        query += "     , t1.dept_appr_div /* 학과 승인 여부 */ ";
-                        query += "     , t1.dept_appr_dt  /* 학과 승인 날짜 */ ";
-                        query += "     , t1.dept_retn_rsn /* 학과 반려 사유 */ ";
-                        query += "     , t1.ins_id        /* 입력자id */ ";
-                        query += "     , t1.ins_ip        /* 입력자ip */ ";
-                        query += "     , t1.ins_dt        /* 입력일시 */ ";
-                        query += "     , t1.ins_pgm       /* 입력프로그램id */ ";
-                        query += "     , t1.upd_id        /* 수정자id */ ";
-                        query += "     , t1.upd_ip        /* 수정자ip */ ";
-                        query += "     , t1.upd_dt        /* 수정일시 */ ";
-                        query += "     , t1.upd_pgm       /* 수정프로그램id */ ";
-                        query += "     , t1.mjr_cd        /* 전공코드 */ ";
-                        query += "     , t1.mjr_nm        /* 전공명 */ ";
-                        query += "     , t1.pwd           /* 비밀번호 */ ";    
+                        query = "select t1.id,t1.std_id        /* 타대생 id(학교코드+학번) */ "
+                        query += "     , t1.std_nm        /* 타대생 명 */ "
+                        query += "     , t1.std_nm_e      /* 타대생 영문명 */ "
+                        query += "     , t1.ms_id         /* 멘토스쿨id */ "
+                        query += "     , t1.apl_no        /* 지원 no */ "
+                        query += "     , t1.apl_id        /* 지원자id(학번) */ "
+                        query += "     , t1.reg_dt        /* 등록일 */ "
+                        query += "     , t1.unv_cd        /* 타대생 대학교 코드(mp0044) */ "
+                        query += "     , t1.unv_nm        /* 타대생 대학교 명 */ "
+                        query += "     , t1.cllg_cd       /* 타대생 대학 코드 */ "
+                        query += "     , t1.cllg_nm       /* 타대생 대학 명 */ "
+                        query += "     , t1.dept_cd       /* 타대생 학부/학과 코드 */ "
+                        query += "     , t1.dept_nm       /* 타대생 학부/학과 명 */ "
+                        query += "     , t1.brth_dt       /* 생년월일 */ "
+                        query += "     , t1.gen           /* 성별 */ "
+                        query += "     , t1.yr            /* 학년도 */ "
+                        query += "     , t1.term_div      /* 학기 */ "
+                        query += "     , t1.sch_yr        /* 학년 */ "
+                        query += "     , t1.exp_dt        /* 자격 박탈일 */ "
+                        query += "     , t1.exp_rsn       /* 박탈 사유 */ "
+                        query += "     , t1.mob_no        /* 휴대전화 */ "
+                        query += "     , t1.tel_no        /* 집전화 */ "
+                        query += "     , t1.tel_no_g      /* 보호자 연락처 */ "
+                        query += "     , t1.h_addr        /* 집주소 */ "
+                        query += "     , t1.post_no       /* 우편번호 */ "
+                        query += "     , t1.email_addr    /* 이메일 주소 */ "
+                        query += "     , t1.bank_acct     /* 은행 계좌 번호 */ "
+                        query += "     , t1.bank_cd       /* 은행 코드 */ "
+                        query += "     , t1.bank_nm       /* 은행 명 */ "
+                        query += "     , t1.bank_dpsr     /* 예금주 */ "
+                        query += "     , t1.cnt_mp_a      /* 멘토링 지원 경력 */ "
+                        query += "     , t1.cnt_mp_p      /* 멘토링 수행 경력 */ "
+                        query += "     , t1.cnt_mp_c      /* 멘토링 완료 경력 */ "
+                        query += "     , t1.cnt_mp_g      /* 멘토링 중도포기 경력 */ "
+                        query += "     , t1.inv_agr_div   /* 개인정보 동의 여부 */ "
+                        query += "     , t1.inv_agr_dt    /* 개인정보 동의 일시 */ "
+                        query += "     , t1.dept_chr_id   /* 학과장 id */ "
+                        query += "     , t1.dept_chr_nm   /* 학과장 명 */ "
+                        query += "     , t1.ast_id        /* 조교 id */ "
+                        query += "     , t1.ast_nm        /* 조교 명 */ "
+                        query += "     , t1.dept_appr_div /* 학과 승인 여부 */ "
+                        query += "     , t1.dept_appr_dt  /* 학과 승인 날짜 */ "
+                        query += "     , t1.dept_retn_rsn /* 학과 반려 사유 */ "
+                        query += "     , t1.ins_id        /* 입력자id */ "
+                        query += "     , t1.ins_ip        /* 입력자ip */ "
+                        query += "     , t1.ins_dt        /* 입력일시 */ "
+                        query += "     , t1.ins_pgm       /* 입력프로그램id */ "
+                        query += "     , t1.upd_id        /* 수정자id */ "
+                        query += "     , t1.upd_ip        /* 수정자ip */ "
+                        query += "     , t1.upd_dt        /* 수정일시 */ "
+                        query += "     , t1.upd_pgm       /* 수정프로그램id */ "
+                        query += "     , t1.mjr_cd        /* 전공코드 */ "
+                        query += "     , t1.mjr_nm        /* 전공명 */ "
+                        query += "     , t1.pwd           /* 비밀번호 */ "
                         query += " from service20_oth_std t1     /* 부산대학교 학생 정보 */ "              
                         if super_flag == 'Y':          
                             query += " where t1.std_id='"+str(id)+"'" 
@@ -845,18 +874,48 @@ def login_login(request):
                             # vl_cscore1 = var2.fin_scr
                             V_OTH_GUBUN = 'T'
                             message = "Ok"
+                            # context = {'message': message,
+                            #     'apl_id' : str(var2.std_id),
+                            #     'apl_nm' : str(var2.std_nm),
+                            #     'univ_cd' : str(var2.unv_cd),
+                            #     'univ_nm' : str(var2.unv_nm),
+                            #     'brth_dt' : str(var2.brth_dt),
+                            #     'gen_cd' : str(var2.gen),
+                            #     'gen_nm' : str(var2.gen),
+                            #     'login_gubun_code' : 'OTH',
+                            #     'login_gubun' : '타대학생'
+                            #     }
                             context = {'message': message,
-                                'apl_id' : str(var2.std_id),
                                 'apl_nm' : str(var2.std_nm),
+                                'apl_id' : str(var2.std_id),
+                                'ms_id' : str(var2.ms_id),
                                 'univ_cd' : str(var2.unv_cd),
                                 'univ_nm' : str(var2.unv_nm),
+                                'cllg_cd' : str(var2.cllg_cd),
+                                'cllg_nm' : str(var2.cllg_nm),
+                                'dept_cd' : str(var2.dept_cd),
+                                'dept_nm' : str(var2.dept_nm.replace('\'','')),
+                                'mjr_cd' : str(var2.mjr_cd),
+                                'mjr_nm' : str(var2.mjr_nm),
                                 'brth_dt' : str(var2.brth_dt),
                                 'gen_cd' : str(var2.gen),
-                                'gen_nm' : str(var2.gen),
+                                'yr' : str(var2.yr),
+                                'sch_yr' : str(var2.sch_yr),
+                                'term_div' : str(var2.term_div),
+                                'tel_no' : str(var2.tel_no),
+                                'tel_no_g' : str(var2.tel_no_g),
+                                'h_addr' : str(var2.h_addr),
+                                'post_no' : str(var2.post_no),
+                                'email_addr' : str(var2.email_addr),
+                                'bank_acct' : str(var2.bank_acct),
+                                'bank_cd' : str(var2.bank_cd),
+                                'bank_nm' : str(var2.bank_nm),
+                                'bank_dpsr' : str(var2.bank_dpsr),
                                 'login_gubun_code' : 'OTH',
                                 'login_gubun' : '타대학생'
                                 }
-                        
+                        		# 타대학생 멘토
+
                         ########################################################################
                         # 타대학생 로그인처리 - 종료
                         ########################################################################         
