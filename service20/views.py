@@ -9270,7 +9270,7 @@ class MP0101M_admin_service_team_atc(generics.ListAPIView):
 def MP0101M_service_team_update(request):
     l_mp_id = request.POST.get('mp_id', "")    
     l_apl_no = request.POST.get('team_no', "")
-    l_length = request.POST.get('over_service_length', "")
+    l_length = request.POST.get('over_service_team_length', "")
     l_att_cdd = list()
     l_att_cdh = list()
     l_chc_tp = list()
@@ -9290,13 +9290,13 @@ def MP0101M_service_team_update(request):
         l_seq.append(request.POST.get('seq_team'+str(i), ""))
 
         if l_chc_tp[i] == '1':
-            l_att_cdd.append(request.POST.get('service_team_combo'+str(com_cnt), ""))
+            l_att_cdd.append(request.POST.get('service_combo_team'+str(com_cnt), ""))
             com_cnt = com_cnt + 1
         elif l_chc_tp[i] == '3':
-            l_att_cdd.append(request.POST.get('service_team_chkbox'+str(chk_cnt), ""))
+            l_att_cdd.append(request.POST.get('service_chkbox_team'+str(chk_cnt), ""))
             chk_cnt = chk_cnt + 1
         else:
-            l_att_cdd.append(request.POST.get('service_team_select'+str(sel_cnt), ""))
+            l_att_cdd.append(request.POST.get('service_select_team'+str(sel_cnt), ""))
             sel_cnt = sel_cnt + 1
     
         print("l_att_cdd===" + l_att_cdd[i])
@@ -9316,31 +9316,135 @@ def MP0101M_service_team_update(request):
 
     client_ip = request.META['REMOTE_ADDR']
     
-    for i in range(0,int(l_length)):
-        query = "  update service20_mp_team_chc "
-        query += "     set att_cdd = '" + str(l_att_cdd[i]) + "' "
-        query += "       , chc_val = (select t1.att_val  "
-        query += "                      from service20_mp_sub t1 "
-        query += "                     where t1.mp_id = '" + str(l_mp_id) + "' "
-        query += "                       and t1.att_id = 'MP0111' "
-        query += "                       and t1.att_cdh = '" + str(l_att_cdh[i]) + "' "
-        query += "                       and t1.att_cdd = '" + str(l_att_cdd[i]) + "' "
-        query += "                       and t1.use_yn = 'Y') "
-        query += "       , chc_seq = '" + l_seq[i] + "' "
-        query += "       , ques_no = (select t2.sort_seq  "
-        query += "                      from service20_mp_sub t2 "
-        query += "                     where t2.mp_id = '" + str(l_mp_id) + "' "
-        query += "                       and t2.att_id = 'MP0111' "
-        query += "                       and t2.att_cdh = '" + str(l_att_cdh[i]) + "' "
-        query += "                       and t2.att_cdd = '" + str(l_att_cdd[i]) + "' "
-        query += "                       and t2.use_yn = 'Y') "
-        query += "       , upd_id = '" + str(upd_id) + "' "
-        query += "       , upd_ip = '" + str(client_ip) + "' "
-        query += "       , upd_dt = now() "
-        query += "       , upd_pgm = '" + str(upd_pgm) + "' "
-        query += "   where mp_id = '" + str(l_mp_id) + "' "
-        query += "     and team_no = '" + str(l_apl_no) + "' "
-        query += "     and chc_no = '" + str(l_chc_no[i]) + "' "
+    query = " SELECT count(0) as up_cnt FROM service20_mp_team_chc WHERE mp_id = '" + str(l_mp_id) + "' AND team_no = '" + str(l_apl_no) + "'"
+    cursor = connection.cursor()
+    cursor.execute(query)    
+    results = namedtuplefetchall(cursor)    
+    up_cnt = int(results[0].up_cnt)
+
+    # 저장된 선택사항과 mp_sub에 관리되는 선택사항의 개수가 일치할 때는 update
+    if l_length == up_cnt:
+        # update
+        for i in range(0,int(l_length)):
+            query = "  update service20_mp_team_chc "
+            query += "     set att_cdd = '" + str(l_att_cdd[i]) + "' "
+            query += "       , chc_val = (select t1.att_val  "
+            query += "                      from service20_mp_sub t1 "
+            query += "                     where t1.mp_id = '" + str(l_mp_id) + "' "
+            query += "                       and t1.att_id = 'MP0111' "
+            query += "                       and t1.att_cdh = '" + str(l_att_cdh[i]) + "' "
+            query += "                       and t1.att_cdd = '" + str(l_att_cdd[i]) + "' "
+            query += "                       and t1.use_yn = 'Y') "
+            query += "       , chc_seq = '" + l_seq[i] + "' "
+            query += "       , ques_no = (select t2.sort_seq  "
+            query += "                      from service20_mp_sub t2 "
+            query += "                     where t2.mp_id = '" + str(l_mp_id) + "' "
+            query += "                       and t2.att_id = 'MP0111' "
+            query += "                       and t2.att_cdh = '" + str(l_att_cdh[i]) + "' "
+            query += "                       and t2.att_cdd = '" + str(l_att_cdd[i]) + "' "
+            query += "                       and t2.use_yn = 'Y') "
+            query += "       , upd_id = '" + str(upd_id) + "' "
+            query += "       , upd_ip = '" + str(client_ip) + "' "
+            query += "       , upd_dt = now() "
+            query += "       , upd_pgm = '" + str(upd_pgm) + "' "
+            query += "   where mp_id = '" + str(l_mp_id) + "' "
+            query += "     and team_no = '" + str(l_apl_no) + "' "
+            query += "     and chc_no = '" + str(l_chc_no[i]) + "' "
+            
+            print(query)
+            cursor = connection.cursor()
+            query_result = cursor.execute(query)
+    # 저장된 선택사항과 mp_sub에 관리되는 선택사항의 개수가 일치하지 않을 때는 기존꺼 전체 0delete 후 전체 isnert
+    else:
+        # delete
+        query = " delete FROM service20_mp_team_chc WHERE mp_id = '" + str(l_mp_id) + "' AND team_no = '" + str(l_apl_no) + "'"
+        cursor = connection.cursor()
+        cursor.execute(query)    
+
+        # insert
+        for i in range(0,int(l_length)):
+            query = " insert "
+            query += "    into "
+            query += "        service20_mp_team_chc(mp_id "
+            query += "        , team_no "
+            query += "        , chc_no "
+            query += "        , att_id "
+            query += "        , att_cdh "
+            query += "        , att_cdd "
+            query += "        , chc_tp "
+            query += "        , chc_val "
+            query += "        , chc_seq "
+            query += "        , ques_no "
+            query += "        , ins_id "
+            query += "        , ins_ip "
+            query += "        , ins_dt "
+            query += "        , ins_pgm "
+            query += "        , upd_id "
+            query += "        , upd_ip "
+            query += "        , upd_dt "
+            query += "        , upd_pgm) "
+            query += "    values ( "
+            query += "    '" + str(l_mp_id) + "'"
+            query += "    , '" + str(l_apl_no) + "'"
+            query += "    , (select ifnull(max(t1.chc_no), 0) + 1 from service20_mp_team_chc t1 where t1.mp_id = '" + str(l_mp_id) + "' and t1.team_no = '" + str(l_apl_no) + "')"
+            query += "    , 'MP0111' "
+            query += "    , '" + str(l_att_cdh[i]) + "'"
+            query += "    , '" + str(l_att_cdd[i]) + "'"
+            query += "    , '" + str(l_chc_tp[i]) + "'"
+            query += "    , (select t2.att_val  /* 선택형 답변 가능수      */ "
+            query += "          from service20_mp_sub t2 "
+            query += "         where t2.mp_id   = '" + str(l_mp_id) + "'"
+            query += "           and t2.att_id  = 'MP0111' /* 선택형 질문             */ "
+            query += "           and t2.att_cdh = '" + str(l_att_cdh[i]) + "' /* 선택형 질문 유형        */ "
+            query += "           and t2.att_cdd = '" + str(l_att_cdd[i]) + "'"
+            query += "           and t2.use_yn  = 'Y') "
+            query += "    , '" + str(l_seq[i]) + "' "
+            query += "    , (select t3.sort_seq  /* 답변 NO      */ "
+            query += "          from service20_mp_sub t3 "
+            query += "         where t3.mp_id   = '" + str(l_mp_id) + "'"
+            query += "           and t3.att_id  = 'MP0111' /* 선택형 질문             */ "
+            query += "           and t3.att_cdh = '" + str(l_att_cdh[i]) + "' /* 선택형 질문 유형        */ "
+            query += "           and t3.att_cdd = '" + str(l_att_cdd[i]) + "'"
+            query += "           and t3.use_yn  = 'Y') "
+            query += "    , '" + str(ins_id) + "'"
+            query += "    , '" + str(client_ip) + "'"
+            query += "    , now() "
+            query += "    , '" + str(ins_pgm) + "'"
+            query += "    , '" + str(upd_id) + "'"
+            query += "    , '" + str(client_ip) + "'"
+            query += "    , now() "
+            query += "    , '" + str(upd_pgm) + "'"
+            query += " ) "
+
+            print(query)
+            cursor = connection.cursor()
+            query_result = cursor.execute(query)
+
+    # for i in range(0,int(l_length)):
+    #     query = "  update service20_mp_team_chc "
+    #     query += "     set att_cdd = '" + str(l_att_cdd[i]) + "' "
+    #     query += "       , chc_val = (select t1.att_val  "
+    #     query += "                      from service20_mp_sub t1 "
+    #     query += "                     where t1.mp_id = '" + str(l_mp_id) + "' "
+    #     query += "                       and t1.att_id = 'MP0111' "
+    #     query += "                       and t1.att_cdh = '" + str(l_att_cdh[i]) + "' "
+    #     query += "                       and t1.att_cdd = '" + str(l_att_cdd[i]) + "' "
+    #     query += "                       and t1.use_yn = 'Y') "
+    #     query += "       , chc_seq = '" + l_seq[i] + "' "
+    #     query += "       , ques_no = (select t2.sort_seq  "
+    #     query += "                      from service20_mp_sub t2 "
+    #     query += "                     where t2.mp_id = '" + str(l_mp_id) + "' "
+    #     query += "                       and t2.att_id = 'MP0111' "
+    #     query += "                       and t2.att_cdh = '" + str(l_att_cdh[i]) + "' "
+    #     query += "                       and t2.att_cdd = '" + str(l_att_cdd[i]) + "' "
+    #     query += "                       and t2.use_yn = 'Y') "
+    #     query += "       , upd_id = '" + str(upd_id) + "' "
+    #     query += "       , upd_ip = '" + str(client_ip) + "' "
+    #     query += "       , upd_dt = now() "
+    #     query += "       , upd_pgm = '" + str(upd_pgm) + "' "
+    #     query += "   where mp_id = '" + str(l_mp_id) + "' "
+    #     query += "     and team_no = '" + str(l_apl_no) + "' "
+    #     query += "     and chc_no = '" + str(l_chc_no[i]) + "' "
         
         cursor = connection.cursor()
         query_result = cursor.execute(query) 
