@@ -141,7 +141,9 @@ urlpatterns = [
     # 멘토 출석부(상세)
     path('myapge/mentoAttdDetailList/', mentoAttdDetailListMypage_list.as_view(), name='mentoAttdDetailListMypage_list'),     
     # 인증서
-    path('myapge/report/certificateList/', certificateListMypage_list.as_view(), name='certificateListMypage_list'),     
+    path('myapge/report/certificateList/', certificateListMypage_list.as_view(), name='certificateListMypage_list'),
+    # 패스워드 변경
+    path('mypage/update/', mypage_update, name='mypage_update'),       
     ########################################################################################
     # myPage
     #
