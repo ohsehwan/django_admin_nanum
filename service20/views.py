@@ -3576,7 +3576,68 @@ class certificateListMypage_list(generics.ListAPIView):
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        return Response(serializer.data)                                        
+        return Response(serializer.data)     
+
+# 패스워드 변경
+@csrf_exempt
+def mypage_update(request):
+    l_id = request.POST.get('id', "")
+    l_password = request.POST.get('password', "")
+    l_ins_id = request.POST.get('ins_id', "")
+    l_ins_pgm = request.POST.get('ins_pgm', "")
+    client_ip = request.META['REMOTE_ADDR']
+
+    chk1 = guardian.objects.filter(grdn_id=l_id).exists()
+    chk2 = teacher.objects.filter(tchr_id=l_id).exists()
+    chk3 = mentee.objects.filter(mnte_id=l_id).exists()
+    chk4 = oth_std.objects.filter(std_id=l_id).exists()
+
+    # 보호자
+    if chk1:
+        query = "update service20_guardian "
+        query += "   set pwd = '" + l_password + "' "
+        query += "     , upd_id = '" + l_ins_id + "' "
+        query += "     , upd_ip = '" + client_ip + "' "
+        query += "     , upd_pgm = '" + l_ins_pgm + "' "
+        query += " where grdn_id = '" + l_id + "' "
+        cursor = connection.cursor()
+        query_result = cursor.execute(query)  
+    # 교사
+    elif chk2:
+        query = "update service20_teacher "
+        query += "   set pwd = '" + l_password + "' "
+        query += "     , upd_id = '" + l_ins_id + "' "
+        query += "     , upd_ip = '" + client_ip + "' "
+        query += "     , upd_pgm = '" + l_ins_pgm + "' "
+        query += " where tchr_id = '" + l_id + "' "
+        cursor = connection.cursor()
+        query_result = cursor.execute(query)  
+    # 멘티
+    elif chk3:
+        query = "update service20_mentee "
+        query += "   set pwd = '" + l_password + "' "
+        query += "     , upd_id = '" + l_ins_id + "' "
+        query += "     , upd_ip = '" + client_ip + "' "
+        query += "     , upd_pgm = '" + l_ins_pgm + "' "
+        query += " where mnte_id = '" + l_id + "' "
+        cursor = connection.cursor()
+        query_result = cursor.execute(query)  
+    # 타대학생
+    elif chk4:
+        query = "update service20_oth_std "
+        query += "   set pwd = '" + l_password + "' "
+        query += "     , upd_id = '" + l_ins_id + "' "
+        query += "     , upd_ip = '" + client_ip + "' "
+        query += "     , upd_pgm = '" + l_ins_pgm + "' "
+        query += " where std_id = '" + l_id + "' "
+        cursor = connection.cursor()
+        query_result = cursor.execute(query)  
+
+    message = "Ok"
+    context = {'message': 'Ok'}
+
+    #return HttpResponse(json.dumss(context), content_type="application/json")
+    return JsonResponse(context,json_dumps_params={'ensure_ascii': True})                                         
 #####################################################################################
 # mypage - END
 #####################################################################################
