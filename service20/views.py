@@ -7757,7 +7757,7 @@ def MP0101M_adm_cancle(request):
 
     # 팀별
     query = "select indv_div "
-    query += " from service20_mpgm A where mp_id = '"+ms_ida+"'"
+    query += " from service20_mpgm A where mp_id = '"+mp_id+"'"
     cursor = connection.cursor()
     query_result = cursor.execute(query)  
     results = namedtuplefetchall(cursor) 
