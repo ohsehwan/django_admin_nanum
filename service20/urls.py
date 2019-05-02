@@ -373,6 +373,8 @@ urlpatterns = [
     path('MP01041M/combo/mte/att/', MP01041M_combo_mte_att.as_view(), name='MP01041M_combo_mte_att'),
     # 멘티 리스트 추가 상세
     path('MP01041M/mte/att/', MP01041M_mte_att.as_view(), name='MP01041M_mte_att'),
+    # 멘토에 따른 멘티 리스트
+    path('MP01041M/mtr/mte/', MP01041M_mtr_mte.as_view(), name='MP01041M_mtr_mte'),
     # 프로그램 리스트 콤보 추가
     path('MP01041M/combo/mpgm/att/', MP01041M_combo_mpgm_att.as_view(), name='MP01041M_combo_mpgm_att'),
     # 출석 상세

@@ -11562,6 +11562,48 @@ class MP01041M_mte_att(generics.ListAPIView):
 
         return Response(serializer.data)
 
+# 멘토에 따른 멘티 리스트 ###################################################
+class MP01041M_mtr_mte_Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = mp_mte
+        fields = '__all__'
+
+class MP01041M_mtr_mte(generics.ListAPIView):
+    queryset = mp_mte.objects.all()
+    serializer_class = MP01041M_mtr_mte_Serializer
+
+    def list(self, request):
+        l_mp_id = request.GET.get('mp_id', "")
+        l_apl_no = request.GET.get('apl_no', "")
+
+        queryset = self.get_queryset()
+
+        query = "select t1.id as id "
+        query += "     , t1.mp_id as mp_id "
+        query += "     , t1.mnte_no as mnte_no "
+        query += "     , t1.apl_no as apl_no "
+        query += "     , t1.mnte_id as mnte_id "
+        query += "     , t1.mnte_nm as mnte_nm "
+        query += "     , t1.sch_nm as sch_nm "
+        query += "     , t1.sch_yr as sch_yr "
+        query += "  from service20_mp_mte t1 "
+        query += "  left join service20_mp_mtr t2 on (t2.mp_id = t1.mp_id and t2.apl_no = t1.apl_no) "
+        query += " where t1.mp_id = '" + l_mp_id + "' "
+        query += "   and t1.apl_no = '" + l_apl_no + "' "
+
+        queryset = mp_mte.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
+
 # 프로그램 리스트 콤보 추가 ###################################################
 class MP01041M_combo_mpgm_att_Serializer(serializers.ModelSerializer):
     std_detl_code = serializers.SerializerMethodField()
