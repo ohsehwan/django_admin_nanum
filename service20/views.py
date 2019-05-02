@@ -7179,6 +7179,7 @@ class MP0101M_adm_list_Serializer(serializers.ModelSerializer):
     status_nm = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
     indv_div = serializers.SerializerMethodField()
+    ldr_id = serializers.SerializerMethodField()
     acpt_dt = serializers.DateTimeField(format='%Y-%m-%d')
     intv_dt = serializers.DateTimeField(format='%Y-%m-%d')
 
@@ -7208,6 +7209,8 @@ class MP0101M_adm_list_Serializer(serializers.ModelSerializer):
         return obj.status
     def get_indv_div(self,obj):
         return obj.indv_div
+    def get_ldr_id(self,obj):
+        return obj.ldr_id
 
 class MP0101M_adm_list(generics.ListAPIView):
     queryset = mp_mtr.objects.all()
