@@ -303,6 +303,12 @@ urlpatterns = [
     path('MP0101M/admin/team/quest/', MP0101M_adm_team_quest.as_view(), name='MP0101M_adm_team_quest'),
     # 멘토링 프로그램(관리자) - 업로드가능한 첨부파일
     path('MP0101M/service/file/chk/', MP0101M_service_team_upload_file_chk.as_view(), name='MP0101M_service_team_upload_file_chk'),
+    # 멘토링 프로그램(팀원팝업) - 조회
+    path('popupTeam/list/', popupTeam_list.as_view(), name='popupTeam_list'),
+    # 멘토링 프로그램(팀원팝업) - delete
+    path('popupTeam/delete/', popupTeam_delete, name='popupTeam_delete'),
+    # 멘토링 프로그램(팀원팝업) - insert
+    path('popupTeam/insert/', popupTeam_insert, name='popupTeam_insert'),
     ########################################################################################
     # 멘토링 프로그램(MP0101M - END )
     #
