@@ -6583,7 +6583,7 @@ def MP0101M_save(request):
                     model_instance = mp_mtr(
                         mp_id=mp_id, 
                         apl_no=team_apl_no, 
-                        mntr_id=ida,
+                        mntr_id=team_apl_id,
                         apl_id=team_apl_id,
                         team_id=str(team_no),
                         apl_nm=rows.apl_nm,
