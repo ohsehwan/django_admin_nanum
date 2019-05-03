@@ -7502,6 +7502,23 @@ def MP0101M_adm_update(request):
     cursor = connection.cursor()
     query_result = cursor.execute(update_text)
 
+
+    # 팀별
+    query = "select indv_div "
+    query += " from service20_mpgm A where mp_id = '"+mp_id+"'"
+    cursor = connection.cursor()
+    query_result = cursor.execute(query)  
+    results = namedtuplefetchall(cursor) 
+    v_indv_div = str(results[0].indv_div)
+
+    if v_indv_div == "T":
+        update_text = " update service20_mp_mtr a "
+        update_text += " SET status = '10' "
+        update_text += " WHERE 1=1 "
+        update_text += " AND a.mp_id = '"+mp_id+"' "
+        update_text += " AND a.team_id in ( select team_id from service20_mp_mtr as sub_a where sub_a.mp_id = '"+mp_id+"' and sub_a.apl_no = '"+apl_no+"' ) "        
+    # 팀별 
+
     for i in range(0,apl_max):
         anst2 = request.POST.get('que'+str(i+1), None)
         ques_no = request.POST.get('ques_no'+str(i+1), None)
