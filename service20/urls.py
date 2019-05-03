@@ -301,6 +301,8 @@ urlpatterns = [
     path('MP0101M/service/team/combo/', MP0101M_service_team_combo.as_view(), name='MP0101M_service_team_combo'),
     # 멘토링 프로그램(관리자) - 질문
     path('MP0101M/admin/team/quest/', MP0101M_adm_team_quest.as_view(), name='MP0101M_adm_team_quest'),
+    # 멘토링 프로그램(관리자) - 업로드가능한 첨부파일
+    path('MP0101M/service/file/chk/', MP0101M_service_team_upload_file_chk.as_view(), name='MP0101M_service_team_upload_file_chk'),
     ########################################################################################
     # 멘토링 프로그램(MP0101M - END )
     #

@@ -9962,6 +9962,43 @@ class MP0101M_adm_team_quest(generics.ListAPIView):
 
         return Response(serializer.data)        
 #팀단위 추가!!!
+
+
+# 멘토링 프로그램 - 업로드 가능한 첨부파일 ###################################################
+class MP0101M_service_team_upload_file_chk_Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = mp_sub
+        fields = '__all__'
+
+class MP0101M_service_team_upload_file_chk(generics.ListAPIView):
+    queryset = mp_sub.objects.all()
+    serializer_class = MP0101M_service_team_upload_file_chk_Serializer
+    
+    def list(self, request):
+        l_mp_id = request.GET.get('mp_id', "")
+
+        query = " select t1.id, t1.mp_id    /* 멘토링프로그램id     */ "
+        query += "     , t1.att_cdh  /* 첨부파일 code header */ "
+        query += "     , t1.att_cdd  /* 첨부파일 code        */ "
+        query += "     , t1.att_val  /* 첨부파일 종류        */ "
+        query += "  from service20_mp_sub t1 "
+        query += " where mp_id   ='" + l_mp_id + "'  "
+        query += "   and att_cdh = 'MP0112' "
+        query += "   and use_yn  = 'Y' "
+        query += " order by sort_seq; "
+
+        queryset = mp_sub.objects.raw(query)
+        
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
 #####################################################################################
 # MP0101M - END 
 #####################################################################################
