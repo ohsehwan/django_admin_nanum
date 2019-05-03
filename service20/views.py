@@ -14083,6 +14083,65 @@ class TE0202_list(generics.ListAPIView):
         return Response(serializer.data)
 
 
+#####################################################################################
+# TE0202 - START
+#####################################################################################
+
+# 멘티출석확인 멘티 리스트 ###################################################
+class TE0202_list_Serializer(serializers.ModelSerializer):
+    apl_no = serializers.SerializerMethodField()
+    apl_nm = serializers.SerializerMethodField()
+
+    class Meta:
+        model = mp_mte
+        fields = '__all__'
+
+    def get_apl_no(self,obj):
+        return obj.apl_no
+    def get_apl_nm(self,obj):
+        return obj.apl_nm
+
+class TE0202_list(generics.ListAPIView):
+    queryset = mp_mte.objects.all()
+    serializer_class = TE0202_list_Serializer
+
+    def list(self, request):
+        l_mp_id = request.GET.get('mp_id', "")
+        l_user_id = request.GET.get('user_id', "")
+
+        queryset = self.get_queryset()
+
+        # /* 멘티출석확인 멘티 리스트 조회 TE0202/list */
+        query = " select t1.id as id "
+        query += " , t1.mp_id as mp_id "
+        query += "     , t1.mnte_no as mnte_no"
+        query += "     , t2.apl_no as apl_no"
+        query += "     , t2.apl_nm as apl_nm"
+        query += "     , t1.mnte_id as mnte_id"
+        query += "     , t1.mnte_nm as mnte_nm"
+        query += "     , t1.sch_nm as sch_nm"
+        query += "     , t1.sch_yr as sch_yr"
+        query += "     , t1.tchr_id as tchr_id"
+        query += "     , t1.grd_id as grd_id"
+        query += "  from service20_mp_mte t1"
+        query += "  LEFT JOIN service20_mp_mtr t2 ON (t2.mp_id = t1.mp_id AND t2.apl_no = t1.apl_no)"
+        query += " where t1.mp_id    = '" + l_mp_id + "'    /* 멘토링 프로그램id */"
+        query += "   and (t1.tchr_id = '" + l_user_id + "' or t1.grd_id = '" + l_user_id + "')"
+
+        print(query)
+        queryset = mp_mte.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
+
+
 # 멘티출석확인 멘티에 따른 월별 멘토 리스트 ###################################################
 class TE0202_detail_Serializer(serializers.ModelSerializer):
     att_ym = serializers.SerializerMethodField()
@@ -14091,9 +14150,9 @@ class TE0202_detail_Serializer(serializers.ModelSerializer):
     att_stm = serializers.SerializerMethodField()
     att_etm = serializers.SerializerMethodField()
     mgr_nm = serializers.SerializerMethodField()
-    mnte_id = serializers.SerializerMethodField()
+    # mnte_id = serializers.SerializerMethodField()
     mp_div_nm = serializers.SerializerMethodField()
-    mnte_nm = serializers.SerializerMethodField()
+    # mnte_nm = serializers.SerializerMethodField()
 
     class Meta:
         model = mp_att
@@ -14111,12 +14170,12 @@ class TE0202_detail_Serializer(serializers.ModelSerializer):
         return obj.att_etm
     def get_mgr_nm(self,obj):
         return obj.mgr_nm
-    def get_mnte_id(self,obj):
-        return obj.mnte_id
+    # def get_mnte_id(self,obj):
+    #     return obj.mnte_id
     def get_mp_div_nm(self,obj):
         return obj.mp_div_nm
-    def get_mnte_nm(self,obj):
-        return obj.mnte_nm
+    # def get_mnte_nm(self,obj):
+    #     return obj.mnte_nm
 
 class TE0202_detail(generics.ListAPIView):
     queryset = mp_att.objects.all()
@@ -14124,9 +14183,10 @@ class TE0202_detail(generics.ListAPIView):
 
     def list(self, request):
         l_yr = request.GET.get('yr', "")
+        l_apl_no = request.GET.get('apl_no', "")
         l_month  = request.GET.get('month', "")
         l_mp_id = request.GET.get('mp_id', "")
-        l_mnte_id = request.GET.get('mnte_id', "")
+        # l_mnte_id = request.GET.get('mnte_id', "")
         l_appr_yn = request.GET.get('appr_yn', "")
         l_mgr_yn = request.GET.get('mgr_yn', "")
 
@@ -14160,23 +14220,24 @@ class TE0202_detail(generics.ListAPIView):
         query += "     , t1.mgr_id as mgr_id    /* 관리자id */"
         query += "     , case when t1.mgr_dt is not null then t4.mgr_nm else null end as mgr_nm   /* 관리자명 */"
         query += "     , substring(t1.mgr_dt, 1, 16)  as mgr_dt   /* 관리자 승인일시 */"
-        query += "     , t3.mnte_id as mnte_id"
+        # query += "     , t3.mnte_id as mnte_id"
         query += "     , t1.att_sts as att_sts"
-        query += "     , t3.mnte_nm as mnte_nm"
+        # query += "     , t3.mnte_nm as mnte_nm"
         query += "  from service20_mp_att t1"
         query += "  left join service20_mp_mtr t2 on (t2.mp_id = t1.mp_id"
         query += "                                   and t2.apl_no = t1.apl_no)"
-        query += "  left join service20_mp_mte t3 on (t3.mp_id = t1.mp_id"
-        query += "                                   and t3.apl_no = t1.apl_no)"
+        # query += "  left join service20_mp_mte t3 on (t3.mp_id = t1.mp_id"
+        # query += "                                   and t3.apl_no = t1.apl_no)"
         query += "  left join service20_mpgm   t4 on (t4.mp_id    = t1.mp_id)"
         query += " left join service20_com_cdd c1 on (c1.std_grp_code  = 'mp0059' and c1.std_detl_code = t1.mp_div) "
         query += " where t1.mp_id    = '" + l_mp_id + "'    /* 멘토링 프로그램id */"
+        query += " and t1.apl_no = '" + l_apl_no + "'"
         query += " and t1.appr_div   like ifnull(nullif('" + l_appr_yn + "', ''), '%%')   "
         query += " and t1.mgr_div   like ifnull(nullif('" + l_mgr_yn + "', ''), '%%')   "
         # query += "   and (('" + l_appr_yn + "' = 'Y' and t1.appr_dt is not null) or ('" + l_appr_yn + "' <> 'Y' and t1.appr_dt is null))"
         # query += "   and (('" + l_mgr_yn + "' = 'Y' and t1.mgr_dt is not null) or ('" + l_mgr_yn + "' <> 'Y' and t1.mgr_dt is null))"
         query += " and (t1.att_sdt >= CONCAT('" + l_yr + "-" + l_month1 + "', '-01') AND t1.att_sdt < ADDDATE(LAST_DAY(CONCAT('" + l_yr + "-" + l_month2 + "', '-01')), 1))"
-        query += "   and t3.mnte_id = '" + l_mnte_id + "'"
+        # query += "   and t3.mnte_id = '" + l_mnte_id + "'"
         query += " order by t1.att_no"
 
         print(query)
@@ -14196,7 +14257,7 @@ class TE0202_detail(generics.ListAPIView):
 @csrf_exempt
 def TE0202_Approval(request):
     l_mp_id = request.POST.get('upd_mp_id', "")
-    l_mnte_id = request.POST.get('upd_mnte_id', "")
+    # l_mnte_id = request.POST.get('upd_mnte_id', "")
     l_apl_no = request.POST.get('upd_apl_no', "")
     l_att_no = request.POST.get('upd_att_no', "")
     l_status = request.POST.get('upd_status', "")
@@ -14218,12 +14279,7 @@ def TE0202_Approval(request):
     query = " update service20_mp_att t1"
     query += "   set t1.appr_dt = case when '" + l_status + "' = 'B' then now() else null end"
     query += "     , t1.appr_id = case when '" + l_status + "' = 'B' then '" + l_user_id + "' else null end"
-    query += "     , t1.appr_nm = case when '" + l_status + "' = 'B' then (select case when grd_id = '" + l_user_id + "' then grd_nm"
-    query += "                                                               when tchr_id = '" + l_user_id + "' then tchr_nm"
-    query += "                                                               else null end as appr_nm"
-    query += "                                                     from service20_mp_mte"
-    query += "                                                    where mp_id = '" + l_mp_id + "'"
-    query += "                                                      and mnte_id = '" + l_mnte_id + "' )"
+    query += "     , t1.appr_nm = case when '" + l_status + "' = 'B' then (select tchr_nm from service20_teacher where tchr_id = '" + l_user_id + "')"
     query += "                         else null end"
     query += "     , t1.appr_div = 'Y'"
     query += "     , t1.att_sts = 'C'"
