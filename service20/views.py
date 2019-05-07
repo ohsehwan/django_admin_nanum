@@ -10116,8 +10116,8 @@ def popupTeam_delete(request):
 def popupTeam_insert(request):
     l_mp_id = request.POST.get('mp_id', "")    
     l_team_id = request.POST.get('team_id', "")
-    l_team_min = request.POST.get('team_min', "")
-    l_team_min = int(l_team_min)+1
+    l_team_min = request.POST.get('team_row', "")
+    l_team_min = int(l_team_min) + 1
     l_apl_id = list()
     l_apl_no = list()
 
