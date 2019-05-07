@@ -11035,10 +11035,11 @@ class MP0103M_Detail_v2_Serializer(serializers.ModelSerializer):
     mgr_nm  = serializers.SerializerMethodField()
     mgr_dt  = serializers.SerializerMethodField()
     status  = serializers.SerializerMethodField()
+    mnte_nm  = serializers.SerializerMethodField()
 
     class Meta:
         model = mp_mtr
-        fields = ('apl_nm','apl_id','tchr_nm','sch_nm','mtr_sub','pln_time', 'appr_nm', 'appr_dt', 'mgr_nm', 'mgr_dt', 'status')
+        fields = ('apl_nm','apl_id','tchr_nm','sch_nm','mtr_sub','pln_time', 'appr_nm', 'appr_dt', 'mgr_nm', 'mgr_dt', 'status', 'mnte_nm')
       
     def get_tchr_nm(self, obj):
         return obj.tchr_nm
@@ -11058,6 +11059,8 @@ class MP0103M_Detail_v2_Serializer(serializers.ModelSerializer):
         return obj.mgr_dt
     def get_status(self, obj):
         return obj.status
+    def get_mnte_nm(self, obj):
+        return obj.mnte_nm
 
 class MP0103M_Detail_v2(generics.ListAPIView):
     queryset = mpgm.objects.all()
@@ -11083,6 +11086,7 @@ class MP0103M_Detail_v2(generics.ListAPIView):
         query += "      , t2.mgr_nm as mgr_nm "
         query += "      , date_format(t1.mgr_dt, '%%y-%%m-%%d %%h:%%i:%%s') as mgr_dt "
         query += "      , t1.status as status "
+        query += "      , fn_mp_mte_select_01(t1.mp_id, t1.apl_no) AS mnte_nm "
         query += "   from service20_mp_plnh t1 "
         query += "   left join service20_mpgm t2 on (t2.mp_id = t1.mp_id) "
         query += "   left join service20_mp_mte t3 on (t3.mp_id = t1.mp_id and t3.apl_no = t1.apl_no) "
