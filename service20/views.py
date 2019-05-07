@@ -13555,7 +13555,8 @@ def MP0105M_update(request,pk):
 class MP0105M_listBtn_Serializer(serializers.ModelSerializer):
 
     mpgm_month  = serializers.SerializerMethodField()  
-    mpgm_month2 = serializers.SerializerMethodField()  
+    mpgm_month2 = serializers.SerializerMethodField()
+    rep_status = serializers.SerializerMethodField()
 
     class Meta:
         model = mpgm
@@ -13565,6 +13566,8 @@ class MP0105M_listBtn_Serializer(serializers.ModelSerializer):
         return obj.mpgm_month  
     def get_mpgm_month2(self,obj):
         return obj.mpgm_month2          
+    def get_rep_status(self,obj):
+        return obj.rep_status
 
 class MP0105M_listBtn(generics.ListAPIView):
     queryset = mpgm.objects.all()
@@ -13578,7 +13581,9 @@ class MP0105M_listBtn(generics.ListAPIView):
 
         queryset = self.get_queryset()
 
-        query  = "select t3.* from ( "    
+        query  = "select t3.*, t4.status as mtr_status"
+        query += "     , case when t3.mpgm_month2 = substring(REPLACE(t5.mnt_to_dt, '-', ''), 1, 6) THEN 'F' ELSE 'M' END AS rep_status"
+        query += " from ( "    
         query += "    select date_format(date_table.date,'%%Y-%%m') as mpgm_month "   
         query += "         , date_format(date_table.date,'%%Y%%m') as mpgm_month2 " 
         query += "         , 'id' as mp_id "  
@@ -13594,6 +13599,8 @@ class MP0105M_listBtn(generics.ListAPIView):
         query += "    and b.status = '60'     "  
         query += "    group by date_format(date_table.date,'%%Y-%%m') "    
         query += ") as t3 "    
+        query += " left join service20_mp_mtr t4 on (t4.mp_id = '" + l_mp_id + "' and t4.apl_no = '" + l_apl_no + "')"
+        query += " left join service20_mpgm t5 on (t5.mp_id = '" + l_mp_id + "')"
         query += "where t3.mpgm_month2 not in ( "    
         query += "    select ifnull(sub_t2.rep_ym,'') "    
         query += "      from service20_mpgm as sub_t1 left join (select * "    
@@ -13606,6 +13613,7 @@ class MP0105M_listBtn(generics.ListAPIView):
         query += "and t3.mpgm_month <= date_format(now(), '%%Y-%%m') "       
         query += "and t3.mpgm_month2 <> '201903' " ## 201903은 첫시작단계라 월별보고서 제외. 추후 필요하다고 하면 삭제하면 됨.
 
+        print(query)
         queryset = mpgm.objects.raw(query)
 
         serializer_class = self.get_serializer_class()
@@ -13625,6 +13633,7 @@ def MP0105M_insert(request):
     mp_id    = request.POST.get('mp_id', "")
     apl_no    = request.POST.get('apl_no', "")
     rep_ym    = request.POST.get('rep_ym', "")
+    rep_div    = request.POST.get('rep_div', "")
 
     upd_id    = request.POST.get('upd_id', "")
     upd_dt    = request.POST.get('upd_dt', "")
@@ -13672,7 +13681,7 @@ def MP0105M_insert(request):
     update_text += "select a.mp_id     /* 멘토링 프로그램id */ "    
     update_text += "     , a.apl_no    /* 멘토 지원 no */ "    
     update_text += "     , (select ifnull(max(rep_no),0)+1 from service20_mp_rep where mp_id = a.mp_id and apl_no = a.apl_no) rep_no "    
-    update_text += "     , 'M'   /* 보고서 구분(mp0062) */ "    
+    update_text += "     , '" + str(rep_div) + "'   /* 보고서 구분(mp0062) */ "    
     update_text += "     , '"+str(rep_ym)+"'    /* 보고서 연월(월보고) */ "    
     update_text += "     , null   /* 담당멘티id */ "    
     update_text += "     , null   /* 담당멘티명 */ "    
