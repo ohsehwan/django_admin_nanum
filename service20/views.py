@@ -5745,6 +5745,36 @@ class MP0101M_list_chk_8(generics.ListAPIView):
 
         return Response(serializer.data)
 
+class MP0101M_list_chk_9_Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = mp_team
+        fields = ('team_id')
+
+class MP0101M_list_chk_9(generics.ListAPIView):
+    queryset = mp_team.objects.all()
+    serializer_class = MP0101M_list_chk_9_Serializer
+
+    def list(self, request):
+
+        mp_id = request.GET.get('mp_id', "")
+        team_id = request.GET.get('team_id', "")
+
+        # 팀명 중복 체크
+        query = " SELECT count(0) AS team_id FROM service20_mp_team WHERE mp_id = '" + mp_id + "' AND team_id = '" + team_id + "' "
+
+        queryset = mp_team.objects.raw(query)
+        
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, context={'request': request}, many=True)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
+
 class MP0101M_list_Serializer(serializers.ModelSerializer):
 
     applyFlag = serializers.SerializerMethodField()
@@ -16053,6 +16083,38 @@ class com_combo_programIntroduce(generics.ListAPIView):
 
 
         queryset = mpgm_introduce.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data) 
+
+# 회원구분 콤보(멘티, 학부모, 교사만)
+class com_combo_member_gubun_Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = com_cdd
+        fields = '__all__'
+
+class com_combo_member_gubun(generics.ListAPIView):
+    queryset = com_cdd.objects.all()
+    serializer_class = com_combo_member_gubun_Serializer
+
+    def list(self, request):
+               
+        queryset = self.get_queryset()
+        
+        query = " select id, std_detl_code, std_detl_code_nm "
+        query += "  from service20_com_cdd "
+        query += " where std_grp_code = 'CM0001' "
+        query += "   and std_detl_code in ('E', 'G', 'T') "
+
+        queryset = com_cdd.objects.raw(query)
 
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(queryset, many=True)
