@@ -92,6 +92,8 @@ urlpatterns = [
     path('com/combo/spc/status/', com_combo_spc_status.as_view(), name='com_combo_spc_status'),
     # 프로그램 찾기 (introduce테이블 프로그램)
     path('com/combo/programIntroduce/', com_combo_programIntroduce.as_view(), name='com_combo_programIntroduce'),
+    # 회원구분 콤보(멘티, 학부모, 교사만)
+    path('com/combo/member_gubun/', com_combo_member_gubun.as_view(), name='com_combo_member_gubun'), 
     ########################################################################################
     # 공통(com)
     #
@@ -205,6 +207,7 @@ urlpatterns = [
     path('MP0101M/list/chk/6/', MP0101M_list_chk_6.as_view(), name='MP0101M_list_chk_6'),
     path('MP0101M/list/chk/7/', MP0101M_list_chk_7.as_view(), name='MP0101M_list_chk_7'),
     path('MP0101M/list/chk/8/', MP0101M_list_chk_8.as_view(), name='MP0101M_list_chk_8'),
+    path('MP0101M/list/chk/9/', MP0101M_list_chk_9.as_view(), name='MP0101M_list_chk_9'),
     # 멘토링 프로그램 리스트 조회
     path('MP0101M/list/', MP0101M_list.as_view(), name='MP0101M_list'),
     # 멘토링 프로그램 신청내역
