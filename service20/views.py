@@ -5749,7 +5749,7 @@ class MP0101M_list_chk_9_Serializer(serializers.ModelSerializer):
 
     class Meta:
         model = mp_team
-        fields = ('team_id')
+        fields = '__all__'
 
 class MP0101M_list_chk_9(generics.ListAPIView):
     queryset = mp_team.objects.all()
@@ -10033,7 +10033,8 @@ class MP0101M_service_team_upload_file_chk(generics.ListAPIView):
         query += " where mp_id   ='" + l_mp_id + "'  "
         query += "   and att_cdh = 'MP0112' "
         query += "   and use_yn  = 'Y' "
-        query += " order by sort_seq; "
+        query += " group by att_cdd "
+        query += " order by sort_seq"
 
         queryset = mp_sub.objects.raw(query)
         
