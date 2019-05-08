@@ -5761,7 +5761,7 @@ class MP0101M_list_chk_9(generics.ListAPIView):
         team_id = request.GET.get('team_id', "")
 
         # 팀명 중복 체크
-        query = " SELECT count(0) AS team_id FROM service20_mp_team WHERE mp_id = '" + mp_id + "' AND team_id = '" + team_id + "' "
+        query = " SELECT id, mp_id, count(0) AS team_id FROM service20_mp_team WHERE mp_id = '" + mp_id + "' AND team_id = '" + team_id + "' "
 
         queryset = mp_team.objects.raw(query)
         
