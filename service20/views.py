@@ -16319,7 +16319,7 @@ class mpmgListView(generics.ListAPIView):
     def list(self, request):
         queryset = self.get_queryset()
 
-        query = "select * from service20_mpgm where status = '20' and use_div = 'Y' order by apl_fr_dt desc, apl_to_dt desc"
+        query = "select * from service20_mpgm where status = '20' and now() between apl_fr_dt and apl_to_dt and use_div = 'Y' order by apl_fr_dt desc, apl_to_dt desc"
 
 
         queryset = mpgm.objects.raw(query)
