@@ -15067,7 +15067,7 @@ def TE0203_Insert(request):
 
         cm_surv_a_flag = cm_surv_a.objects.filter(pgm_id=str(mp_id),surv_seq=str(surv_seq),ansr_id=str(ansr_id),ques_no=str(ques_no)).exists()
         query = ""
-        if not ms_apl_flag:
+        if not cm_surv_a_flag:
             # 미존재
             query += " insert into service20_cm_surv_a ("
             query += "      pgm_id"
