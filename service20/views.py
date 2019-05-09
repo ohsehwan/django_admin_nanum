@@ -15115,24 +15115,24 @@ def TE0203_Insert(request):
             # 존재
             
             # /*프로그램 만족도 조사_저장*/
-            update_text  = " update service20_cm_surv_a t1 "
-            update_text += " set t1.ansr_div = '"+str(ansr_div)+"' "
-            update_text += " , t1.ques_dt = REPLACE(REPLACE(REPLACE(SUBSTRING(NOW(),1, 10), '-',''),':',''),' ', '')"
-            update_text += " , t1.surv_id = '"+str(surv_id)+"' "
+            query += " update service20_cm_surv_a t1 "
+            query += " set t1.ansr_div = '"+str(ansr_div)+"' "
+            query += " , t1.ques_dt = REPLACE(REPLACE(REPLACE(SUBSTRING(NOW(),1, 10), '-',''),':',''),' ', '')"
+            query += " , t1.surv_id = '"+str(surv_id)+"' "
 
-            update_text += " , t1.ans_t1 = case when '" + str(ans_t2) + "' = '' and '" + str(ans_t3) + "' = '' then '" + str(ans_t1) +"' else null end "
-            update_text += " , t1.ans_t2 = case when '" + str(ans_t1) + "' = '' and '" + str(ans_t3) + "' = '' then '" + str(ans_t2) +"' else null end "
-            update_text += " , t1.ans_t3 = case when '" + str(ans_t1) + "' = '' and '" + str(ans_t2) + "' = '' then '" + str(ans_t3) +"' else null end "
+            query += " , t1.ans_t1 = case when '" + str(ans_t2) + "' = '' and '" + str(ans_t3) + "' = '' then '" + str(ans_t1) +"' else null end "
+            query += " , t1.ans_t2 = case when '" + str(ans_t1) + "' = '' and '" + str(ans_t3) + "' = '' then '" + str(ans_t2) +"' else null end "
+            query += " , t1.ans_t3 = case when '" + str(ans_t1) + "' = '' and '" + str(ans_t2) + "' = '' then '" + str(ans_t3) +"' else null end "
             
 
-            update_text += " , t1.upd_ip = '"+str(client_ip)+"' "
-            update_text += " , t1.upd_dt = now() "
-            update_text += " , t1.upd_pgm = '"+str(upd_pgm)+"' "
-            update_text += " where 1=1 "
-            update_text += " and t1.pgm_id    = '"+str(mp_id)+"' "
-            update_text += " and t1.surv_seq = '"+str(surv_seq)+"' "
-            update_text += " and t1.ansr_id = '"+str(ansr_id)+"' "
-            update_text += " and t1.ques_no = '"+str(ques_no)+"' "
+            query += " , t1.upd_ip = '"+str(client_ip)+"' "
+            query += " , t1.upd_dt = now() "
+            query += " , t1.upd_pgm = '"+str(upd_pgm)+"' "
+            query += " where 1=1 "
+            query += " and t1.pgm_id    = '"+str(mp_id)+"' "
+            query += " and t1.surv_seq = '"+str(surv_seq)+"' "
+            query += " and t1.ansr_id = '"+str(ansr_id)+"' "
+            query += " and t1.ques_no = '"+str(ques_no)+"' "
 
             # (따옴표 처리)
             # cm_surv_a.objects.filter(pgm_id=str(mp_id),surv_seq=str(surv_seq),ansr_id=str(ansr_id),ques_no=str(ques_no)).update(ans_t1=str(mtr_revw))
