@@ -15016,25 +15016,47 @@ def TE0203_Insert(request):
     upd_dt = request.POST.get('upd_dt', "")
     upd_pgm = request.POST.get('upd_pgm', "")
 
+    client_ip = request.META['REMOTE_ADDR']
+
+    # 저장상태구분 I(제출)/S(임시저장)
+    save_status = request.POST.get('save_status', "")
+
     quesRow = request.POST.get('ques_row', 0)
     row_max = int(quesRow)
 
-    # service20_cm_surv_h update
-    query = " update service20_cm_surv_h"
-    query += " set status = '90'"
-    query += "  , surv_dt = now()"
-    query += "  , avg_ans_t1 = '" + avg + "'"
-    query += "  , upd_id = '" + upd_id + "'"
-    query += "  , upd_ip = '" + upd_ip + "'"
-    query += "  , upd_dt = now()"
-    query += "  , upd_pgm = '" + upd_pgm + "'"
-    query += " where pgm_id = '" + mp_id + "'"
-    query += "  and surv_seq = '" + surv_seq + "'"
-    query += "  and ansr_id = '" + ansr_id + "'"
+    if save_status == "I":
+        # 제출
+        query = " update service20_cm_surv_h"
+        query += " set status = '90'"
+        query += "  , surv_dt = now()"
+        query += "  , avg_ans_t1 = '" + avg + "'"
+        query += "  , upd_id = '" + upd_id + "'"
+        query += "  , upd_ip = '" + upd_ip + "'"
+        query += "  , upd_dt = now()"
+        query += "  , upd_pgm = '" + upd_pgm + "'"
+        query += " where pgm_id = '" + mp_id + "'"
+        query += "  and surv_seq = '" + surv_seq + "'"
+        query += "  and ansr_id = '" + ansr_id + "'"
 
-    print(query)
-    cursor = connection.cursor()
-    query_result = cursor.execute(query)   
+        print(query)
+        cursor = connection.cursor()
+        query_result = cursor.execute(query)   
+    elif save_status == "S":
+        # 임시저장
+        query = " update service20_cm_surv_h"
+        query += " set surv_dt = now()"
+        query += "  , avg_ans_t1 = '" + avg + "'"
+        query += "  , upd_id = '" + upd_id + "'"
+        query += "  , upd_ip = '" + upd_ip + "'"
+        query += "  , upd_dt = now()"
+        query += "  , upd_pgm = '" + upd_pgm + "'"
+        query += " where pgm_id = '" + mp_id + "'"
+        query += "  and surv_seq = '" + surv_seq + "'"
+        query += "  and ansr_id = '" + ansr_id + "'"
+
+        print(query)
+        cursor = connection.cursor()
+        query_result = cursor.execute(query)   
 
     # service20_cm_surv_a Insert
     for i in range(0,row_max):
@@ -15043,51 +15065,83 @@ def TE0203_Insert(request):
         ans_t2 = request.POST.get('ans_t2'+str(i+1), "")
         ans_t3 = request.POST.get('ans_t3'+str(i+1), "")
 
-        query = " insert into service20_cm_surv_a ("
-        query += "      pgm_id"
-        query += "    , surv_seq"
-        query += "    , ansr_id"
-        query += "    , ques_no"
-        query += "    , ansr_div"
-        query += "    , ans_t1"
-        query += "    , ans_t2"
-        query += "    , ans_t3"
-        query += "    , ques_dt"
-        query += "    , surv_id"
-        query += "    , ins_id"
-        query += "    , ins_ip"
-        query += "    , ins_dt"
-        query += "    , ins_pgm"
-        query += "    , upd_id"
-        query += "    , upd_ip"
-        query += "    , upd_dt"
-        query += "    , upd_pgm"
-        query += ")"
-        query += " values ("
-        query += "      '" + str(mp_id) + "'"
-        query += "    , '" + str(surv_seq) + "'"
-        query += "    , '" + str(ansr_id) + "'"
-        query += "    , '" + str(ques_no) + "'"
-        query += "    , '" + str(ansr_div) + "'"
-        query += "    , case when '" + str(ans_t2) + "' = '' and '" + str(ans_t3) + "' = '' then '" + str(ans_t1) +"' else null end "
-        query += "    , case when '" + str(ans_t1) + "' = '' and '" + str(ans_t3) + "' = '' then '" + str(ans_t2) +"' else null end "
-        query += "    , case when '" + str(ans_t1) + "' = '' and '" + str(ans_t2) + "' = '' then '" + str(ans_t3) +"' else null end "
-        query += "    , REPLACE(REPLACE(REPLACE(SUBSTRING(NOW(),1, 10), '-',''),':',''),' ', '')"
-        query += "    , '" + str(surv_id) + "'"
-        query += "    , '" + str(ins_id) + "'"
-        query += "    , '" + str(ins_ip) + "'"
-        query += "    , now()"
-        query += "    , '" + str(ins_pgm) + "'"
-        query += "    , '" + str(upd_id) + "'"
-        query += "    , '" + str(upd_ip) + "'"
-        query += "    , now()"
-        query += "    , '" + str(upd_pgm) + "'"
-        query += " )"
+        cm_surv_a_flag = cm_surv_a.objects.filter(pgm_id=str(mp_id),surv_seq=str(surv_seq),ansr_id=str(ansr_id),ques_no=str(ques_no)).exists()
+        query = ""
+        if not ms_apl_flag:
+            # 미존재
+            query += " insert into service20_cm_surv_a ("
+            query += "      pgm_id"
+            query += "    , surv_seq"
+            query += "    , ansr_id"
+            query += "    , ques_no"
+            query += "    , ansr_div"
+            query += "    , ans_t1"
+            query += "    , ans_t2"
+            query += "    , ans_t3"
+            query += "    , ques_dt"
+            query += "    , surv_id"
+            query += "    , ins_id"
+            query += "    , ins_ip"
+            query += "    , ins_dt"
+            query += "    , ins_pgm"
+            query += "    , upd_id"
+            query += "    , upd_ip"
+            query += "    , upd_dt"
+            query += "    , upd_pgm"
+            query += ")"
+            query += " values ("
+            query += "      '" + str(mp_id) + "'"
+            query += "    , '" + str(surv_seq) + "'"
+            query += "    , '" + str(ansr_id) + "'"
+            query += "    , '" + str(ques_no) + "'"
+            query += "    , '" + str(ansr_div) + "'"
+            query += "    , case when '" + str(ans_t2) + "' = '' and '" + str(ans_t3) + "' = '' then '" + str(ans_t1) +"' else null end "
+            query += "    , case when '" + str(ans_t1) + "' = '' and '" + str(ans_t3) + "' = '' then '" + str(ans_t2) +"' else null end "
+            query += "    , case when '" + str(ans_t1) + "' = '' and '" + str(ans_t2) + "' = '' then '" + str(ans_t3) +"' else null end "
+            query += "    , REPLACE(REPLACE(REPLACE(SUBSTRING(NOW(),1, 10), '-',''),':',''),' ', '')"
+            query += "    , '" + str(surv_id) + "'"
+            query += "    , '" + str(ins_id) + "'"
+            query += "    , '" + str(ins_ip) + "'"
+            query += "    , now()"
+            query += "    , '" + str(ins_pgm) + "'"
+            query += "    , '" + str(upd_id) + "'"
+            query += "    , '" + str(upd_ip) + "'"
+            query += "    , now()"
+            query += "    , '" + str(upd_pgm) + "'"
+            query += " )"
+
+                
+        else:
+            # 존재
+            
+            # /*프로그램 만족도 조사_저장*/
+            update_text  = " update service20_cm_surv_a t1 "
+            update_text += " set t1.ansr_div = '"+str(ansr_div)+"' "
+            update_text += " , t1.ques_dt = REPLACE(REPLACE(REPLACE(SUBSTRING(NOW(),1, 10), '-',''),':',''),' ', '')"
+            update_text += " , t1.surv_id = '"+str(surv_id)+"' "
+
+            update_text += " , t1.ans_t1 = case when '" + str(ans_t2) + "' = '' and '" + str(ans_t3) + "' = '' then '" + str(ans_t1) +"' else null end "
+            update_text += " , t1.ans_t2 = case when '" + str(ans_t1) + "' = '' and '" + str(ans_t3) + "' = '' then '" + str(ans_t2) +"' else null end "
+            update_text += " , t1.ans_t3 = case when '" + str(ans_t1) + "' = '' and '" + str(ans_t2) + "' = '' then '" + str(ans_t3) +"' else null end "
+            
+
+            update_text += " , t1.upd_ip = '"+str(client_ip)+"' "
+            update_text += " , t1.upd_dt = now() "
+            update_text += " , t1.upd_pgm = '"+str(upd_pgm)+"' "
+            update_text += " where 1=1 "
+            update_text += " and t1.pgm_id    = '"+str(mp_id)+"' "
+            update_text += " and t1.surv_seq = '"+str(surv_seq)+"' "
+            update_text += " and t1.ansr_id = '"+str(ansr_id)+"' "
+            update_text += " and t1.ques_no = '"+str(ques_no)+"' "
+
+            # (따옴표 처리)
+            # cm_surv_a.objects.filter(pgm_id=str(mp_id),surv_seq=str(surv_seq),ansr_id=str(ansr_id),ques_no=str(ques_no)).update(ans_t1=str(mtr_revw))
+
 
         print("ins_1")
         print(query)
         cursor = connection.cursor()
-        query_result = cursor.execute(query)    
+        query_result = cursor.execute(query)  
 
     context = {'message': 'Ok'}
 
