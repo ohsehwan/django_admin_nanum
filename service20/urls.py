@@ -94,6 +94,12 @@ urlpatterns = [
     path('com/combo/programIntroduce/', com_combo_programIntroduce.as_view(), name='com_combo_programIntroduce'),
     # 회원구분 콤보(멘티, 학부모, 교사만)
     path('com/combo/member_gubun/', com_combo_member_gubun.as_view(), name='com_combo_member_gubun'), 
+    # 멘티와의 관계 콤보
+    path('com/combo/member_rel/', com_combo_member_rel.as_view(), name='com_combo_member_rel'), 
+    # 멘티의 학교 리스트 콤보
+    path('com/combo/member_mnte_sch/', com_combo_member_mnte_sch.as_view(), name='com_combo_member_mnte_sch'), 
+    # 학교 구분 콤보
+    path('com/combo/sch_grd/', com_combo_sch_grd.as_view(), name='com_combo_sch_grd'), 
     ########################################################################################
     # 공통(com)
     #
@@ -109,6 +115,19 @@ urlpatterns = [
     path('main/list/mento_count/', main_list_mento_count.as_view(), name='main_list_mento_count'),
     ########################################################################################
     # MainPage
+    #
+    ########################################################################################
+
+    ########################################################################################
+    # membership(회원가입)
+    #
+    ########################################################################################
+    # 회원가입 중복체크
+    path('member/overlap/', member_overlap.as_view(), name='member_overlap'),
+    # 회원가입 insert
+    path('member/insert/', member_insert, name='member_insert'),
+    ########################################################################################
+    # membership(회원가입)
     #
     ########################################################################################
 
