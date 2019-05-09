@@ -16167,10 +16167,113 @@ class com_combo_member_gubun(generics.ListAPIView):
                
         queryset = self.get_queryset()
         
-        query = " select id, std_detl_code, std_detl_code_nm "
+        query = " select '0'id,''std_detl_code,'선택'std_detl_code_nm "
+        query += " union  "
+        query += " select id, std_detl_code, std_detl_code_nm "
         query += "  from service20_com_cdd "
         query += " where std_grp_code = 'CM0001' "
         query += "   and std_detl_code in ('E', 'G', 'T') "
+
+        queryset = com_cdd.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data) 
+
+# 멘티와의 관계 콤보
+class com_combo_member_rel_Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = com_cdd
+        fields = '__all__'
+
+class com_combo_member_rel(generics.ListAPIView):
+    queryset = com_cdd.objects.all()
+    serializer_class = com_combo_member_rel_Serializer
+
+    def list(self, request):
+               
+        queryset = self.get_queryset()
+        
+        query = " select '0'id,''std_detl_code,'선택'std_detl_code_nm "
+        query += " union  "
+        query += " select id, std_detl_code, std_detl_code_nm "
+        query += "  from service20_com_cdd "
+        query += " where std_grp_code = 'MP0047' "
+
+        queryset = com_cdd.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data) 
+
+# 멘티의 학교 리스트 콤보
+class com_combo_member_mnte_sch_Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = com_cdd
+        fields = '__all__'
+
+class com_combo_member_mnte_sch(generics.ListAPIView):
+    queryset = com_cdd.objects.all()
+    serializer_class = com_combo_member_mnte_sch_Serializer
+
+    def list(self, request):
+               
+        queryset = self.get_queryset()
+        
+        query = " select '0' as id, '' as std_detl_code, '선택' as std_detl_code_nm "
+        query += " union  "
+        query += " select t1.id, t1.std_detl_code, t1.std_detl_code_nm "
+        query += "   from (select '0' as id, tchr_id as std_detl_code, sch_nm as std_detl_code_nm "
+        query += "           from service20_teacher "
+        query += "           group by tchr_id, sch_nm "
+        query += "           order by sch_nm) t1 "
+
+        queryset = com_cdd.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data) 
+
+# 학교 구분 콤보
+class com_combo_sch_grd_Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = com_cdd
+        fields = '__all__'
+
+class com_combo_sch_grd(generics.ListAPIView):
+    queryset = com_cdd.objects.all()
+    serializer_class = com_combo_sch_grd_Serializer
+
+    def list(self, request):
+               
+        queryset = self.get_queryset()
+        
+        query = " select '0'id,''std_detl_code,'선택'std_detl_code_nm "
+        query += " union  "
+        query += " select id, std_detl_code, std_detl_code_nm "
+        query += "  from service20_com_cdd "
+        query += " where std_grp_code = 'MP0006' "
 
         queryset = com_cdd.objects.raw(query)
 
@@ -16259,7 +16362,337 @@ class main_list_mento_count(generics.ListAPIView):
 
         # return Response(serializer.data)        
 
+# 회원가입 중복체크
+class member_overlap_Serializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = com_cdd
+        fields = '__all__'
+
+class member_overlap(generics.ListAPIView):
+    queryset = com_cdd.objects.all()
+    serializer_class = member_overlap_Serializer
+
+    def list(self, request):
+        member_id = request.GET.get('member_id', "")
+        member_nm = request.GET.get('member_nm', "")
+        member_birth = request.GET.get('member_birth', "")
+        member_gubun = request.GET.get('member_gubun', "")
+        message = "Ok" 
+
+        # 멘티
+        if member_gubun == "E":
+            mnte_flag = mentee.objects.filter(mnte_nm=member_nm, brth_dt=member_birth).exists()
+
+            if not mnte_flag:
+                message = "true"
+            else:
+                message = "false"
+        # 교사
+        elif member_gubun == "T":
+            teacher_flag = teacher.objects.filter(tchr_id=member_id).exists()
+
+            if not teacher_flag:
+                message = "true"
+            else:
+                message = "false"
+        # 학부모
+        elif member_gubun == "G":
+            guardian_flag = guardian.objects.filter(grdn_nm=member_nm, brth_dt=member_birth).exists()
+
+            if not guardian_flag:
+                message = "true"
+            else:
+                message = "false"
+
+        context = {'message': message,} 
+        return JsonResponse(context,json_dumps_params={'ensure_ascii': True})
+
+# 회원가입 insert
+@csrf_exempt
+def member_insert(request):
+    cursor = connection.cursor()
+
+    member_gubun = request.POST.get('member_gubun', "")
+    member_id = request.POST.get('member_id', "")
+    member_nm = request.POST.get('member_nm', " ")
+    member_birth = request.POST.get('member_birth', "")
+    member_nm_e = request.POST.get('member_nm_e', "")
+    member_pwd = request.POST.get('member_pwd', "")
+    member_gen = request.POST.get('member_gen', "")
+    member_mob = request.POST.get('member_mob', "")
+    member_tel = request.POST.get("member_tel","")
+    member_email = request.POST.get('member_email', "")   
+    member_post = request.POST.get("member_post","")                         
+    member_addr = request.POST.get('member_addr', "")
+    member_city = request.POST.get('member_city', "")
+    member_gu = request.POST.get('member_gu', "")
+    member_grd_nm = request.POST.get('member_grd_nm', "")
+    member_grd_tel = request.POST.get('member_grd_tel', "")                      
+    member_rel = request.POST.get('member_rel', "")
+    member_sch_grd = request.POST.get('member_sch_grd', "")
+    member_sch = request.POST.get('member_sch', "")
+    member_sch_nm = request.POST.get('member_sch_nm', "")
+    member_sch_yr = request.POST.get('member_sch_yr', "")
+    member_post_sch = request.POST.get('member_sch_post', "")
+    member_addr_sch = request.POST.get('member_sch_addr', "")
+
+    ins_id = request.POST.get('ins_id', "")
+    ins_ip = request.POST.get('ins_ip', "")
+    ins_dt = request.POST.get('ins_dt', "")
+    ins_pgm = request.POST.get('ins_pgm', "")
+    upd_id = request.POST.get('upd_id', "")
+    upd_ip = request.POST.get('upd_ip', "")
+    upd_dt = request.POST.get('upd_dt', "")
+    upd_pgm = request.POST.get('upd_pgm', "")
+
+    client_ip = request.META['REMOTE_ADDR']
+
+    login_id = ""
+
+    print("member_gubun===" + member_gubun)
+    # 멘티
+    if member_gubun == "E":
+        # 멘티ID 부여
+        mentee_id_query = f"""select CONCAT('T',substr(DATE_FORMAT(now(), '%Y'),3,2),(select ifnull(lpad(max(right(mnte_id,4)) + 1,4,0),'0001')   from service20_mentee where substr(mnte_id,2,2)  = substr(DATE_FORMAT(now(), '%Y'),3,2))) as id from dual"""
+        print(mentee_id_query)
+        cursor.execute(mentee_id_query)
+        results_01 = namedtuplefetchall(cursor) 
+        mentee_id= results_01[0].id
+
+        teacher_row = teacher.objects.filter(tchr_id=member_sch)[0]
+        tchr_nm = teacher_row.tchr_nm
+        tchr_mob_no = teacher_row.mob_no
+        # tchr_city = teacher_row.area_city
+        # tchr_gu = teacher_row.area_gu
+        tchr_s_addr = teacher_row.s_addr
+        tchr_email = teacher_row.email_addr
+
+        # 성별 치환 (1:M, 2:F)
+        if member_gen == "1":
+            member_gen = "M"
+        else:
+            member_gen = "F"
+
+        l_insert_query = f"""
+                            insert
+                            into   service20_mentee
+                                (
+                                        mnte_id,
+                                        mnte_nm,
+                                        mnte_nm_e,
+                                        brth_dt,
+                                        sch_grd,
+                                        sch_cd,
+                                        sch_nm,
+                                        gen,
+                                        yr,
+                                        term_div,
+                                        sch_yr,
+                                        mob_no,
+                                        pwd,
+                                        grd_id,
+                                        tchr_id,
+                                        tchr_nm,
+                                        tchr_tel,
+                                        prnt_nat_cd,
+                                        prnt_nat_nm,
+                                        area_city,
+                                        area_gu,
+                                        h_addr,
+                                        s_addr,
+                                        email_addr,
+                                        mp_id,
+                                        apl_no,
+                                        mp_dt,
+                                        cnt_mp_a,
+                                        cnt_mp_p,
+                                        cnt_mp_c,
+                                        cnt_mp_g,
+                                        ins_id,
+                                        ins_ip,
+                                        ins_dt,
+                                        ins_pgm,
+                                        upd_id,
+                                        upd_ip,
+                                        upd_dt,
+                                        upd_pgm
+                                )
+                                values
+                                (
+                                        '{mentee_id}',
+                                        '{member_nm}',
+                                        '{member_nm_e}',
+                                        '{member_birth}',
+                                        '{member_sch_grd}',
+                                        ' ',
+                                        '{member_sch_nm}',
+                                        '{member_gen}',
+                                        '',
+                                        '',
+                                        '{member_sch_yr}',
+                                        '{member_mob}',
+                                        '{member_pwd}',
+                                        ' ',
+                                        '{member_sch}',
+                                        '{tchr_nm}',
+                                        '{tchr_mob_no}',
+                                        ' ',
+                                        ' ',
+                                        '{member_city}',
+                                        '{member_gu}',
+                                        '{member_addr}',
+                                        '{tchr_s_addr}',
+                                        '{tchr_email}',
+                                        ' ',
+                                        0,
+                                        ' ',
+                                        '0',
+                                        '0',
+                                        '0',
+                                        '0',
+                                        '{mentee_id}',
+                                        '{client_ip}',
+                                        now(),
+                                        '{ins_pgm}',
+                                        '{mentee_id}',
+                                        '{client_ip}',
+                                        now(),
+                                        '{ins_pgm}'
+                                )
+        """
+        print(l_insert_query)
+        cursor.execute(l_insert_query)
+
+        login_id = mentee_id
+    # 교사
+    elif member_gubun == "T":
+        l_insert_query = f"""
+                            insert
+                                into
+                                    service20_teacher (
+                                    tchr_id
+                                    , tchr_nm
+                                    , tchr_nm_e
+                                    , sch_grd
+                                    , sch_cd
+                                    , sch_nm
+                                    , mob_no
+                                    , tel_no
+                                    , area_city
+                                    , area_gu
+                                    , h_addr
+                                    , h_post_no
+                                    , s_addr
+                                    , s_post_no
+                                    , email_addr
+                                    , ins_id
+                                    , ins_ip
+                                    , ins_dt
+                                    , ins_pgm
+                                    , upd_id
+                                    , upd_ip
+                                    , upd_dt
+                                    , upd_pgm
+                                    , pwd)
+                                values(
+                                '{member_id}'
+                                , '{member_nm}'
+                                , '{member_nm_e}'
+                                , '{member_sch_grd}'
+                                , ''
+                                , '{member_sch}'
+                                , '{member_mob}'
+                                , '{member_tel}'
+                                , '{member_city}'
+                                , '{member_gu}'
+                                , '{member_addr}'
+                                , '{member_post}'
+                                , '{member_addr_sch}'
+                                , '{member_post_sch}'
+                                , '{member_email}'
+                                , '{member_id}'
+                                , '{client_ip}'
+                                , now()
+                                , '{ins_pgm}'
+                                , '{member_id}'
+                                , '{client_ip}'
+                                , now()
+                                , '{ins_pgm}'
+                                , '{member_pwd}')
+        """
+        print(l_insert_query)
+        cursor.execute(l_insert_query)
+
+        login_id = member_id
+    # 학부모
+    elif member_gubun == "G":
+        # 학부모ID 부여
+        grdn_id_query = f"""select CONCAT('R',substr(DATE_FORMAT(now(), '%Y'),3,2),(select ifnull(lpad(max(right(grdn_id,4)) + 1,4,0),'0001') from service20_guardian where substr(grdn_id,2,2)  = substr(DATE_FORMAT(now(), '%Y'),3,2))) as id from dual"""
+        print(grdn_id_query)
+        cursor.execute(grdn_id_query)
+        results_01 = namedtuplefetchall(cursor) 
+        grdn_id= results_01[0].id
+
+        l_insert_query = f"""
+                            insert
+                                into
+                                    service20_guardian (
+                                    grdn_id
+                                    , grdn_nm
+                                    , grdn_nm_e
+                                    , rel_tp
+                                    , brth_dt
+                                    , mob_no
+                                    , tel_no
+                                    , moth_nat_cd
+                                    , moth_nat_nm
+                                    , tch_id
+                                    , h_addr
+                                    , h_post_no
+                                    , email_addr
+                                    , ins_id
+                                    , ins_ip
+                                    , ins_dt
+                                    , ins_pgm
+                                    , upd_id
+                                    , upd_ip
+                                    , upd_dt
+                                    , upd_pgm
+                                    , pwd)
+                                values(
+                                '{grdn_id}'
+                                , '{member_nm}'
+                                , '{member_nm_e}'
+                                , '{member_rel}'
+                                , '{member_birth}'
+                                , '{member_mob}'
+                                , '{member_tel}'
+                                , ' '
+                                , ' '
+                                , '{member_sch}'
+                                , '{member_addr}'
+                                , '{member_post}'
+                                , '{member_email}'
+                                , '{grdn_id}'
+                                , '{client_ip}'
+                                , now()
+                                , '{ins_pgm}'
+                                , '{grdn_id}'
+                                , '{client_ip}'
+                                , now()
+                                , '{ins_pgm}'
+                                , '{member_pwd}')
+        """
+        print(l_insert_query)
+        cursor.execute(l_insert_query)
+
+        login_id = grdn_id
+
+    context = {'login_id': login_id,'login_pwd': member_pwd} 
+    
+    return JsonResponse(context,json_dumps_params={'ensure_ascii': True})
+    
 #파일업로드 멘토스쿨
 @csrf_exempt
 def com_upload_ms(request):
