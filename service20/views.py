@@ -6309,6 +6309,9 @@ def MP0101M_save(request):
     mentoTeamMax = request.POST.get('mentoTeamMax', 0)
     team_nm = request.POST.get('Team_memberNo', "")
 
+    # 저장상태구분 I(제출)/S(임시저장)
+    save_status = request.POST.get('save_status', "")
+
     ms_ida = request.POST.get('ms_id', None)
     apl_max = request.POST.get('aplMax', 0)
     apl_max_team = request.POST.get('aplMaxTeam', 0)
