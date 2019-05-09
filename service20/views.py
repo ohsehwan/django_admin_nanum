@@ -8230,6 +8230,12 @@ def MP0101M_service_insert(request):
 
     client_ip = request.META['REMOTE_ADDR']
     
+
+    # delete
+    query = " delete FROM service20_mp_chc WHERE mp_id = '" + l_mp_id + "' AND apl_no = '" + l_apl_no + "'"
+    cursor = connection.cursor()
+    cursor.execute(query) 
+
     for i in range(0,int(l_length)):
         query = " insert "
         query += "    into "
@@ -9146,6 +9152,11 @@ def MP0101M_service_team_insert(request):
     upd_pgm = request.POST.get('upd_pgm', "")
 
     client_ip = request.META['REMOTE_ADDR']
+    
+    # delete
+    query = " delete FROM service20_mp_team_chc WHERE mp_id = '" + l_mp_id + "' AND team_no = '" + l_apl_no + "'"
+    cursor = connection.cursor()
+    cursor.execute(query)
     
     for i in range(0,int(l_length)):
         query = " insert "
