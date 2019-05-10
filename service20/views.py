@@ -10475,25 +10475,26 @@ def popupTeam_insert(request):
 class MP0102M_list_Serializer(serializers.ModelSerializer):
 
     mp_name = serializers.SerializerMethodField()
-    mnte_no = serializers.SerializerMethodField()
-    mnte_id = serializers.SerializerMethodField()
-    mnte_nm = serializers.SerializerMethodField()
+    # mnte_no = serializers.SerializerMethodField()
+    # mnte_id = serializers.SerializerMethodField()
+    # mnte_nm = serializers.SerializerMethodField()
     spc_no = serializers.SerializerMethodField()
     spc_status_nm = serializers.SerializerMethodField()
-    mte_status = serializers.SerializerMethodField()
+    # mte_status = serializers.SerializerMethodField()
     mtr_status = serializers.SerializerMethodField()
-    mtr_mgr_id = serializers.SerializerMethodField()
-    mtr_mgr_dt = serializers.SerializerMethodField()
-    mte_mgr_id = serializers.SerializerMethodField()
-    mte_mgr_dt = serializers.SerializerMethodField()
+    mgr_id = serializers.SerializerMethodField()
+    mgr_dt = serializers.SerializerMethodField()
+    # mte_mgr_id = serializers.SerializerMethodField()
+    # mte_mgr_dt = serializers.SerializerMethodField()
     mgr_nm = serializers.SerializerMethodField()
     apl_no = serializers.SerializerMethodField()
     spc_apl_no = serializers.SerializerMethodField()
     att_status = serializers.SerializerMethodField()
     att_no = serializers.SerializerMethodField()
-    sati_status = serializers.SerializerMethodField()
     cncl_rsn = serializers.SerializerMethodField()
-    partici = serializers.SerializerMethodField()
+    cncl_nm = serializers.SerializerMethodField()
+    sati_status = serializers.SerializerMethodField()
+    # partici = serializers.SerializerMethodField()
 
     class Meta:
         model = mp_spc
@@ -10501,28 +10502,28 @@ class MP0102M_list_Serializer(serializers.ModelSerializer):
 
     def get_mp_name(self, obj):
         return obj.mp_name
-    def get_mnte_no(self, obj):
-        return obj.mnte_no
-    def get_mnte_id(self, obj):
-        return obj.mnte_id
-    def get_mnte_nm(self, obj):
-        return obj.mnte_nm
+    # def get_mnte_no(self, obj):
+    #     return obj.mnte_no
+    # def get_mnte_id(self, obj):
+    #     return obj.mnte_id
+    # def get_mnte_nm(self, obj):
+    #     return obj.mnte_nm
     def get_spc_no(self, obj):
         return obj.spc_no
     def get_spc_status_nm(self, obj):
         return obj.spc_status_nm
-    def get_mte_status(self, obj):
-        return obj.mte_status
+    # def get_mte_status(self, obj):
+    #     return obj.mte_status
     def get_mtr_status(self, obj):
         return obj.mtr_status
-    def get_mtr_mgr_id(self, obj):
-        return obj.mtr_mgr_id
-    def get_mtr_mgr_dt(self, obj):
-        return obj.mtr_mgr_dt
-    def get_mte_mgr_id(self, obj):
-        return obj.mte_mgr_id
-    def get_mte_mgr_dt(self, obj):
-        return obj.mte_mgr_dt
+    def get_mgr_id(self, obj):
+        return obj.mgr_id
+    def get_mgr_dt(self, obj):
+        return obj.mgr_dt
+    # def get_mte_mgr_id(self, obj):
+    #     return obj.mte_mgr_id
+    # def get_mte_mgr_dt(self, obj):
+    #     return obj.mte_mgr_dt
     def get_mgr_nm(self, obj):
         return obj.mgr_nm
     def get_apl_no(self, obj):
@@ -10533,12 +10534,14 @@ class MP0102M_list_Serializer(serializers.ModelSerializer):
         return obj.att_status
     def get_att_no(self, obj):
         return obj.att_no
-    def get_sati_status(self, obj):
-        return obj.sati_status
     def get_cncl_rsn(self, obj):
         return obj.cncl_rsn
-    def get_partici(self, obj):
-        return obj.partici
+    def get_cncl_nm(self, obj):
+        return obj.cncl_nm
+    def get_sati_status(self, obj):
+        return obj.sati_status
+    # def get_partici(self, obj):
+    #     return obj.partici
 
 
 class MP0102M_list(generics.ListAPIView):
@@ -10556,78 +10559,129 @@ class MP0102M_list(generics.ListAPIView):
         
         queryset = self.get_queryset()
         
-        query = "/* 학습외 프로그램별 멘티 조회 */    "
-        query += " select t2.id, t3.mp_id as mp_id "
-        query += "     , t6.mp_name as mp_name "
-        query += "     , t1.mnte_no as mnte_no "
-        query += "     , t1.mnte_id as mnte_id "
-        query += "     , t5.mnte_nm as mnte_nm "
-        query += "     , t3.spc_no as spc_no  "
-        query += "     , t2.spc_div as spc_div "
-        query += "     , t2.status as spc_status "
-        query += "     , t7.std_detl_code_nm as spc_status_nm "
-        query += "     , t1.status as mte_status "
-        query += "     , t3.status as mtr_status "
-        query += "     , t2.spc_name as spc_name "
-        query += "     , t3.mgr_id as mtr_mgr_id "
-        query += "     , t3.mgr_dt as mtr_mgr_dt "
-        query += "     , t1.appr_id as appr_id "
-        query += "     , t1.appr_dt as appr_dt "
-        query += "     , t1.appr_nm as appr_nm "
-        query += "     , t1.mgr_id as mte_mgr_id "
-        query += "     , t1.mgr_dt as mte_mgr_dt "
-        query += "     , t6.mgr_nm as mgr_nm "
-        query += "     , substring(t2.ins_dt, 1, 10) as ins_dt "
-        query += "     , t2.spc_intro as spc_intro "
-        query += "     , t2.yr as yr "
-        query += "     , t2.yr_seq as yr_seq "
-        query += "     , substring(t2.apl_ntc_fr_dt, 1, 10) as apl_ntc_fr_dt "
-        query += "     , substring(t2.apl_ntc_to_dt, 1, 10) as apl_ntc_to_dt "
-        query += "     , t2.apl_term as apl_term "
-        query += "     , substring(t2.apl_fr_dt, 1, 10) as apl_fr_dt "
-        query += "     , substring(t2.apl_to_dt, 1, 10) as apl_to_dt "
-        query += "     , case when t2.mnt_term = '10' then '1' "
-        query += "            else '2' end as mnt_term "
-        query += "     , substring(t2.mnt_fr_dt, 1, 10) as mnt_fr_dt "
-        query += "     , substring(t2.mnt_to_dt, 1, 10) as mnt_to_dt "
-        query += "     , substring(t2.cnf_dt, 1, 10) as cnf_dt "
-        query += "     , t2.appr_tm as appr_tm "
-        query += "     , t2.tot_apl as tot_apl "
-        query += "     , t2.cnt_apl as cnt_apl "
-        query += "     , t2.cnt_pln as cnt_pln "
-        query += "     , t2.cnt_att as cnt_att "
-        query += "     , t2.use_div as use_div "
-        query += "     , t2.pic_div as pic_div "
-        query += "     , t2.rep_div as rep_div "
-        query += "     , t2.ord_div as ord_div "
-        query += "     , t3.apl_no as apl_no "
-        query += "     , t3.spc_apl_no as spc_apl_no "
-        query += "     , t8.att_sts as att_status "
-        query += "     , t8.att_no as att_no "
-        query += "     , (select count(0) "
-        query += "          from service20_cm_surv_a st1 "
-        query += "          left join service20_cm_surv_h st2 on (st2.pgm_id = st1.pgm_id and st2.surv_seq = st1.surv_seq and st2.ansr_id = st1.ansr_id) "
-        query += "          left join service20_cm_surv_p st3 on (st3.pgm_id = st1.pgm_id) "
-        query += "         where st3.spc_no = t2.spc_no "
-        query += "     ) as sati_status "
-        query += "     , t9.std_detl_code_nm as cncl_rsn "
-        query += "     , t10.std_detl_code_nm as partici "
-        query += "  from service20_mp_spc_mte t1 "
-        query += "  left join service20_mp_spc t2 on (t2.mp_id = t1.mp_id and t2.spc_no = t1.spc_no) "
-        query += "  left join service20_mp_spc_mtr t3 on (t3.mp_id = t1.mp_id and t3.spc_no = t1.spc_no and t3.spc_apl_no = t1.spc_apl_no and t3.apl_no = t1.apl_no) "
-        query += "  left join service20_mp_mtr t4 on (t4.mp_id = t1.mp_id and t4.apl_no = t1.apl_no) "
-        query += "  left join service20_mp_mte t5 on (t5.mp_id = t1.mp_id and t5.mnte_no = t1.mnte_no and t5.apl_no = t1.apl_no) "
-        query += "  left join service20_mpgm t6 on (t6.mp_id = t1.mp_id) "
-        query += "  left join service20_com_cdd t7 on (t7.std_grp_code = 'MP0084' and t7.std_detl_code = t2.status) "
-        query += "  left join service20_mp_att t8 on (t8.mp_id = t1.mp_id and t8.apl_no = t1.apl_no and t8.spc_no = t2.spc_no) "
-        query += "  left join service20_com_cdd t9 on (t9.std_grp_code = 'MP0099' and t9.std_detl_code = t3.cncl_rsn) "
-        query += "  left join service20_com_cdd t10 on (t10.std_grp_code = 'MP0054' and t10.std_detl_code = t5.status) "
-        query += " where t2.yr = '" + str(l_yr) + "' "
-        query += "   and t2.apl_term = '" + str(l_apl_term) + "' "
-        query += "   and t2.spc_div like ifnull(nullif('" + str(l_spc_div) + "', ''), '%%') "
-        query += "   and t2.status like ifnull(nullif('" + str(l_status) + "', ''), '%%') "
-        query += "   and t3.apl_id = trim('" + str(l_apl_id) + "') "
+        # query = "/* 학습외 프로그램별 멘티 조회 */    "
+        # query += " select t2.id, t3.mp_id as mp_id "
+        # query += "     , t6.mp_name as mp_name "
+        # query += "     , t1.mnte_no as mnte_no "
+        # query += "     , t1.mnte_id as mnte_id "
+        # query += "     , t5.mnte_nm as mnte_nm "
+        # query += "     , t3.spc_no as spc_no  "
+        # query += "     , t2.spc_div as spc_div "
+        # query += "     , t2.status as spc_status "
+        # query += "     , t7.std_detl_code_nm as spc_status_nm "
+        # query += "     , t1.status as mte_status "
+        # query += "     , t3.status as mtr_status "
+        # query += "     , t2.spc_name as spc_name "
+        # query += "     , t3.mgr_id as mtr_mgr_id "
+        # query += "     , t3.mgr_dt as mtr_mgr_dt "
+        # query += "     , t1.appr_id as appr_id "
+        # query += "     , t1.appr_dt as appr_dt "
+        # query += "     , t1.appr_nm as appr_nm "
+        # query += "     , t1.mgr_id as mte_mgr_id "
+        # query += "     , t1.mgr_dt as mte_mgr_dt "
+        # query += "     , t6.mgr_nm as mgr_nm "
+        # query += "     , substring(t2.ins_dt, 1, 10) as ins_dt "
+        # query += "     , t2.spc_intro as spc_intro "
+        # query += "     , t2.yr as yr "
+        # query += "     , t2.yr_seq as yr_seq "
+        # query += "     , substring(t2.apl_ntc_fr_dt, 1, 10) as apl_ntc_fr_dt "
+        # query += "     , substring(t2.apl_ntc_to_dt, 1, 10) as apl_ntc_to_dt "
+        # query += "     , t2.apl_term as apl_term "
+        # query += "     , substring(t2.apl_fr_dt, 1, 10) as apl_fr_dt "
+        # query += "     , substring(t2.apl_to_dt, 1, 10) as apl_to_dt "
+        # query += "     , case when t2.mnt_term = '10' then '1' "
+        # query += "            else '2' end as mnt_term "
+        # query += "     , substring(t2.mnt_fr_dt, 1, 10) as mnt_fr_dt "
+        # query += "     , substring(t2.mnt_to_dt, 1, 10) as mnt_to_dt "
+        # query += "     , substring(t2.cnf_dt, 1, 10) as cnf_dt "
+        # query += "     , t2.appr_tm as appr_tm "
+        # query += "     , t2.tot_apl as tot_apl "
+        # query += "     , t2.cnt_apl as cnt_apl "
+        # query += "     , t2.cnt_pln as cnt_pln "
+        # query += "     , t2.cnt_att as cnt_att "
+        # query += "     , t2.use_div as use_div "
+        # query += "     , t2.pic_div as pic_div "
+        # query += "     , t2.rep_div as rep_div "
+        # query += "     , t2.ord_div as ord_div "
+        # query += "     , t3.apl_no as apl_no "
+        # query += "     , t3.spc_apl_no as spc_apl_no "
+        # query += "     , t8.att_sts as att_status "
+        # query += "     , t8.att_no as att_no "
+        # query += "     , (select count(0) "
+        # query += "          from service20_cm_surv_a st1 "
+        # query += "          left join service20_cm_surv_h st2 on (st2.pgm_id = st1.pgm_id and st2.surv_seq = st1.surv_seq and st2.ansr_id = st1.ansr_id) "
+        # query += "          left join service20_cm_surv_p st3 on (st3.pgm_id = st1.pgm_id) "
+        # query += "         where st3.spc_no = t2.spc_no "
+        # query += "     ) as sati_status "
+        # query += "     , t9.std_detl_code_nm as cncl_rsn "
+        # query += "     , t10.std_detl_code_nm as partici "
+        # query += "  from service20_mp_spc_mte t1 "
+        # query += "  left join service20_mp_spc t2 on (t2.mp_id = t1.mp_id and t2.spc_no = t1.spc_no) "
+        # query += "  left join service20_mp_spc_mtr t3 on (t3.mp_id = t1.mp_id and t3.spc_no = t1.spc_no and t3.spc_apl_no = t1.spc_apl_no and t3.apl_no = t1.apl_no) "
+        # query += "  left join service20_mp_mtr t4 on (t4.mp_id = t1.mp_id and t4.apl_no = t1.apl_no) "
+        # query += "  left join service20_mp_mte t5 on (t5.mp_id = t1.mp_id and t5.mnte_no = t1.mnte_no and t5.apl_no = t1.apl_no) "
+        # query += "  left join service20_mpgm t6 on (t6.mp_id = t1.mp_id) "
+        # query += "  left join service20_com_cdd t7 on (t7.std_grp_code = 'MP0084' and t7.std_detl_code = t2.status) "
+        # query += "  left join service20_mp_att t8 on (t8.mp_id = t1.mp_id and t8.apl_no = t1.apl_no and t8.spc_no = t2.spc_no) "
+        # query += "  left join service20_com_cdd t9 on (t9.std_grp_code = 'MP0099' and t9.std_detl_code = t3.cncl_rsn) "
+        # query += "  left join service20_com_cdd t10 on (t10.std_grp_code = 'MP0054' and t10.std_detl_code = t5.status) "
+        # query += " where t2.yr = '" + str(l_yr) + "' "
+        # query += "   and t2.apl_term = '" + str(l_apl_term) + "' "
+        # query += "   and t2.spc_div like ifnull(nullif('" + str(l_spc_div) + "', ''), '%%') "
+        # query += "   and t2.status like ifnull(nullif('" + str(l_status) + "', ''), '%%') "
+        # query += "   and t3.apl_id = trim('" + str(l_apl_id) + "') "
 
+        query = f"""
+                SELECT t1.id
+                    , t1.mp_id AS mp_id
+                    , t1.spc_no AS spc_no
+                    , t3.mp_name AS mp_name
+                    , t1.spc_name AS spc_name
+                    , t1.spc_div AS spc_div
+                    , SUBSTRING(t1.ins_dt, 1, 10) AS ins_dt
+                    , t3.mgr_nm AS mgr_nm
+                    , CASE WHEN t1.mnt_term = '10' THEN '1'
+                            ELSE '2' END AS mnt_term
+                    , SUBSTRING(t1.apl_fr_dt, 1, 10) AS apl_fr_dt
+                    , SUBSTRING(t1.apl_to_dt, 1, 10) AS apl_to_dt
+                    , SUBSTRING(t1.mnt_fr_dt, 1, 10) AS mnt_fr_dt
+                    , SUBSTRING(t1.mnt_to_dt, 1, 10) AS mnt_to_dt
+                    , t1.status AS spc_status  /* 학습외 프로그램의 상태 */
+                    , t5.std_detl_code_nm AS spc_status_nm
+                    , t1.appr_tm AS appr_tm
+                    , t1.cnt_apl AS cnt_apl
+                    , t1.tot_apl AS tot_apl
+                    , t2.spc_apl_no AS spc_apl_no
+                    , t2.apl_no AS apl_no
+                    , t2.status AS mtr_status  /* 신청, 취소, 선발 여부 확인 */
+                    , t2.cncl_rsn AS cncl_rsn
+                    , t6.std_detl_code_nm AS cncl_nm
+                    , t2.mgr_id AS mgr_id
+                    , SUBSTRING(t2.mgr_dt, 1, 10) AS mgr_dt
+                    , SUBSTRING(t1.cnf_dt, 1, 10) AS cnf_dt
+                    , t4.att_sts AS att_status
+                    , t4.att_no AS att_no
+                    , (select st2.status
+                        from service20_cm_surv_a st1
+                        left join service20_cm_surv_h st2 on (st2.pgm_id = st1.pgm_id and st2.surv_seq = st1.surv_seq and st2.ansr_id = st1.ansr_id)
+                        left join service20_cm_surv_p st3 on (st3.pgm_id = st1.pgm_id)
+                        where st3.spc_no = t1.spc_no
+                        AND st1.ansr_id = t2.apl_id) AS sati_status
+                FROM service20_mp_spc t1
+                LEFT JOIN service20_mp_spc_mtr t2 on (t2.mp_id = t1.mp_id AND t2.spc_no = t1.spc_no)
+                LEFT JOIN service20_mpgm t3 ON (t3.mp_id = t1.mp_id)
+                LEFT JOIN service20_mp_att t4 ON (t4.mp_id = t1.mp_id AND t4.apl_no = t2.apl_no and t4.spc_no = t1.spc_no)
+                LEFT JOIN service20_com_cdd t5 ON (t5.std_grp_code = 'MP0085' AND t5.std_detl_code = t2.status)
+                LEFT JOIN service20_com_cdd t6 ON (t6.std_grp_code = 'MP0099' AND t6.std_detl_code = t2.cncl_rsn)
+                WHERE t1.yr = '{l_yr}'
+                AND t1.apl_term = '{l_apl_term}'
+                AND t1.spc_div LIKE ifnull(NULLIF('{l_spc_div}', ''), '%%')
+                AND t1.status LIKE ifnull(NULLIF('{l_status}', ''), '%%')
+                AND t2.apl_id = TRIM('{l_apl_id}')
+                order by t1.mp_id desc
+        """
+
+        print(query)
         queryset = mp_spc.objects.raw(query)
 
         serializer_class = self.get_serializer_class()
@@ -10640,7 +10694,70 @@ class MP0102M_list(generics.ListAPIView):
 
         return Response(serializer.data)
 
-# 멘토링 프로그램 - 해외봉사활동 프로그램 (update) ###################################################
+# 학습외신청(멘티) 리스트 ###################################################
+class MP0102M_mentee_list_Serializer(serializers.ModelSerializer):
+
+    mnte_nm = serializers.SerializerMethodField()
+    sati_status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = mp_spc_mte
+        fields = '__all__'
+
+    def get_mnte_nm(self, obj):
+        return obj.mnte_nm
+    def get_sati_status(self, obj):
+        return obj.sati_status
+
+class MP0102M_mentee_list(generics.ListAPIView):
+    queryset = mp_spc_mte.objects.all()
+    serializer_class = MP0102M_mentee_list_Serializer
+
+    def list(self, request):
+        l_mp_id = request.GET.get('mp_id', "")
+        l_spc_no = request.GET.get('spc_no', "")
+        l_spc_apl_no = request.GET.get('spc_apl_no', "")
+        
+        queryset = self.get_queryset()
+
+        query = f"""
+                SELECT t1.id AS id
+                    , t1.mp_id AS mp_id
+                    , t1.mnte_id AS mnte_id
+                    , t1.spc_no AS spc_no
+                    , t1.spc_apl_no AS spc_apl_no
+                    , t1.mnte_no AS mnte_no
+                    , t1.status AS status
+                    , t1.appr_file AS appr_file
+                    , t1.appr_dt AS appr_dt
+                    , t2.mnte_nm AS mnte_nm
+                    , (select st2.status
+                        from service20_cm_surv_a st1
+                        left join service20_cm_surv_h st2 on (st2.pgm_id = st1.pgm_id and st2.surv_seq = st1.surv_seq and st2.ansr_id = st1.ansr_id)
+                        left join service20_cm_surv_p st3 on (st3.pgm_id = st1.pgm_id)
+                        where st3.spc_no = t1.spc_no
+                        AND st1.ansr_id = t1.mnte_id) AS sati_status
+                FROM service20_mp_spc_mte t1
+                LEFT JOIN service20_mp_mte t2 ON (t2.mp_id = t1.mp_id AND t2.mnte_no = t1.mnte_no)
+                WHERE t1.mp_id = '{l_mp_id}'
+                AND t1.spc_no = '{l_spc_no}'
+                AND t1.spc_apl_no = '{l_spc_apl_no}'
+        """
+
+        print(query)
+        queryset = mp_spc_mte.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
+
+# 학습외신청(멘토) 학습외 신청 및 취소 ###################################################
 @csrf_exempt
 def MP0102M_mento_update(request):
     l_mp_id = request.POST.get('mp_id', "")    
@@ -10681,6 +10798,96 @@ def MP0102M_mento_update(request):
 
     return JsonResponse(context,json_dumps_params={'ensure_ascii': True}) 
 
+# 학습외신청(멘티) 학습외 신청 및 취소 ###################################################
+@csrf_exempt
+def MP0102M_mentee_update(request):
+    req = request
+    DIR = os.getcwd()
+    UPLOAD_DIR = '/NANUM/www/img/spc/'
+    UPLOAD_DIR = 'img'
+    
+    if request.method == 'POST':
+        l_no = request.POST.get('no', "")
+        l_mp_id = request.POST.get('mp_id', "")
+        l_mnte_no = request.POST.get('mnte_no', "")
+        l_spc_no = request.POST.get('spc_no', "")
+        l_spc_apl_no = request.POST.get('spc_apl_no', "")
+        l_spc_status = request.POST.get('spc_status', "")
+        # l_cncl_rsn = request.POST.get('cncl_rsn', "")
+
+        ins_id = request.POST.get('ins_id', "")
+        ins_ip = request.POST.get('ins_ip', "")
+        ins_dt = request.POST.get('ins_dt', "")
+        ins_pgm = request.POST.get('ins_pgm', "")
+        upd_id = request.POST.get('upd_id', "")
+        upd_ip = request.POST.get('upd_ip', "")
+        upd_dt = request.POST.get('upd_dt', "")
+        upd_pgm = request.POST.get('upd_pgm', "")
+
+        client_ip = request.META['REMOTE_ADDR']
+
+        try:
+            file = request.FILES['appr_file' + str(l_no)]
+        except MultiValueDictKeyError:
+            file = False
+
+        if file != False:
+            print(file)
+            filename = file._name
+            n_filename = str(l_mp_id) + str(l_mnte_no) + str(l_spc_no) + str(l_spc_apl_no) + os.path.splitext(filename)[1]
+            print(n_filename)
+            print (UPLOAD_DIR)
+        
+            fp = open('%s/%s' % (UPLOAD_DIR, n_filename) , 'wb')
+            for chunk in file.chunks():
+                fp.write(chunk)
+            fp.close()
+
+            cursor = connection.cursor()
+            fullFile = str(UPLOAD_DIR) + str(n_filename)
+            fullFile = "/img/spc/"+ str(n_filename)
+
+            query = " /* 학습외 신청 */ "
+            query += " update service20_mp_spc_mte "
+            query += "   set status = '" + l_spc_status + "' "
+            query += "     , appr_id = (select grd_id from service20_mp_mte where mp_id = '" + l_mp_id + "' and mnte_no = '" + l_mnte_no + "') "
+            query += "     , appr_nm = (select grd_nm from service20_mp_mte where mp_id = '" + l_mp_id + "' and mnte_no = '" + l_mnte_no + "') "
+            query += "     , appr_dt = now() "
+            query += "     , appr_file = '" + str(fullFile) + "' "
+            query += "     , upd_id = '" + upd_id + "' "
+            query += "     , upd_ip = '" + client_ip + "' "
+            query += "     , upd_dt = now() "
+            query += "     , upd_pgm = '" + upd_pgm + "' "
+            query += " where mp_id = '" + l_mp_id + "' "
+            query += "   and mnte_no = '" + l_mnte_no + "' "
+            query += "   and spc_no = '" + l_spc_no + "' "
+            query += "   and spc_apl_no = '" + l_spc_apl_no + "' "
+
+            cursor.execute(query)
+        else:
+            cursor = connection.cursor()
+
+            query = " /* 학습외 취소 */ "
+            query += " update service20_mp_spc_mte "
+            query += "   set status = '" + l_spc_status + "' "
+            query += "     , appr_id = null "
+            query += "     , appr_nm = null "
+            query += "     , appr_dt = null "
+            query += "     , appr_file = null "
+            query += "     , upd_id = '" + upd_id + "' "
+            query += "     , upd_ip = '" + client_ip + "' "
+            query += "     , upd_dt = now() "
+            query += "     , upd_pgm = '" + upd_pgm + "' "
+            query += " where mp_id = '" + l_mp_id + "' "
+            query += "   and mnte_no = '" + l_mnte_no + "' "
+            query += "   and spc_no = '" + l_spc_no + "' "
+            query += "   and spc_apl_no = '" + l_spc_apl_no + "' "
+            
+            cursor.execute(query)
+
+    print(query)
+
+    return HttpResponse('File Uploaded')
 
 # 학습외신청(멘토) 보호자 승인 양식 detail set ###################################################
 class MP0102M_mento_report_Serializer(serializers.ModelSerializer):
@@ -16703,7 +16910,7 @@ def member_insert(request):
     context = {'login_id': login_id,'login_pwd': member_pwd} 
     
     return JsonResponse(context,json_dumps_params={'ensure_ascii': True})
-    
+
 #파일업로드 멘토스쿨
 @csrf_exempt
 def com_upload_ms(request):
