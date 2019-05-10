@@ -10728,6 +10728,7 @@ class MP0102M_mentee_list(generics.ListAPIView):
                     , t1.spc_apl_no AS spc_apl_no
                     , t1.mnte_no AS mnte_no
                     , t1.status AS status
+                    , t3.std_detl_code_nm as mte_status
                     , t1.appr_file AS appr_file
                     , t1.appr_dt AS appr_dt
                     , t2.mnte_nm AS mnte_nm
@@ -10739,6 +10740,7 @@ class MP0102M_mentee_list(generics.ListAPIView):
                         AND st1.ansr_id = t1.mnte_id) AS sati_status
                 FROM service20_mp_spc_mte t1
                 LEFT JOIN service20_mp_mte t2 ON (t2.mp_id = t1.mp_id AND t2.mnte_no = t1.mnte_no)
+                LEFT JOIN service20_com_cdd t3 ON (t3.std_detl_code = "MP0085" AND t3.std_detl_code = t1.status)
                 WHERE t1.mp_id = '{l_mp_id}'
                 AND t1.spc_no = '{l_spc_no}'
                 AND t1.spc_apl_no = '{l_spc_apl_no}'
@@ -10832,38 +10834,62 @@ def MP0102M_mentee_update(request):
             file = False
 
         if file != False:
-            print(file)
-            filename = file._name
-            n_filename = str(l_mp_id) + str(l_mnte_no) + str(l_spc_no) + str(l_spc_apl_no) + os.path.splitext(filename)[1]
-            print(n_filename)
-            print (UPLOAD_DIR)
-        
-            fp = open('%s/%s' % (UPLOAD_DIR, n_filename) , 'wb')
-            for chunk in file.chunks():
-                fp.write(chunk)
-            fp.close()
+            # 불참
+            if l_spc_status == '49':
+                cursor = connection.cursor()
+                fullFile = str(UPLOAD_DIR) + str(n_filename)
+                fullFile = "/img/spc/"+ str(n_filename)
 
-            cursor = connection.cursor()
-            fullFile = str(UPLOAD_DIR) + str(n_filename)
-            fullFile = "/img/spc/"+ str(n_filename)
+                query = " /* 학습외 신청 */ "
+                query += " update service20_mp_spc_mte "
+                query += "   set status = '" + l_spc_status + "' "
+                query += "     , appr_id = null "
+                query += "     , appr_nm = null "
+                query += "     , appr_dt = null "
+                query += "     , appr_file = null "
+                query += "     , upd_id = '" + upd_id + "' "
+                query += "     , upd_ip = '" + client_ip + "' "
+                query += "     , upd_dt = now() "
+                query += "     , upd_pgm = '" + upd_pgm + "' "
+                query += " where mp_id = '" + l_mp_id + "' "
+                query += "   and mnte_no = '" + l_mnte_no + "' "
+                query += "   and spc_no = '" + l_spc_no + "' "
+                query += "   and spc_apl_no = '" + l_spc_apl_no + "' "
 
-            query = " /* 학습외 신청 */ "
-            query += " update service20_mp_spc_mte "
-            query += "   set status = '" + l_spc_status + "' "
-            query += "     , appr_id = (select grd_id from service20_mp_mte where mp_id = '" + l_mp_id + "' and mnte_no = '" + l_mnte_no + "') "
-            query += "     , appr_nm = (select grd_nm from service20_mp_mte where mp_id = '" + l_mp_id + "' and mnte_no = '" + l_mnte_no + "') "
-            query += "     , appr_dt = now() "
-            query += "     , appr_file = '" + str(fullFile) + "' "
-            query += "     , upd_id = '" + upd_id + "' "
-            query += "     , upd_ip = '" + client_ip + "' "
-            query += "     , upd_dt = now() "
-            query += "     , upd_pgm = '" + upd_pgm + "' "
-            query += " where mp_id = '" + l_mp_id + "' "
-            query += "   and mnte_no = '" + l_mnte_no + "' "
-            query += "   and spc_no = '" + l_spc_no + "' "
-            query += "   and spc_apl_no = '" + l_spc_apl_no + "' "
+                cursor.execute(query)
+            else:
+                print(file)
+                filename = file._name
+                n_filename = str(l_mp_id) + str(l_mnte_no) + str(l_spc_no) + str(l_spc_apl_no) + os.path.splitext(filename)[1]
+                print(n_filename)
+                print (UPLOAD_DIR)
+            
+                fp = open('%s/%s' % (UPLOAD_DIR, n_filename) , 'wb')
+                for chunk in file.chunks():
+                    fp.write(chunk)
+                fp.close()
 
-            cursor.execute(query)
+                cursor = connection.cursor()
+                fullFile = str(UPLOAD_DIR) + str(n_filename)
+                fullFile = "/img/spc/"+ str(n_filename)
+
+                query = " /* 학습외 신청 */ "
+                query += " update service20_mp_spc_mte "
+                query += "   set status = '" + l_spc_status + "' "
+                query += "     , appr_id = (select grd_id from service20_mp_mte where mp_id = '" + l_mp_id + "' and mnte_no = '" + l_mnte_no + "') "
+                query += "     , appr_nm = (select grd_nm from service20_mp_mte where mp_id = '" + l_mp_id + "' and mnte_no = '" + l_mnte_no + "') "
+                query += "     , appr_dt = now() "
+                query += "     , appr_file = '" + str(fullFile) + "' "
+                query += "     , upd_id = '" + upd_id + "' "
+                query += "     , upd_ip = '" + client_ip + "' "
+                query += "     , upd_dt = now() "
+                query += "     , upd_pgm = '" + upd_pgm + "' "
+                query += " where mp_id = '" + l_mp_id + "' "
+                query += "   and mnte_no = '" + l_mnte_no + "' "
+                query += "   and spc_no = '" + l_spc_no + "' "
+                query += "   and spc_apl_no = '" + l_spc_apl_no + "' "
+
+                cursor.execute(query)
         else:
             cursor = connection.cursor()
 
