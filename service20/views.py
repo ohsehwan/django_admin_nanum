@@ -10065,10 +10065,11 @@ class MP0101M_team_logininfo_Serializer(serializers.ModelSerializer):
     stds_div = serializers.SerializerMethodField()
     stds_nm = serializers.SerializerMethodField()
     score03 = serializers.SerializerMethodField()
+    mob_no = serializers.SerializerMethodField()
     score_yn = serializers.SerializerMethodField()
     class Meta:
         model = com_cdd
-        fields = ('id', 'user_id', 'user_nm','user_brth_dt','user_sch_nm1','user_sch_nm2','stds_div','stds_nm','score03','score_yn')
+        fields = ('id', 'user_id', 'user_nm','user_brth_dt','user_sch_nm1','user_sch_nm2','stds_div','stds_nm','score03','mob_no','score_yn')
 
     def get_id(self,obj):
         return obj.id
@@ -10088,6 +10089,8 @@ class MP0101M_team_logininfo_Serializer(serializers.ModelSerializer):
         return obj.stds_nm
     def get_score03(self,obj):
         return obj.score03
+    def get_mob_no(self,obj):
+        return obj.mob_no
     def get_score_yn(self,obj):
         return obj.score_yn
 
@@ -10116,6 +10119,7 @@ class MP0101M_team_logininfo(generics.ListAPIView):
         query += "    B.stds_div,"
         query += "    B.stds_nm,"
         query += "    B.score03,"
+        query += "    B.mob_no,"
         query += "    case when B.score03*1 > 2.5 then 'Y' else 'N' end score_yn"
         query += " from"
         query += "    vw_nanum_login A"
