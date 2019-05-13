@@ -100,6 +100,8 @@ urlpatterns = [
     path('com/combo/member_mnte_sch/', com_combo_member_mnte_sch.as_view(), name='com_combo_member_mnte_sch'), 
     # 학교 구분 콤보
     path('com/combo/sch_grd/', com_combo_sch_grd.as_view(), name='com_combo_sch_grd'), 
+    # 만족도조사 상태 콤보
+    path('com/combo/surv/status/', com_combo_surv_status.as_view(), name='com_combo_sch_grd'), 
     ########################################################################################
     # 공통(com)
     #

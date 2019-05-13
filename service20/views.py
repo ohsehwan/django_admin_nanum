@@ -16579,6 +16579,39 @@ class com_combo_sch_grd(generics.ListAPIView):
 
         return Response(serializer.data) 
 
+# 만족도조사 상태 콤보
+class com_combo_surv_status_Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = com_cdd
+        fields = '__all__'
+
+class com_combo_surv_status(generics.ListAPIView):
+    queryset = com_cdd.objects.all()
+    serializer_class = com_combo_surv_status_Serializer
+
+    def list(self, request):
+               
+        queryset = self.get_queryset()
+        
+        query = " select '0'id,''std_detl_code,'전체'std_detl_code_nm "
+        query += " union  "
+        query += " select id, std_detl_code, std_detl_code_nm "
+        query += "  from service20_com_cdd "
+        query += " where std_grp_code = 'CM0006' "
+
+        queryset = com_cdd.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data) 
+
 class mpmgListSerializer(serializers.ModelSerializer):
 
     testField = serializers.SerializerMethodField()
