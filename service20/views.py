@@ -9904,9 +9904,12 @@ class MP0101M_team_logininfo_Serializer(serializers.ModelSerializer):
     user_brth_dt = serializers.SerializerMethodField()
     user_sch_nm1 = serializers.SerializerMethodField()
     user_sch_nm2 = serializers.SerializerMethodField()
+    stds_div = serializers.SerializerMethodField()
+    stds_nm = serializers.SerializerMethodField()
+    score03 = serializers.SerializerMethodField()
     class Meta:
         model = com_cdd
-        fields = ('id', 'user_id', 'user_nm','user_brth_dt','user_sch_nm1','user_sch_nm2')
+        fields = ('id', 'user_id', 'user_nm','user_brth_dt','user_sch_nm1','user_sch_nm2','stds_div','stds_nm','score03')
 
     def get_id(self,obj):
         return obj.id
@@ -9920,6 +9923,12 @@ class MP0101M_team_logininfo_Serializer(serializers.ModelSerializer):
         return obj.user_sch_nm1
     def get_user_sch_nm2(self,obj):
         return obj.user_sch_nm2
+    def get_stds_div(self,obj):
+        return obj.stds_div
+    def get_stds_nm(self,obj):
+        return obj.stds_nm
+    def get_score03(self,obj):
+        return obj.score03
 
 # 멘토링 프로그램 팀단위 로그인id 가져오기
 class MP0101M_team_logininfo(generics.ListAPIView):
@@ -9934,6 +9943,24 @@ class MP0101M_team_logininfo(generics.ListAPIView):
         query += "      , user_sch_nm2 "
         query += "  from vw_nanum_login "
         query += " where user_div in ('M','S') "
+
+
+        query = "select"
+        query += "    0 as id,"
+        query += "    A.user_id,"
+        query += "    A.user_nm,"
+        query += "    A.user_brth_dt,"
+        query += "    A.user_sch_nm1,"
+        query += "    A.user_sch_nm2,"
+        query += "    B.stds_div,"
+        query += "    B.stds_nm,"
+        query += "    B.score03"
+        query += "from"
+        query += "    vw_nanum_login A"
+        query += "left join service20_vw_nanum_stdt B on"
+        query += "    (A.user_id = B.apl_id)"
+        query += "where A.user_div in ('M','S')   "
+        query += "    and B.stds_div = '01'        "
 
         print(query)
         queryset = com_cdd.objects.raw(query)
