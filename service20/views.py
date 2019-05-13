@@ -6329,7 +6329,14 @@ def MP0101M_save(request):
     #mp_mtr_max = mp_mtr_max + 1
 
     print("::start::")
-
+    l_status = '10'
+    if save_status == "I":
+        # 제출
+        l_status = '10'
+    elif save_status == "S":    
+        # 저장
+       l_status = '00'
+        
     apl_no = mp_mtr_max
     apl_id = ida
     v_gen = ""
@@ -6443,7 +6450,7 @@ def MP0101M_save(request):
             pr_term_div=rows.pr_term_div,
             inv_agr_div = 'Y',
             inv_agr_dt = datetime.datetime.today(),
-            status='10', # 지원
+            status=l_status, # 지원
             mjr_cd=rows.mjr_cd,
             mjr_nm=rows.mjr_nm,
             ins_id=apl_id,
