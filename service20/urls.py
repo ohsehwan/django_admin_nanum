@@ -62,7 +62,7 @@ urlpatterns = [
     path('com/combo/appr/', com_combo_appr.as_view(), name='com_combo_appr'),
     # 관리자승인 콤보박스
     path('com/combo/mgr/', com_combo_mgr.as_view(), name='com_combo_mgr'),
-    # 계획서상태 콤보박스
+    # 계획서, 보고서 상태 콤보박스
     path('com/combo/pln/status/', com_combo_pln_status.as_view(), name='com_combo_pln_status'),
     # 멘토의 학번으로 해당되는 멘티찾기
     path('com/list/my_mentee/', com_list_my_mentee.as_view(), name='com_list_my_mentee'),

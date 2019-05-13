@@ -1831,6 +1831,7 @@ class com_combo_pln_status(generics.ListAPIView):
         query += "     , std_detl_code_nm as std_detl_code_nm"
         query += "  from service20_com_cdd"
         query += " where std_grp_code = 'MP0070'    /* 계획서작성부 */"
+        query += "   and std_detl_code in ('20', '11', '30') "
 
         print(query)
         queryset = com_cdd.objects.raw(query)
