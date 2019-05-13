@@ -16941,6 +16941,48 @@ class member_overlap(generics.ListAPIView):
         context = {'message': message,} 
         return JsonResponse(context,json_dumps_params={'ensure_ascii': True})
 
+# 회원가입 학부모 검색
+class member_popup_guard_Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = guardian
+        fields = '__all__'
+
+class member_popup_guard(generics.ListAPIView):
+    queryset = guardian.objects.all()
+    serializer_class = member_popup_guard_Serializer
+
+    def list(self, request):
+        grdn_nm = request.GET.get('grdn_nm', "")
+        brth_dt = request.GET.get('brth_dt', "")
+
+        queryset = self.get_queryset()
+
+        query = f"""
+                SELECT grdn_id AS grdn_id
+                    , grdn_nm AS grdn_nm
+                    , brth_dt AS brth_dt
+                    , replace(mob_no, '-', '') AS mob_no
+                    , replace(tel_no, '-', '') AS tel_no
+                    , h_addr AS h_addr
+                FROM service20_guardian
+                WHERE grdn_nm = '{grdn_nm}'
+                AND brth_dt = '{brth_dt}';
+        """
+
+        print(query)
+        queryset = guardian.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
+
 # 회원가입 insert
 @csrf_exempt
 def member_insert(request):

@@ -126,6 +126,8 @@ urlpatterns = [
     ########################################################################################
     # 회원가입 중복체크
     path('member/overlap/', member_overlap.as_view(), name='member_overlap'),
+    # 회원가입 학부모 검색
+    path('member/popup/guard/', member_popup_guard.as_view(), name='member_popup_guard'),
     # 회원가입 insert
     path('member/insert/', member_insert, name='member_insert'),
     ########################################################################################
