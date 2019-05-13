@@ -9969,11 +9969,11 @@ class MP0101M_team_logininfo(generics.ListAPIView):
         query += "    B.stds_nm,"
         query += "    B.score03,"
         query += "    case when B.score03*1 > 2.5 then 'Y' else 'N' end score_yn"
-        query += "from"
+        query += " from"
         query += "    vw_nanum_login A"
-        query += "left join service20_vw_nanum_stdt B on"
+        query += " left join service20_vw_nanum_stdt B on"
         query += "    (A.user_id = B.apl_id)"
-        query += "where A.user_div in ('M','S')   "
+        query += " where A.user_div in ('M','S')   "
         query += "    and B.stds_div = '01'        "
 
         print(query)
