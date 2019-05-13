@@ -5960,6 +5960,160 @@ class MP0101M_list(generics.ListAPIView):
 
         return Response(serializer.data)
 
+class MP0101M_list_all_hompage_Serializer(serializers.ModelSerializer):
+
+    applyFlag = serializers.SerializerMethodField()
+    applyFlagNm = serializers.SerializerMethodField()
+    applyStatus = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    statusCode = serializers.SerializerMethodField()
+    status_nm  = serializers.SerializerMethodField()
+    sup_org_nm = serializers.SerializerMethodField()
+    mng_org_nm = serializers.SerializerMethodField()
+    apl_no = serializers.SerializerMethodField()
+    apl_id = serializers.SerializerMethodField()
+    cert_en = serializers.SerializerMethodField()
+    apl_status = serializers.SerializerMethodField()
+    apl_status_nm = serializers.SerializerMethodField()
+
+    apl_fr_dt = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
+    apl_to_dt = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
+    mnt_fr_dt = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
+    mnt_to_dt = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
+
+    class Meta:
+        model = mpgm
+        fields = (
+            'mp_id',
+            'mp_name',
+            'status',
+            'statusCode',
+            'yr',
+            'yr_seq',
+            'sup_org',
+            'mng_org',
+            'applyFlag',
+            'applyStatus',
+            'apl_fr_dt',
+            'apl_to_dt',
+            'mnt_fr_dt',
+            'mnt_to_dt',
+            'cnt_trn',
+            'status',
+            'status_nm',
+            'applyFlagNm',
+            'sup_org_nm',
+            'mng_org_nm',
+            'mgr_nm',
+            'apl_no',
+            'apl_id',
+            'cert_en',
+            'apl_status',
+            'apl_status_nm',
+        )
+
+    def get_applyFlag(self, obj):
+        return obj.applyFlag    
+    def get_applyFlagNm(self, obj):
+        return obj.applyFlagNm    
+    def get_applyStatus(self, obj):
+        
+        if obj.applyFlag == 'N':
+            return '지원'
+        else:
+            # print(obj.applyFlag)
+            # rows = com_cdd.objects.filter(std_grp_code='MP0053',std_detl_code=obj.applyFlag)
+            # return str(rows[0].std_detl_code_nm)
+            return '미지원'
+        return obj.applyStatus    
+
+    def get_statusCode(self,obj):
+        return obj.statusCode 
+
+    def get_status_nm(self,obj):
+        return obj.status_nm   
+
+    def get_status(self,obj):
+        return obj.status
+
+    def get_sup_org_nm(self,obj):
+        return obj.sup_org_nm
+
+    def get_mng_org_nm(self, obj):
+        return obj.mng_org_nm
+
+    def get_apl_no(self, obj):
+        return obj.apl_no
+
+    def get_apl_id(self, obj):
+        return obj.apl_id
+    def get_cert_en(self, obj):
+        return obj.cert_en
+    def get_apl_status(self, obj):
+        return obj.apl_status
+    def get_apl_status_nm(self, obj):
+        return obj.apl_status_nm                
+
+
+class MP0101M_list_all_hompage(generics.ListAPIView):
+    queryset = mpgm.objects.all()
+    serializer_class = MP0101M_list_all_hompage_Serializer
+
+    def list(self, request):
+        ida = request.GET.get('user_id', "")
+
+        
+        # 멘토만 조회가능.
+        query = " select apl_to_dt,  "
+        query += "        IF(A.status = '10'  "
+        query += "           AND Now() > A.apl_to_dt, 'xx', A.status) AS statusCode,  "
+        query += "        IF(A.status = '10'  "
+        query += "           AND Now() > A.apl_to_dt, '모집완료',  "
+        query += "        (SELECT std_detl_code_nm  "
+        query += "         FROM   service20_com_cdd  "
+        query += "         WHERE  std_grp_code = 'MP0001'  "
+        query += "                AND use_indc = 'y'  "
+        query += "                AND std_detl_code = A.status))      AS status_nm,  "
+        query += "        Ifnull(B.status, 'N')                       AS applyFlag,  "
+    
+        query += " CASE  "
+        query += "      WHEN Ifnull(B.status, 'N') = 'N' THEN '미지원' "
+        query += "      ELSE (SELECT std_detl_code_nm  "
+        query += "              FROM   service20_com_cdd  "
+        query += "              WHERE  std_grp_code = 'MP0053'  "
+        query += "                 AND std_detl_code = B.status)  "
+        query += " end                                         AS applyFlagNm,  "
+        query += " c1.std_detl_code_nm   AS sup_org_nm, "
+        query += " c2.std_detl_code_nm   AS mng_org_nm, "
+        query += " B.apl_no   AS apl_no, B.apl_id AS apl_id, "
+        query += " B.cert_en   AS cert_en,"
+        query += " B.status    as apl_status,"
+        query += " (select std_detl_code_nm from service20_com_cdd where B.status = std_detl_code and std_grp_code = 'MP0053') as apl_status_nm,"
+        query += "        A.*  "
+        query += " FROM   service20_mpgm A  "
+        query += "        LEFT JOIN service20_mp_mtr B  "
+        query += "               ON ( A.mp_id = B.mp_id  "
+        # query += "                    AND A.yr = B.yr  "
+        query += "                    AND B.apl_id = '"+str(ida)+"'  "
+        query += "                    AND B.fnl_rslt = 'P' )  "
+        query += "        LEFT JOIN service20_com_cdd c1 ON (c1.std_grp_code  = 'MP0004' AND c1.std_detl_code = A.sup_org) "
+        query += "        LEFT JOIN service20_com_cdd c2 ON (c2.std_grp_code = 'MP0003' AND c2.std_detl_code = A.mng_org)"
+        query += " WHERE  B.apl_id = '"+str(ida)+"'  "
+        query += " ORDER  BY A.apl_fr_dt DESC,  "
+        query += "           A.apl_to_dt DESC  "
+
+        queryset = mpgm.objects.raw(query)  
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, context={'request': request}, many=True)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
+
+# 앱사용(시작)
 class MP0101M_list_all_Serializer(serializers.ModelSerializer):
 
     applyFlag = serializers.SerializerMethodField()
@@ -6084,21 +6238,14 @@ class MP0101M_list_all(generics.ListAPIView):
         query += "                 AND std_detl_code = B.status)  "
         query += " end                                         AS applyFlagNm,  "
         query += " c1.std_detl_code_nm   AS sup_org_nm, "
-        query += " c2.std_detl_code_nm   AS mng_org_nm, "
-        query += " B.apl_no   AS apl_no, B.apl_id AS apl_id, "
-        query += " B.cert_en   AS cert_en,"
-        query += " B.status    as apl_status,"
-        query += " (select std_detl_code_nm from service20_com_cdd where B.status = std_detl_code and std_grp_code = 'MP0053') as apl_status_nm,"
         query += "        A.*  "
         query += " FROM   service20_mpgm A  "
         query += "        LEFT JOIN service20_mp_mtr B  "
         query += "               ON ( A.mp_id = B.mp_id  "
         # query += "                    AND A.yr = B.yr  "
-        query += "                    AND B.apl_id = '"+str(ida)+"'  "
-        query += "                    AND B.fnl_rslt = 'P' )  "
+        query += "                    AND B.apl_id = '"+str(ida)+"' )  "
         query += "        LEFT JOIN service20_com_cdd c1 ON (c1.std_grp_code  = 'MP0004' AND c1.std_detl_code = A.sup_org) "
-        query += "        LEFT JOIN service20_com_cdd c2 ON (c2.std_grp_code = 'MP0003' AND c2.std_detl_code = A.mng_org)"
-        query += " WHERE  B.apl_id = '"+str(ida)+"'  "
+        query += " WHERE  B.apl_id = '"+str(ida)+"'  "        
         query += " ORDER  BY A.apl_fr_dt DESC,  "
         query += "           A.apl_to_dt DESC  "
 
@@ -6112,6 +6259,7 @@ class MP0101M_list_all(generics.ListAPIView):
             return self.get_paginated_response(serializer.data)
 
         return Response(serializer.data)
+# 앱사용(종료) 
 
 class MP0101M_list_all_mypage_Serializer(serializers.ModelSerializer):
 

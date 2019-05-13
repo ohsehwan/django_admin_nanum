@@ -231,7 +231,9 @@ urlpatterns = [
     path('MP0101M/list/chk/9/', MP0101M_list_chk_9.as_view(), name='MP0101M_list_chk_9'),
     # 멘토링 프로그램 리스트 조회
     path('MP0101M/list/', MP0101M_list.as_view(), name='MP0101M_list'),
-    # 멘토링 프로그램 신청내역
+    # 멘토링 프로그램 신청내역(홈페이지)
+    path('MP0101M/list/all/hompage/', MP0101M_list_all_hompage.as_view(), name='MP0101M_list_all_hompage'),
+    # 멘토링 프로그램 신청내역(앱)
     path('MP0101M/list/all/', MP0101M_list_all.as_view(), name='MP0101M_list_all'),
     # 멘토링 프로그램 신청내역
     path('MP0101M/list/all/mypage/', MP0101M_list_all_mypage.as_view(), name='MP0101M_list_all_mypage'),
