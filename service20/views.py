@@ -1808,7 +1808,7 @@ class com_combo_mgr(generics.ListAPIView):
 
         return Response(serializer.data)
 
-# 계획서상태 콤보박스 ###################################################
+# 계획서, 보고서 상태 콤보박스 ###################################################
 class com_combo_pln_status_Serializer(serializers.ModelSerializer):
 
     class Meta:
@@ -1824,15 +1824,25 @@ class com_combo_pln_status(generics.ListAPIView):
 
         queryset = self.get_queryset()
         
-        query = " select '0' as id, '' as std_detl_code, '전체' as std_detl_code_nm "
-        query += " union  "
-        query += " select id as id "
-        query += "     , std_detl_code as std_detl_code"
-        query += "     , std_detl_code_nm as std_detl_code_nm"
-        query += "  from service20_com_cdd"
-        query += " where std_grp_code = 'MP0070'    /* 계획서작성부 */"
-        query += "   and std_detl_code in ('20', '11', '30') "
+        # query = " select '0' as id, '' as std_detl_code, '전체' as std_detl_code_nm "
+        # query += " union  "
+        # query += " select id as id "
+        # query += "     , std_detl_code as std_detl_code"
+        # query += "     , std_detl_code_nm as std_detl_code_nm"
+        # query += "  from service20_com_cdd"
+        # query += " where std_grp_code = 'MP0070'    /* 계획서작성부 */"
+        # query += "   and std_detl_code in ('20', '11', '30') "
 
+        query = """
+                select '0' as id, '' as std_detl_code, '전체' as std_detl_code_nm 
+                union  
+                select id as id, std_detl_code as std_detl_code
+                    , case when trim(rmrk) = '' then std_detl_code_nm else concat(std_detl_code_nm, '(',rmrk ,')') end std_detl_code_nm 
+                from service20_com_cdd
+                where std_grp_code = 'MP0070'    /* 계획서작성부 */
+                and std_detl_code in ('20', '11', '30');
+        """
+        
         print(query)
         queryset = com_cdd.objects.raw(query)
 
