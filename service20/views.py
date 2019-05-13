@@ -6330,12 +6330,15 @@ def MP0101M_save(request):
 
     print("::start::")
     l_status = '10'
+    team_l_status = '10'
     if save_status == "I":
         # 제출
         l_status = '10'
+        team_l_status = '10'
     elif save_status == "S":    
         # 저장
        l_status = '00'
+       team_l_status = '00'
         
     apl_no = mp_mtr_max
     apl_id = ida
