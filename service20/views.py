@@ -14337,6 +14337,82 @@ def MP0105M_insert(request):
     context = {'message': 'Ok'}
 
     return JsonResponse(context,json_dumps_params={'ensure_ascii': True})
+
+# 보고서 Min, Max ###################################################
+class MP0105M_detail_min_max_Serializer(serializers.ModelSerializer):
+
+    min_len_mp_rep_mtr_obj = serializers.SerializerMethodField()
+    max_len_mp_rep_mtr_obj = serializers.SerializerMethodField()
+    min_len_mp_rep_mtr_desc = serializers.SerializerMethodField()
+    max_len_mp_rep_mtr_desc = serializers.SerializerMethodField()
+    min_len_mp_rep_coatching = serializers.SerializerMethodField()
+    max_len_mp_rep_coatching = serializers.SerializerMethodField()
+    min_len_mp_rep_spcl_note = serializers.SerializerMethodField()
+    max_len_mp_rep_spcl_note = serializers.SerializerMethodField()
+    min_len_mp_rep_mtr_revw = serializers.SerializerMethodField()
+    max_len_mp_rep_mtr_revw = serializers.SerializerMethodField()
+
+    class Meta:
+        model = mpgm
+        fields = '__all__'
+
+    def get_min_len_mp_rep_mtr_obj(self,obj):
+        return obj.min_len_mp_rep_mtr_obj
+    def get_max_len_mp_rep_mtr_obj(self,obj):
+        return obj.max_len_mp_rep_mtr_obj
+    def get_min_len_mp_rep_mtr_desc(self,obj):
+        return obj.min_len_mp_rep_mtr_desc
+    def get_max_len_mp_rep_mtr_desc(self,obj):
+        return obj.max_len_mp_rep_mtr_desc
+    def get_min_len_mp_rep_coatching(self,obj):
+        return obj.min_len_mp_rep_coatching
+    def get_max_len_mp_rep_coatching(self,obj):
+        return obj.max_len_mp_rep_coatching
+    def get_min_len_mp_rep_spcl_note(self,obj):
+        return obj.min_len_mp_rep_spcl_note
+    def get_max_len_mp_rep_spcl_note(self,obj):
+        return obj.max_len_mp_rep_spcl_note
+    def get_min_len_mp_rep_mtr_revw(self,obj):
+        return obj.min_len_mp_rep_mtr_revw
+    def get_max_len_mp_rep_mtr_revw(self,obj):
+        return obj.max_len_mp_rep_mtr_revw
+
+class MP0105M_detail_min_max(generics.ListAPIView):
+    queryset = mpgm.objects.all()
+    serializer_class = MP0105M_detail_min_max_Serializer
+
+
+    def list(self, request):
+        l_mp_id = request.GET.get('mp_id', "")
+        l_user_id = request.GET.get('user_id', "")
+
+        queryset = self.get_queryset()
+
+        query  = f"""
+                select '0' as id, '' as mp_id
+                    , fn_mp_sub_att_val_select_01('P190001', 'CL0004', 'MS0028', '10') min_len_mp_rep_mtr_obj /* 학습목표(MTR_OBJ) - 프로그램 보고서(MP_REP) */  
+                    , fn_mp_sub_att_val_select_01('P190001', 'CL0004', 'MS0029', '10') max_len_mp_rep_mtr_obj /* 학습목표(MTR_OBJ) - 프로그램 보고서(MP_REP) */
+                    , fn_mp_sub_att_val_select_01('P190001', 'CL0005', 'MS0028', '10') min_len_mp_rep_mtr_desc /* 학습내용(MTR_DESC) - 프로그램 보고서(MP_REP) */  
+                    , fn_mp_sub_att_val_select_01('P190001', 'CL0005', 'MS0029', '10') max_len_mp_rep_mtr_desc /* 학습내용(MTR_DESC) - 프로그램 보고서(MP_REP) */
+                    , fn_mp_sub_att_val_select_01('P190001', 'CL0006', 'MS0028', '10') min_len_mp_rep_coatching /* 학습외 지도(상담)(COATCHING) - 프로그램 보고서(MP_REP)   */
+                    , fn_mp_sub_att_val_select_01('P190001', 'CL0006', 'MS0029', '10') max_len_mp_rep_coatching /* 학습외 지도(상담)(COATCHING) - 프로그램 보고서(MP_REP)   */
+                    , fn_mp_sub_att_val_select_01('P190001', 'CL0007', 'MS0028', '10') min_len_mp_rep_spcl_note /* 특이사항(SPCL_NOTE) - 프로그램 보고서(MP_REP)   */
+                    , fn_mp_sub_att_val_select_01('P190001', 'CL0007', 'MS0029', '10') max_len_mp_rep_spcl_note /* 특이사항(SPCL_NOTE) - 프로그램 보고서(MP_REP)    */
+                    , fn_mp_sub_att_val_select_01('P190001', 'CL0008', 'MS0028', '10') min_len_mp_rep_mtr_revw /* 소감문(MTR_REVW) - 프로그램 보고서(MP_REP)   */
+                    , fn_mp_sub_att_val_select_01('P190001', 'CL0008', 'MS0029', '10') max_len_mp_rep_mtr_revw /* 소감문(MTR_REVW) - 프로그램 보고서(MP_REP)    */
+        """
+        queryset = mpgm.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)   
+        
 #####################################################################################
 # MP0105M - END
 #####################################################################################
