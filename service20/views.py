@@ -4126,9 +4126,11 @@ class MS0101M_quest_Serializer(serializers.ModelSerializer):
     std_detl_code_nm = serializers.SerializerMethodField()
     std_detl_code = serializers.SerializerMethodField()
     rmrk = serializers.SerializerMethodField()
+    ans_min_len = serializers.SerializerMethodField()
+    ans_max_len = serializers.SerializerMethodField()
     class Meta:
         model = ms_sub
-        fields = ('id','ms_id','att_id','att_seq','att_cdh','att_cdd','att_val','use_yn','sort_seq','std_detl_code','std_detl_code_nm','rmrk')
+        fields = ('id','ms_id','att_id','att_seq','att_cdh','att_cdd','att_val','use_yn','sort_seq','std_detl_code','std_detl_code_nm','rmrk','ans_min_len','ans_max_len')
 
         
     def get_std_detl_code(self,obj):
@@ -4139,6 +4141,10 @@ class MS0101M_quest_Serializer(serializers.ModelSerializer):
 
     def get_rmrk(self,obj):
         return obj.rmrk    
+    def get_ans_min_len(self,obj):
+        return obj.ans_min_len  
+    def get_ans_max_len(self,obj):
+        return obj.ans_max_len  
 
 # 멘토스쿨 질문유형 가져오기
 class MS0101M_quest(generics.ListAPIView):
@@ -4149,6 +4155,22 @@ class MS0101M_quest(generics.ListAPIView):
         key1 = request.GET.get('ms_id', None)           
         
         query = "select B.std_detl_code,B.std_detl_code_nm,B.rmrk,A.* from service20_ms_sub A left outer join service20_com_cdd B on (A.att_id = B.std_grp_code and A.att_cdd = B.std_detl_code) where A.att_id='MS0014' and B.use_indc = 'Y' and A.ms_id = '"+key1+"' order by A.sort_seq"
+
+        query = "select  "
+        query += "     t3.std_detl_code, "
+        query += "     t3.std_detl_code_nm, "
+        query += "     t3.rmrk, "
+        query += "     fn_ms_sub_att_val_select_01(t1.ms_id, t1.att_id, 'MS0028', t1.att_cdd) ans_min_len, "
+        query += "     fn_ms_sub_att_val_select_01(t1.ms_id, t1.att_id, 'MS0029', t1.att_cdd) ans_max_len, "
+        query += "     t1.* "
+        query += "FROM service20_ms_sub t1 "
+        query += "LEFT JOIN service20_com_cdd t3 ON (t3.std_grp_code  = t1.att_cdh "
+        query += "                               AND t3.std_detl_code = t1.att_cdd) "
+        query += "WHERE t1.ms_id   = '"+key1+"' "
+        query += " AND t1.att_id  = 'MS0014' "
+        query += " AND t1.att_cdh = 'MS0014' "
+        query += "ORDER BY t1.sort_seq "
+
         queryset = ms_sub.objects.raw(query)
 
         serializer_class = self.get_serializer_class()
@@ -6419,9 +6441,11 @@ class MP0101M_quest_Serializer(serializers.ModelSerializer):
     std_detl_code_nm = serializers.SerializerMethodField()
     std_detl_code = serializers.SerializerMethodField()
     rmrk = serializers.SerializerMethodField()
+    ans_min_len = serializers.SerializerMethodField()
+    ans_max_len = serializers.SerializerMethodField()
     class Meta:
         model = mp_sub
-        fields = ('id','mp_id','att_id','att_seq','att_cdh','att_cdd','att_val','use_yn','sort_seq','std_detl_code','std_detl_code_nm','rmrk')
+        fields = ('id','mp_id','att_id','att_seq','att_cdh','att_cdd','att_val','use_yn','sort_seq','std_detl_code','std_detl_code_nm','rmrk','ans_min_len','ans_max_len')
 
         
     def get_std_detl_code(self,obj):
@@ -6432,6 +6456,10 @@ class MP0101M_quest_Serializer(serializers.ModelSerializer):
 
     def get_rmrk(self,obj):
         return obj.rmrk    
+    def get_ans_min_len(self,obj):
+        return obj.ans_min_len  
+    def get_ans_max_len(self,obj):
+        return obj.ans_max_len
 
 # 멘토링 프로그램 질문유형 가져오기
 class MP0101M_quest(generics.ListAPIView):
@@ -6442,6 +6470,22 @@ class MP0101M_quest(generics.ListAPIView):
         key1 = request.GET.get('mp_id', None)           
         
         query = "select B.std_detl_code,B.std_detl_code_nm,B.rmrk,A.* from service20_mp_sub A left outer join service20_com_cdd B on (A.att_id = B.std_grp_code and A.att_cdd = B.std_detl_code) where A.att_id='MS0014' and B.use_indc = 'Y' and A.mp_id = '"+key1+"' order by A.sort_seq"
+        
+        query = "select  "
+        query += "     t3.std_detl_code, "
+        query += "     t3.std_detl_code_nm, "
+        query += "     t3.rmrk, "
+        query += "     fn_mp_sub_att_val_select_01(t1.mp_id, t1.att_id, 'MS0028', t1.att_cdd) ans_min_len, "
+        query += "     fn_mp_sub_att_val_select_01(t1.mp_id, t1.att_id, 'MS0029', t1.att_cdd) ans_max_len, "
+        query += "     t1.* "
+        query += "FROM service20_mp_sub t1 "
+        query += "LEFT JOIN service20_com_cdd t3 ON (t3.std_grp_code  = t1.att_cdh "
+        query += "                               AND t3.std_detl_code = t1.att_cdd) "
+        query += "WHERE t1.mp_id   = '"+key1+"' "
+        query += " AND t1.att_id  = 'MS0014' "
+        query += " AND t1.att_cdh = 'MS0014' "
+        query += "ORDER BY t1.sort_seq "
+
         queryset = mp_sub.objects.raw(query)
 
         serializer_class = self.get_serializer_class()
