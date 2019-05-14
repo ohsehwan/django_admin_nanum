@@ -8332,9 +8332,14 @@ class MP0101M_service_combo_field(generics.ListAPIView):
 # 멘토링 프로그램 - 해외봉사활동 프로그램 (업로드 카운트) ###################################################
 class MP0101M_service_upload_cnt_Serializer(serializers.ModelSerializer):
 
+    val = serializers.SerializerMethodField()
+
     class Meta:
         model = mp_sub
         fields = '__all__'
+
+    def get_val(self,obj):
+        return obj.val
 
 class MP0101M_service_upload_cnt(generics.ListAPIView):
     queryset = mp_sub.objects.all()
