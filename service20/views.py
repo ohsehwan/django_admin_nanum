@@ -8343,15 +8343,29 @@ class MP0101M_service_upload_cnt(generics.ListAPIView):
     def list(self, request):
         l_mp_id = request.GET.get('mp_id', "")
 
-        query = " select t1.id, t1.mp_id    /* 멘토링프로그램id     */ "
-        query += "     , t1.att_cdh  /* 첨부파일 code header */ "
-        query += "     , t1.att_cdd  /* 첨부파일 code        */ "
-        query += "     , t1.att_val  /* 첨부파일 종류        */ "
-        query += "  from service20_mp_sub t1 "
-        query += " where mp_id   ='" + l_mp_id + "'  "
-        query += "   and att_cdh = 'MP0086' "
-        query += "   and use_yn  = 'Y' "
-        query += " order by sort_seq; "
+        # query = " select t1.id, t1.mp_id    /* 멘토링프로그램id     */ "
+        # query += "     , t1.att_cdh  /* 첨부파일 code header */ "
+        # query += "     , t1.att_cdd  /* 첨부파일 code        */ "
+        # query += "     , t1.att_val  /* 첨부파일 종류        */ "
+        # query += "  from service20_mp_sub t1 "
+        # query += " where mp_id   ='" + l_mp_id + "'  "
+        # query += "   and att_cdh = 'MP0086' "
+        # query += "   and use_yn  = 'Y' "
+        # query += " order by sort_seq; "
+
+
+        query = "     select t1.id, t1.mp_id    /* 멘토링프로그램id     */ "
+        query += "           , t1.att_cdh  /* 첨부파일 code header */ "
+        query += "           , t1.att_cdd  /* 첨부파일 code        */ "
+        query += "           , t1.att_val  /* 첨부파일 종류        */ "
+        query += "           , fn_mp_sub_val_select_01(t1.mp_id, t1.att_id, 'MP0112', t1.att_cdd) val"
+        query += "        FROM service20_mp_sub t1"
+        query += "        LEFT JOIN service20_com_cdd t3 ON (t3.std_grp_code  = t1.att_cdh"
+        query += "                                       AND t3.std_detl_code = t1.att_cdd)"
+        query += "       WHERE t1.mp_id   = '" + l_mp_id + "'"
+        query += "         AND t1.att_id  = 'MP0086'"
+        query += "         AND t1.att_cdh = 'MP0086'"
+        query += "       ORDER BY t1.sort_seq"
 
         queryset = mp_sub.objects.raw(query)
         
