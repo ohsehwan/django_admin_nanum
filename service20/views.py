@@ -14830,6 +14830,8 @@ class MP0108_list_Serializer(serializers.ModelSerializer):
     uncmp_resp_nm = serializers.SerializerMethodField()
     uncmp_tp = serializers.SerializerMethodField()
     uncmp_tp_nm = serializers.SerializerMethodField()
+    min_len_mp_ucmp_req_uncmp_desc = serializers.SerializerMethodField()
+    max_len_mp_ucmp_req_uncmp_desc = serializers.SerializerMethodField()
 
     class Meta:
         model = mp_mtr
@@ -14868,7 +14870,11 @@ class MP0108_list_Serializer(serializers.ModelSerializer):
     def get_uncmp_tp(self,obj):
         return obj.uncmp_tp 
     def get_uncmp_tp_nm(self,obj):
-        return obj.uncmp_tp_nm                                                                                                                           
+        return obj.uncmp_tp_nm                      
+    def get_min_len_mp_ucmp_req_uncmp_desc(self,obj):
+        return obj.min_len_mp_ucmp_req_uncmp_desc 
+    def get_max_len_mp_ucmp_req_uncmp_desc(self,obj):
+        return obj.max_len_mp_ucmp_req_uncmp_desc                                                                                                      
 
 class MP0108_list(generics.ListAPIView):
     queryset = mp_mtr.objects.all()
@@ -14917,6 +14923,8 @@ class MP0108_list(generics.ListAPIView):
         query += "     , (select std_detl_code_nm from service20_com_cdd where std_detl_code = t3.uncmp_resp and std_grp_code = 'ms0005') as uncmp_resp_nm "
         query += "     , t3.uncmp_tp   /* 미완료 유형(mp0096) */   /* 중단 유형(mp0096) */         "
         query += "     , (select std_detl_code_nm from service20_com_cdd where std_detl_code = t3.uncmp_tp and std_grp_code = 'mp0096') as uncmp_tp_nm "       
+        query += "     , fn_mp_sub_att_val_select_01('P190001', 'CL0009', 'MS0028', '10') min_len_mp_ucmp_req_uncmp_desc /* 미완료 소명 사유(UNCMP_DESC) - 미완료 소명서(MP_UCMP_REQ) */ "
+        query += "     , fn_mp_sub_att_val_select_01('P190001', 'CL0009', 'MS0029', '10') max_len_mp_ucmp_req_uncmp_desc /* 미완료 소명 사유(UNCMP_DESC) - 미완료 소명서(MP_UCMP_REQ) */ "
         query += "  from service20_mp_mtr t1 "
         query += "    inner join service20_mpgm t2 on (t2.mp_id = t1.mp_id) "
         query += "    inner join service20_mp_ucmp_req t3 on (t3.mp_id = t1.mp_id and t1.apl_id = t3.apl_id) "
