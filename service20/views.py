@@ -14510,6 +14510,8 @@ class MP0107_list_Serializer(serializers.ModelSerializer):
     stop_resp_nm = serializers.SerializerMethodField()
     stop_tp = serializers.SerializerMethodField()
     stop_tp_nm = serializers.SerializerMethodField()
+    min_len_mp_stop_req_stop_desc = serializers.SerializerMethodField()
+    min_len_mp_stop_req_stop_desc = serializers.SerializerMethodField()
 
     class Meta:
         model = mp_mtr
@@ -14548,7 +14550,11 @@ class MP0107_list_Serializer(serializers.ModelSerializer):
     def get_stop_tp(self,obj):
         return obj.stop_tp 
     def get_stop_tp_nm(self,obj):
-        return obj.stop_tp_nm                                                                                                                           
+        return obj.stop_tp_nm        
+    def get_min_len_mp_stop_req_stop_desc(self,obj):
+        return obj.min_len_mp_stop_req_stop_desc   
+    def get_min_len_mp_stop_req_stop_desc(self,obj):
+        return obj.min_len_mp_stop_req_stop_desc                                                                                                                      
 
 class MP0107_list(generics.ListAPIView):
     queryset = mp_mtr.objects.all()
@@ -14597,6 +14603,8 @@ class MP0107_list(generics.ListAPIView):
         query += "     , (select std_detl_code_nm from service20_com_cdd where std_detl_code = t3.stop_resp and std_grp_code = 'ms0005') as stop_resp_nm "
         query += "     , t3.stop_tp   /* 중단 유형(mp0095) */         "
         query += "     , (select std_detl_code_nm from service20_com_cdd where std_detl_code = t3.stop_tp and std_grp_code = 'mp0095') as stop_tp_nm "       
+        query += "     , fn_mp_sub_att_val_select_01('P190001', 'CL0010', 'MS0028', '10') min_len_mp_stop_req_stop_desc /* 중단 사유(STOP_DESC) - 활동중단 사유서(MP_STOP_REQ) */ " 
+        query += "     , fn_mp_sub_att_val_select_01('P190001', 'CL0010', 'MS0029', '10') max_len_mp_stop_req_stop_desc /* 중단 사유(STOP_DESC) - 활동중단 사유서(MP_STOP_REQ) */ "
         query += "  from service20_mp_mtr t1 "
         query += "    left join service20_mpgm t2 on (t2.mp_id = t1.mp_id) "
         query += "    left join service20_mp_stop_req t3 on (t3.mp_id = t1.mp_id and t1.apl_id = t3.apl_id) "
