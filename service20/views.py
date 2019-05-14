@@ -11641,8 +11641,8 @@ class MP0103M_Detail_v2(generics.ListAPIView):
         query += "      , date_format(t1.mgr_dt, '%%y-%%m-%%d %%h:%%i:%%s') as mgr_dt "
         query += "      , t1.status as status "
         query += "      , fn_mp_mte_select_01(t1.mp_id, t1.apl_no) AS mnte_nm "
-        query += "      , fn_mp_sub_att_val_select_01('P190001', 'CL0001', 'MS0028', '10') min_len_mp_plnd_mtr_desc /* 멘토링 내용(MTR_DESC) - 프로그램 수행 계획서 상세(MP_PLND) */ "
-        query += "      , fn_mp_sub_att_val_select_01('P190001', 'CL0001', 'MS0029', '10') max_len_mp_plnd_mtr_desc /* 멘토링 내용(MTR_DESC) - 프로그램 수행 계획서 상세(MP_PLND) */ "
+        query += "      , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0001', 'MS0028', '10') min_len_mp_plnd_mtr_desc /* 멘토링 내용(MTR_DESC) - 프로그램 수행 계획서 상세(MP_PLND) */ "
+        query += "      , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0001', 'MS0029', '10') max_len_mp_plnd_mtr_desc /* 멘토링 내용(MTR_DESC) - 프로그램 수행 계획서 상세(MP_PLND) */ "
         query += "   from service20_mp_plnh t1 "
         query += "   left join service20_mpgm t2 on (t2.mp_id = t1.mp_id) "
         query += "   left join service20_mp_mte t3 on (t3.mp_id = t1.mp_id and t3.apl_no = t1.apl_no) "
@@ -14382,22 +14382,21 @@ class MP0105M_detail_min_max(generics.ListAPIView):
 
     def list(self, request):
         l_mp_id = request.GET.get('mp_id', "")
-        l_user_id = request.GET.get('user_id', "")
 
         queryset = self.get_queryset()
 
         query  = f"""
                 select '0' as id, '' as mp_id
-                    , fn_mp_sub_att_val_select_01('P190001', 'CL0004', 'MS0028', '10') min_len_mp_rep_mtr_obj /* 학습목표(MTR_OBJ) - 프로그램 보고서(MP_REP) */  
-                    , fn_mp_sub_att_val_select_01('P190001', 'CL0004', 'MS0029', '10') max_len_mp_rep_mtr_obj /* 학습목표(MTR_OBJ) - 프로그램 보고서(MP_REP) */
-                    , fn_mp_sub_att_val_select_01('P190001', 'CL0005', 'MS0028', '10') min_len_mp_rep_mtr_desc /* 학습내용(MTR_DESC) - 프로그램 보고서(MP_REP) */  
-                    , fn_mp_sub_att_val_select_01('P190001', 'CL0005', 'MS0029', '10') max_len_mp_rep_mtr_desc /* 학습내용(MTR_DESC) - 프로그램 보고서(MP_REP) */
-                    , fn_mp_sub_att_val_select_01('P190001', 'CL0006', 'MS0028', '10') min_len_mp_rep_coatching /* 학습외 지도(상담)(COATCHING) - 프로그램 보고서(MP_REP)   */
-                    , fn_mp_sub_att_val_select_01('P190001', 'CL0006', 'MS0029', '10') max_len_mp_rep_coatching /* 학습외 지도(상담)(COATCHING) - 프로그램 보고서(MP_REP)   */
-                    , fn_mp_sub_att_val_select_01('P190001', 'CL0007', 'MS0028', '10') min_len_mp_rep_spcl_note /* 특이사항(SPCL_NOTE) - 프로그램 보고서(MP_REP)   */
-                    , fn_mp_sub_att_val_select_01('P190001', 'CL0007', 'MS0029', '10') max_len_mp_rep_spcl_note /* 특이사항(SPCL_NOTE) - 프로그램 보고서(MP_REP)    */
-                    , fn_mp_sub_att_val_select_01('P190001', 'CL0008', 'MS0028', '10') min_len_mp_rep_mtr_revw /* 소감문(MTR_REVW) - 프로그램 보고서(MP_REP)   */
-                    , fn_mp_sub_att_val_select_01('P190001', 'CL0008', 'MS0029', '10') max_len_mp_rep_mtr_revw /* 소감문(MTR_REVW) - 프로그램 보고서(MP_REP)    */
+                    , fn_mp_sub_att_val_select_01('{l_mp_id}', 'CL0004', 'MS0028', '10') min_len_mp_rep_mtr_obj /* 학습목표(MTR_OBJ) - 프로그램 보고서(MP_REP) */  
+                    , fn_mp_sub_att_val_select_01('{l_mp_id}', 'CL0004', 'MS0029', '10') max_len_mp_rep_mtr_obj /* 학습목표(MTR_OBJ) - 프로그램 보고서(MP_REP) */
+                    , fn_mp_sub_att_val_select_01('{l_mp_id}', 'CL0005', 'MS0028', '10') min_len_mp_rep_mtr_desc /* 학습내용(MTR_DESC) - 프로그램 보고서(MP_REP) */  
+                    , fn_mp_sub_att_val_select_01('{l_mp_id}', 'CL0005', 'MS0029', '10') max_len_mp_rep_mtr_desc /* 학습내용(MTR_DESC) - 프로그램 보고서(MP_REP) */
+                    , fn_mp_sub_att_val_select_01('{l_mp_id}', 'CL0006', 'MS0028', '10') min_len_mp_rep_coatching /* 학습외 지도(상담)(COATCHING) - 프로그램 보고서(MP_REP)   */
+                    , fn_mp_sub_att_val_select_01('{l_mp_id}', 'CL0006', 'MS0029', '10') max_len_mp_rep_coatching /* 학습외 지도(상담)(COATCHING) - 프로그램 보고서(MP_REP)   */
+                    , fn_mp_sub_att_val_select_01('{l_mp_id}', 'CL0007', 'MS0028', '10') min_len_mp_rep_spcl_note /* 특이사항(SPCL_NOTE) - 프로그램 보고서(MP_REP)   */
+                    , fn_mp_sub_att_val_select_01('{l_mp_id}', 'CL0007', 'MS0029', '10') max_len_mp_rep_spcl_note /* 특이사항(SPCL_NOTE) - 프로그램 보고서(MP_REP)    */
+                    , fn_mp_sub_att_val_select_01('{l_mp_id}', 'CL0008', 'MS0028', '10') min_len_mp_rep_mtr_revw /* 소감문(MTR_REVW) - 프로그램 보고서(MP_REP)   */
+                    , fn_mp_sub_att_val_select_01('{l_mp_id}', 'CL0008', 'MS0029', '10') max_len_mp_rep_mtr_revw /* 소감문(MTR_REVW) - 프로그램 보고서(MP_REP)    */
         """
         queryset = mpgm.objects.raw(query)
 
@@ -14603,8 +14602,8 @@ class MP0107_list(generics.ListAPIView):
         query += "     , (select std_detl_code_nm from service20_com_cdd where std_detl_code = t3.stop_resp and std_grp_code = 'ms0005') as stop_resp_nm "
         query += "     , t3.stop_tp   /* 중단 유형(mp0095) */         "
         query += "     , (select std_detl_code_nm from service20_com_cdd where std_detl_code = t3.stop_tp and std_grp_code = 'mp0095') as stop_tp_nm "       
-        query += "     , fn_mp_sub_att_val_select_01('P190001', 'CL0010', 'MS0028', '10') min_len_mp_stop_req_stop_desc /* 중단 사유(STOP_DESC) - 활동중단 사유서(MP_STOP_REQ) */ " 
-        query += "     , fn_mp_sub_att_val_select_01('P190001', 'CL0010', 'MS0029', '10') max_len_mp_stop_req_stop_desc /* 중단 사유(STOP_DESC) - 활동중단 사유서(MP_STOP_REQ) */ "
+        query += "     , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0010', 'MS0028', '10') min_len_mp_stop_req_stop_desc /* 중단 사유(STOP_DESC) - 활동중단 사유서(MP_STOP_REQ) */ " 
+        query += "     , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0010', 'MS0029', '10') max_len_mp_stop_req_stop_desc /* 중단 사유(STOP_DESC) - 활동중단 사유서(MP_STOP_REQ) */ "
         query += "  from service20_mp_mtr t1 "
         query += "    left join service20_mpgm t2 on (t2.mp_id = t1.mp_id) "
         query += "    left join service20_mp_stop_req t3 on (t3.mp_id = t1.mp_id and t1.apl_id = t3.apl_id) "
@@ -14923,8 +14922,8 @@ class MP0108_list(generics.ListAPIView):
         query += "     , (select std_detl_code_nm from service20_com_cdd where std_detl_code = t3.uncmp_resp and std_grp_code = 'ms0005') as uncmp_resp_nm "
         query += "     , t3.uncmp_tp   /* 미완료 유형(mp0096) */   /* 중단 유형(mp0096) */         "
         query += "     , (select std_detl_code_nm from service20_com_cdd where std_detl_code = t3.uncmp_tp and std_grp_code = 'mp0096') as uncmp_tp_nm "       
-        query += "     , fn_mp_sub_att_val_select_01('P190001', 'CL0009', 'MS0028', '10') min_len_mp_ucmp_req_uncmp_desc /* 미완료 소명 사유(UNCMP_DESC) - 미완료 소명서(MP_UCMP_REQ) */ "
-        query += "     , fn_mp_sub_att_val_select_01('P190001', 'CL0009', 'MS0029', '10') max_len_mp_ucmp_req_uncmp_desc /* 미완료 소명 사유(UNCMP_DESC) - 미완료 소명서(MP_UCMP_REQ) */ "
+        query += "     , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0009', 'MS0028', '10') min_len_mp_ucmp_req_uncmp_desc /* 미완료 소명 사유(UNCMP_DESC) - 미완료 소명서(MP_UCMP_REQ) */ "
+        query += "     , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0009', 'MS0029', '10') max_len_mp_ucmp_req_uncmp_desc /* 미완료 소명 사유(UNCMP_DESC) - 미완료 소명서(MP_UCMP_REQ) */ "
         query += "  from service20_mp_mtr t1 "
         query += "    inner join service20_mpgm t2 on (t2.mp_id = t1.mp_id) "
         query += "    inner join service20_mp_ucmp_req t3 on (t3.mp_id = t1.mp_id and t1.apl_id = t3.apl_id) "
@@ -15922,8 +15921,8 @@ class TE0204_list(generics.ListAPIView):
         query += " , t1.rep_no   /* 보고서 no */ "
         query += " , t1.rep_div  /* 소감문 구분 */ "
         query += " , t1.rvwr_div /* 소감문 작성자 구분 */ "
-        query += " , fn_mp_sub_att_val_select_01('P190001', 'CL0008', 'MS0028', '10') min_len_mp_rep_mtr_revw /* 소감문(MTR_REVW) - 프로그램 보고서(MP_REP) */ "   
-        query += " , fn_mp_sub_att_val_select_01('P190001', 'CL0008', 'MS0029', '10') max_len_mp_rep_mtr_revw /* 소감문(MTR_REVW) - 프로그램 보고서(MP_REP) */ "
+        query += " , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0008', 'MS0028', '10') min_len_mp_rep_mtr_revw /* 소감문(MTR_REVW) - 프로그램 보고서(MP_REP) */ "   
+        query += " , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0008', 'MS0029', '10') max_len_mp_rep_mtr_revw /* 소감문(MTR_REVW) - 프로그램 보고서(MP_REP) */ "
         query += " from service20_mp_rvw t1 "
         query += " left join service20_mpgm t2 on (t2.mp_id   = t1.mp_id) "
         query += " left join service20_mp_mte t3 on (t3.mp_id   = t1.mp_id "
