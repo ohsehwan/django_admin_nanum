@@ -8677,9 +8677,14 @@ class MP0101M_admin_service_chc(generics.ListAPIView):
 # 멘토링 프로그램(관리자) - 해외봉사활동 프로그램 (첨부데이터) ###################################################
 class MP0101M_admin_service_atc_Serializer(serializers.ModelSerializer):
 
+    val = serializers.SerializerMethodField()
+
     class Meta:
         model = mp_mtr_atc
         fields = '__all__'
+
+    def get_val(self,obj):
+        return obj.val 
 
 class MP0101M_admin_service_atc(generics.ListAPIView):
     queryset = mp_mtr_atc.objects.all()
@@ -8698,6 +8703,7 @@ class MP0101M_admin_service_atc(generics.ListAPIView):
         query += "     , atc_nm as atc_nm "
         query += "     , atc_file_nm as atc_file_nm "
         query += "     , atc_file_url as atc_file_url "
+        query += "     , fn_mp_sub_val_select_01(mp_id, atc_cdh, 'MP0112', atc_cdd) val"
         query += "  from service20_mp_mtr_atc "
         query += " where mp_id = '" + l_mp_id + "' "
         query += "   and apl_no = '" + l_apl_no + "' "
