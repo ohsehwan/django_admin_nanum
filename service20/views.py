@@ -12414,61 +12414,6 @@ class MP0104M_Detail(generics.ListAPIView):
 # MP0104M - END
 #####################################################################################
 
-
-
-#####################################################################################
-# MP0105M - START
-#####################################################################################
-
-# 보고서 현황 리스트 ###################################################
-class MP0105M_combo_1_Serializer(serializers.ModelSerializer):
-
-    # testField = serializers.SerializerMethodField()
-    mp_name = serializers.SerializerMethodField()
-    
-
-    class Meta:
-        model = mp_mtr
-        fields = ('mp_id','apl_no','mntr_id','indv_div','team_id','apl_id','apl_nm','apl_nm_e','unv_cd','unv_nm','cllg_cd','cllg_nm','dept_cd','dept_nm','brth_dt','gen','yr','term_div','sch_yr','mob_no','tel_no','tel_no_g','h_addr','post_no','email_addr','bank_acct','bank_cd','bank_nm','bank_dpsr','cnt_mp_a','cnt_mp_p','cnt_mp_c','cnt_mp_g','apl_dt','status','doc_cncl_dt','doc_cncl_rsn','tot_doc','score1','score2','score3','score4','score5','score6','cscore1','cscore2','cscore3','cscore4','cscore5','cscore6','doc_rank','doc_rslt','intv_team','intv_dt','intv_part_pl','intv_np_rsn_pl','intv_part_pl_dt','intv_part_ac','intv_np_rsn_ac','intv_part_ac_dt','intv_tot','intv_rslt','ms_trn_yn','fnl_rslt','mntr_dt','sms_send_no','ins_id','ins_ip','ins_dt','ins_pgm','upd_id','upd_ip','upd_dt','upd_pgm','mp_name','pr_yr','pr_sch_yr','pr_term_div','mp_name')
-
-    def get_mp_name(self,obj):
-        return obj.mp_name
-
-class MP0105M_combo_1(generics.ListAPIView):
-    queryset = mp_rep.objects.all()
-    serializer_class = MP0105M_combo_1_Serializer
-
-
-    def list(self, request):
-        l_yr = request.GET.get('yr', "")
-        l_mp_id = request.GET.get('mp_id', "")
-        l_apl_id = request.GET.get('apl_id', "")
-
-
-        queryset = self.get_queryset()
-
-        query = " select A.id "
-        query += " , A.mp_id "
-        query += " , A.apl_no "
-        query += " , B.mp_name "
-        query += " FROM service20_mp_mtr A "
-        query += " , service20_mpgm B "
-        query += " WHERE apl_id = '"+l_apl_id+"' "
-        query += " AND mntr_id IS NOT null "
-        query += " AND A.mp_id = B.mp_id "
-
-        queryset = mp_mtr.objects.raw(query)
-
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(queryset, many=True)
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        return Response(serializer.data)
-
 #####################################################################################
 # MP01041M - START
 #####################################################################################
@@ -13513,6 +13458,59 @@ def MP01041M_upload(request):
 # MP01041M - END
 #####################################################################################
 
+#####################################################################################
+# MP0105M - START
+#####################################################################################
+
+# 보고서 현황 리스트 ###################################################
+class MP0105M_combo_1_Serializer(serializers.ModelSerializer):
+
+    # testField = serializers.SerializerMethodField()
+    mp_name = serializers.SerializerMethodField()
+    
+
+    class Meta:
+        model = mp_mtr
+        fields = ('mp_id','apl_no','mntr_id','indv_div','team_id','apl_id','apl_nm','apl_nm_e','unv_cd','unv_nm','cllg_cd','cllg_nm','dept_cd','dept_nm','brth_dt','gen','yr','term_div','sch_yr','mob_no','tel_no','tel_no_g','h_addr','post_no','email_addr','bank_acct','bank_cd','bank_nm','bank_dpsr','cnt_mp_a','cnt_mp_p','cnt_mp_c','cnt_mp_g','apl_dt','status','doc_cncl_dt','doc_cncl_rsn','tot_doc','score1','score2','score3','score4','score5','score6','cscore1','cscore2','cscore3','cscore4','cscore5','cscore6','doc_rank','doc_rslt','intv_team','intv_dt','intv_part_pl','intv_np_rsn_pl','intv_part_pl_dt','intv_part_ac','intv_np_rsn_ac','intv_part_ac_dt','intv_tot','intv_rslt','ms_trn_yn','fnl_rslt','mntr_dt','sms_send_no','ins_id','ins_ip','ins_dt','ins_pgm','upd_id','upd_ip','upd_dt','upd_pgm','mp_name','pr_yr','pr_sch_yr','pr_term_div','mp_name')
+
+    def get_mp_name(self,obj):
+        return obj.mp_name
+
+class MP0105M_combo_1(generics.ListAPIView):
+    queryset = mp_rep.objects.all()
+    serializer_class = MP0105M_combo_1_Serializer
+
+
+    def list(self, request):
+        l_yr = request.GET.get('yr', "")
+        l_mp_id = request.GET.get('mp_id', "")
+        l_apl_id = request.GET.get('apl_id', "")
+
+
+        queryset = self.get_queryset()
+
+        query = " select A.id "
+        query += " , A.mp_id "
+        query += " , A.apl_no "
+        query += " , B.mp_name "
+        query += " FROM service20_mp_mtr A "
+        query += " , service20_mpgm B "
+        query += " WHERE apl_id = '"+l_apl_id+"' "
+        query += " AND mntr_id IS NOT null "
+        query += " AND A.mp_id = B.mp_id "
+
+        queryset = mp_mtr.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
+
 # 보고서 현황 콤보1 ###################################################
 class MP0105M_list_Serializer(serializers.ModelSerializer):
 
@@ -14412,7 +14410,7 @@ class MP0105M_detail_min_max(generics.ListAPIView):
             return self.get_paginated_response(serializer.data)
 
         return Response(serializer.data)   
-        
+
 #####################################################################################
 # MP0105M - END
 #####################################################################################
@@ -15807,6 +15805,10 @@ def TE0203_Insert(request):
 # TE0204 - START
 #####################################################################################
 
+#####################################################################################
+# TE0204 - START
+#####################################################################################
+
 # 프로그램 소감문 작성 리스트 ###################################################
 class TE0204_list_Serializer(serializers.ModelSerializer):
 
@@ -15823,6 +15825,8 @@ class TE0204_list_Serializer(serializers.ModelSerializer):
     grd_rel_nm = serializers.SerializerMethodField()
     status_nm = serializers.SerializerMethodField()
     write_dt = serializers.SerializerMethodField()
+    min_len_mp_rep_mtr_revw = serializers.SerializerMethodField()
+    max_len_mp_rep_mtr_revw = serializers.SerializerMethodField()
 
     class Meta:
         model = mp_rvw
@@ -15853,6 +15857,10 @@ class TE0204_list_Serializer(serializers.ModelSerializer):
         return obj.status_nm  
     def get_write_dt(self,obj):        
         return obj.write_dt          
+    def get_min_len_mp_rep_mtr_revw(self,obj):        
+        return obj.min_len_mp_rep_mtr_revw  
+    def get_max_len_mp_rep_mtr_revw(self,obj):        
+        return obj.max_len_mp_rep_mtr_revw  
 
 class TE0204_list(generics.ListAPIView):
     queryset = mp_rvw.objects.all()
@@ -15898,6 +15906,8 @@ class TE0204_list(generics.ListAPIView):
         query += " , t1.rep_no   /* 보고서 no */ "
         query += " , t1.rep_div  /* 소감문 구분 */ "
         query += " , t1.rvwr_div /* 소감문 작성자 구분 */ "
+        query += " , fn_mp_sub_att_val_select_01('P190001', 'CL0008', 'MS0028', '10') min_len_mp_rep_mtr_revw /* 소감문(MTR_REVW) - 프로그램 보고서(MP_REP) */ "   
+        query += " , fn_mp_sub_att_val_select_01('P190001', 'CL0008', 'MS0029', '10') max_len_mp_rep_mtr_revw /* 소감문(MTR_REVW) - 프로그램 보고서(MP_REP) */ "
         query += " from service20_mp_rvw t1 "
         query += " left join service20_mpgm t2 on (t2.mp_id   = t1.mp_id) "
         query += " left join service20_mp_mte t3 on (t3.mp_id   = t1.mp_id "
@@ -15923,7 +15933,7 @@ class TE0204_list(generics.ListAPIView):
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        return Response(serializer.data)      
+        return Response(serializer.data)          
 
 # 보고서 현황 save
 @csrf_exempt
