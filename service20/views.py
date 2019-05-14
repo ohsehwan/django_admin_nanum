@@ -14511,7 +14511,7 @@ class MP0107_list_Serializer(serializers.ModelSerializer):
     stop_tp = serializers.SerializerMethodField()
     stop_tp_nm = serializers.SerializerMethodField()
     min_len_mp_stop_req_stop_desc = serializers.SerializerMethodField()
-    min_len_mp_stop_req_stop_desc = serializers.SerializerMethodField()
+    max_len_mp_stop_req_stop_desc = serializers.SerializerMethodField()
 
     class Meta:
         model = mp_mtr
@@ -14553,8 +14553,8 @@ class MP0107_list_Serializer(serializers.ModelSerializer):
         return obj.stop_tp_nm        
     def get_min_len_mp_stop_req_stop_desc(self,obj):
         return obj.min_len_mp_stop_req_stop_desc   
-    def get_min_len_mp_stop_req_stop_desc(self,obj):
-        return obj.min_len_mp_stop_req_stop_desc                                                                                                                      
+    def get_max_len_mp_stop_req_stop_desc(self,obj):
+        return obj.max_len_mp_stop_req_stop_desc                                                                                                                      
 
 class MP0107_list(generics.ListAPIView):
     queryset = mp_mtr.objects.all()
