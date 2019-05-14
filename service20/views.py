@@ -11562,10 +11562,12 @@ class MP0103M_Detail_v2_Serializer(serializers.ModelSerializer):
     mgr_dt  = serializers.SerializerMethodField()
     status  = serializers.SerializerMethodField()
     mnte_nm  = serializers.SerializerMethodField()
+    min_len_mp_plnd_mtr_desc  = serializers.SerializerMethodField()
+    max_len_mp_plnd_mtr_desc  = serializers.SerializerMethodField() 
 
     class Meta:
         model = mp_mtr
-        fields = ('apl_nm','apl_id','tchr_nm','sch_nm','mtr_sub','pln_time', 'appr_nm', 'appr_dt', 'mgr_nm', 'mgr_dt', 'status', 'mnte_nm')
+        fields = ('apl_nm','apl_id','tchr_nm','sch_nm','mtr_sub','pln_time', 'appr_nm', 'appr_dt', 'mgr_nm', 'mgr_dt', 'status', 'mnte_nm', 'min_len_mp_plnd_mtr_desc', 'max_len_mp_plnd_mtr_desc')
       
     def get_tchr_nm(self, obj):
         return obj.tchr_nm
@@ -11587,6 +11589,10 @@ class MP0103M_Detail_v2_Serializer(serializers.ModelSerializer):
         return obj.status
     def get_mnte_nm(self, obj):
         return obj.mnte_nm
+    def get_min_len_mp_plnd_mtr_desc(self, obj):
+        return obj.min_len_mp_plnd_mtr_desc
+    def get_max_len_mp_plnd_mtr_desc(self, obj):
+        return obj.max_len_mp_plnd_mtr_desc
 
 class MP0103M_Detail_v2(generics.ListAPIView):
     queryset = mpgm.objects.all()
@@ -11613,6 +11619,8 @@ class MP0103M_Detail_v2(generics.ListAPIView):
         query += "      , date_format(t1.mgr_dt, '%%y-%%m-%%d %%h:%%i:%%s') as mgr_dt "
         query += "      , t1.status as status "
         query += "      , fn_mp_mte_select_01(t1.mp_id, t1.apl_no) AS mnte_nm "
+        query += "      , fn_mp_sub_att_val_select_01('P190001', 'CL0001', 'MS0028', '10') min_len_mp_plnd_mtr_desc /* 멘토링 내용(MTR_DESC) - 프로그램 수행 계획서 상세(MP_PLND) */ "
+        query += "      , fn_mp_sub_att_val_select_01('P190001', 'CL0001', 'MS0029', '10') max_len_mp_plnd_mtr_desc /* 멘토링 내용(MTR_DESC) - 프로그램 수행 계획서 상세(MP_PLND) */ "
         query += "   from service20_mp_plnh t1 "
         query += "   left join service20_mpgm t2 on (t2.mp_id = t1.mp_id) "
         query += "   left join service20_mp_mte t3 on (t3.mp_id = t1.mp_id and t3.apl_no = t1.apl_no) "
