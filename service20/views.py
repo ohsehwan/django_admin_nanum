@@ -12486,6 +12486,7 @@ class MP01041M_mtr_Serializer(serializers.ModelSerializer):
 
     min_len_mp_att_mtr_desc = serializers.SerializerMethodField()
     max_len_mp_att_mtr_desc = serializers.SerializerMethodField()
+    att_val = serializers.SerializerMethodField()
 
     class Meta:
         model = mp_mtr
@@ -12495,6 +12496,8 @@ class MP01041M_mtr_Serializer(serializers.ModelSerializer):
         return obj.min_len_mp_att_mtr_desc
     def get_max_len_mp_att_mtr_desc(self,obj):
         return obj.max_len_mp_att_mtr_desc
+    def get_att_val(self,obj):
+        return obj.att_val
 
 class MP01041M_mtr(generics.ListAPIView):
     queryset = mp_mtr.objects.all()
@@ -12507,19 +12510,21 @@ class MP01041M_mtr(generics.ListAPIView):
         queryset = self.get_queryset()
 
         query = "/* 멘토 그리드 */"
-        query += " select id as id "
-        query += "     , mp_id as mp_id"
-        query += "     , apl_no as apl_no"
-        query += "     , mntr_id as mntr_id"
-        query += "     , apl_nm as apl_nm"
-        query += "     , unv_nm as unv_nm"
-        query += "     , dept_nm as dept_nm"
-        query += "     , sch_yr as sch_yr"
+        query += " select t1.id as id "
+        query += "     , t1.mp_id as mp_id"
+        query += "     , t1.apl_no as apl_no"
+        query += "     , t1.mntr_id as mntr_id"
+        query += "     , t1.apl_nm as apl_nm"
+        query += "     , t1.unv_nm as unv_nm"
+        query += "     , t1.dept_nm as dept_nm"
+        query += "     , t1.sch_yr as sch_yr"
         query += "     , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0003', 'MS0028', '10') min_len_mp_att_mtr_desc /* 멘토링 내용(보고서)(MTR_DESC) - 프로그램 출석부(멘토)(MP_ATT) */ "
         query += "     , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0003', 'MS0029', '10') max_len_mp_att_mtr_desc /* 멘토링 내용(보고서)(MTR_DESC) - 프로그램 출석부(멘토)(MP_ATT) */ "
-        query += "  from service20_mp_mtr"
-        query += " where mp_id = '" + l_mp_id + "'"
-        query += "   and apl_id = '" + l_apl_id + "'"
+        query += "     , t2.att_val as att_val"
+        query += "  from service20_mp_mtr t1"
+        query += "  left join service20_mp_sub t2 on (t2.mp_id = t1.mp_id and t2.att_id = 'MP0094' and t2.att_cdh = 'MP0094' and t2.att_cdd = '1') "
+        query += " where t1.mp_id = '" + l_mp_id + "'"
+        query += "   and t1.apl_id = '" + l_apl_id + "'"
 
         print(query)
         queryset = mp_mtr.objects.raw(query)
