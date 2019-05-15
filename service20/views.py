@@ -7585,10 +7585,10 @@ class MP0101M_adm_quest_Serializer2(serializers.ModelSerializer):
     std_detl_code = serializers.SerializerMethodField()
     std_detl_code_nm = serializers.SerializerMethodField()
     rmrk = serializers.SerializerMethodField()
-
+    val = serializers.SerializerMethodField()
     class Meta:
         model = mp_ans
-        fields = ('id','mp_id','test_div','apl_no','ques_no','apl_id','apl_nm','sort_seq','ans_t1','ans_t2','ans_t3','score','std_detl_code','std_detl_code_nm','rmrk')
+        fields = ('id','mp_id','test_div','apl_no','ques_no','apl_id','apl_nm','sort_seq','ans_t1','ans_t2','ans_t3','score','std_detl_code','std_detl_code_nm','rmrk','val')
 
     def get_std_detl_code(self,obj):
         return obj.std_detl_code
@@ -7598,6 +7598,9 @@ class MP0101M_adm_quest_Serializer2(serializers.ModelSerializer):
 
     def get_rmrk(self,obj):
         return obj.rmrk
+
+    def get_val(self,obj):
+        return obj.val
 
 # 멘토링 프로그램(관리자) - 질문
 class MP0101M_adm_quest(generics.ListAPIView):
@@ -7609,7 +7612,7 @@ class MP0101M_adm_quest(generics.ListAPIView):
         l_user_id = request.GET.get('user_id', None)           
         l_exist = mp_sub.objects.filter(mp_id=key1).exists()
         
-        query = "select B.std_detl_code,B.std_detl_code_nm,B.rmrk,A.* from service20_mp_ans A, service20_com_cdd B where A.ques_no = B.std_detl_code and B.use_indc = 'Y' and B.std_grp_code in (select att_cdh from service20_mp_sub where att_id='MS0014' and mp_id = '"+str(key1)+"') and A.mp_id = '"+str(key1)+"' and apl_id = '"+str(l_user_id)+"' order by A.sort_seq"
+        query = "select B.std_detl_code,B.std_detl_code_nm,B.rmrk,fn_mp_sub_val_select_01(A.mp_id, 'MP0086', 'MP0112', B.std_detl_code) val,A.* from service20_mp_ans A, service20_com_cdd B where A.ques_no = B.std_detl_code and B.use_indc = 'Y' and B.std_grp_code in (select att_cdh from service20_mp_sub where att_id='MS0014' and mp_id = '"+str(key1)+"') and A.mp_id = '"+str(key1)+"' and apl_id = '"+str(l_user_id)+"' order by A.sort_seq"
         queryset = mp_ans.objects.raw(query)
 
         
