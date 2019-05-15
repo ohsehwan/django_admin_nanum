@@ -7586,9 +7586,11 @@ class MP0101M_adm_quest_Serializer2(serializers.ModelSerializer):
     std_detl_code_nm = serializers.SerializerMethodField()
     rmrk = serializers.SerializerMethodField()
     val = serializers.SerializerMethodField()
+    ans_min_len = serializers.SerializerMethodField()
+    ans_max_len = serializers.SerializerMethodField()
     class Meta:
         model = mp_ans
-        fields = ('id','mp_id','test_div','apl_no','ques_no','apl_id','apl_nm','sort_seq','ans_t1','ans_t2','ans_t3','score','std_detl_code','std_detl_code_nm','rmrk','val')
+        fields = ('id','mp_id','test_div','apl_no','ques_no','apl_id','apl_nm','sort_seq','ans_t1','ans_t2','ans_t3','score','std_detl_code','std_detl_code_nm','rmrk','val','ans_min_len','ans_max_len')
 
     def get_std_detl_code(self,obj):
         return obj.std_detl_code
@@ -7602,6 +7604,12 @@ class MP0101M_adm_quest_Serializer2(serializers.ModelSerializer):
     def get_val(self,obj):
         return obj.val
 
+    def get_ans_min_len(self,obj):
+        return obj.ans_min_len
+
+    def get_ans_max_len(self,obj):
+        return obj.ans_max_len
+
 # 멘토링 프로그램(관리자) - 질문
 class MP0101M_adm_quest(generics.ListAPIView):
     queryset = com_cdd.objects.all()
@@ -7613,6 +7621,33 @@ class MP0101M_adm_quest(generics.ListAPIView):
         l_exist = mp_sub.objects.filter(mp_id=key1).exists()
         
         query = "select B.std_detl_code,B.std_detl_code_nm,B.rmrk,fn_mp_sub_val_select_01(A.mp_id, 'MP0086', 'MP0112', B.std_detl_code) val,A.* from service20_mp_ans A, service20_com_cdd B where A.ques_no = B.std_detl_code and B.use_indc = 'Y' and B.std_grp_code in (select att_cdh from service20_mp_sub where att_id='MS0014' and mp_id = '"+str(key1)+"') and A.mp_id = '"+str(key1)+"' and apl_id = '"+str(l_user_id)+"' order by A.sort_seq"
+
+        query = "select "
+        query += "    B.std_detl_code, "
+        query += "    B.std_detl_code_nm, "
+        query += "    B.rmrk, "
+        query += "    fn_mp_sub_val_select_01(A.mp_id, 'MP0086', 'MP0112', B.std_detl_code) val, "
+        query += "    fn_mp_sub_att_val_select_01(A.mp_id, 'MP0086', 'MS0028', B.std_detl_code) ans_min_len, "
+        query += "    fn_mp_sub_att_val_select_01(A.mp_id, 'MP0086', 'MS0029', B.std_detl_code) ans_max_len, "
+        query += "    A.* "
+        query += "from "
+        query += "    service20_mp_ans A, "
+        query += "    service20_com_cdd B "
+        query += "where "
+        query += "    A.ques_no = B.std_detl_code "
+        query += "    and B.use_indc = 'Y' "
+        query += "    and B.std_grp_code in ( "
+        query += "        select att_cdh "
+        query += "    from "
+        query += "        service20_mp_sub "
+        query += "    where "
+        query += "        att_id = 'MS0014' "
+        query += "        and mp_id = '"+str(key1)+"') "
+        query += "    and A.mp_id = '"+str(key1)+"' "
+        query += "    and apl_id = '"+str(l_user_id)+"' "
+        query += " order by A.sort_seq"
+    
+
         queryset = mp_ans.objects.raw(query)
 
         
