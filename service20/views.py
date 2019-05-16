@@ -11622,6 +11622,7 @@ class MP0103M_Detail(generics.ListAPIView):
         query += "    AND a.apl_no = b.apl_no"
         query += "    AND a.apl_no = c.apl_no"
 
+        print(query)
         queryset = mp_plnd.objects.raw(query)
 
         serializer_class = self.get_serializer_class()
@@ -11652,7 +11653,7 @@ class MP0103M_Detail_v2_Serializer(serializers.ModelSerializer):
 
     class Meta:
         model = mp_mtr
-        fields = ('apl_nm','apl_id','tchr_nm','sch_nm','mtr_sub','pln_time', 'appr_nm', 'appr_dt', 'mgr_nm', 'mgr_dt', 'status', 'mnte_nm', 'min_len_mp_plnd_mtr_desc', 'max_len_mp_plnd_mtr_desc')
+        fields = ('apl_no', 'apl_nm','apl_id','tchr_nm','sch_nm','mtr_sub','pln_time', 'appr_nm', 'appr_dt', 'mgr_nm', 'mgr_dt', 'status', 'mnte_nm', 'min_len_mp_plnd_mtr_desc', 'max_len_mp_plnd_mtr_desc')
       
     def get_tchr_nm(self, obj):
         return obj.tchr_nm
@@ -11680,19 +11681,20 @@ class MP0103M_Detail_v2_Serializer(serializers.ModelSerializer):
         return obj.max_len_mp_plnd_mtr_desc
 
 class MP0103M_Detail_v2(generics.ListAPIView):
-    queryset = mpgm.objects.all()
+    queryset = mp_mtr.objects.all()
     serializer_class = MP0103M_Detail_v2_Serializer
 
     def list(self, request):
         l_mp_id = request.GET.get('mp_id', "")
         # apl_id = request.GET.get('apl_id', "")
-        apl_no = request.GET.get('apl_no', "")
+        apl_id = request.GET.get('apl_id', "")
 
         queryset = self.get_queryset()
     
         query = " /* 프로그램 수행계획서 작성 폼 데이터 */ "
         query += " select t1.id as id "
         query += "      , t4.apl_id as apl_id "
+        query += "      , t4.apl_no as apl_no "
         query += "      , t4.apl_nm as apl_nm "
         query += "      , t3.tchr_nm as tchr_nm "
         query += "      , t3.sch_nm as sch_nm "
@@ -11704,15 +11706,15 @@ class MP0103M_Detail_v2(generics.ListAPIView):
         query += "      , date_format(t1.mgr_dt, '%%y-%%m-%%d %%h:%%i:%%s') as mgr_dt "
         query += "      , t1.status as status "
         query += "      , fn_mp_mte_select_01(t1.mp_id, t1.apl_no) AS mnte_nm "
-        query += "      , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0001', 'MS0028', '10') min_len_mp_plnd_mtr_desc /* 멘토링 내용(MTR_DESC) - 프로그램 수행 계획서 상세(MP_PLND) */ "
-        query += "      , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0001', 'MS0029', '10') max_len_mp_plnd_mtr_desc /* 멘토링 내용(MTR_DESC) - 프로그램 수행 계획서 상세(MP_PLND) */ "
+        query += "      , fn_mp_sub_att_val_select_01('P190001', 'CL0001', 'MS0028', '10') min_len_mp_plnd_mtr_desc /* 멘토링 내용(MTR_DESC) - 프로그램 수행 계획서 상세(MP_PLND) */ "
+        query += "      , fn_mp_sub_att_val_select_01('P190001', 'CL0001', 'MS0029', '10') max_len_mp_plnd_mtr_desc /* 멘토링 내용(MTR_DESC) - 프로그램 수행 계획서 상세(MP_PLND) */ "
         query += "   from service20_mp_plnh t1 "
         query += "   left join service20_mpgm t2 on (t2.mp_id = t1.mp_id) "
         query += "   left join service20_mp_mte t3 on (t3.mp_id = t1.mp_id and t3.apl_no = t1.apl_no) "
         query += "   left join service20_mp_mtr t4 on (t4.mp_id = t1.mp_id and t4.apl_no = t1.apl_no) "
         query += "   left join service20_mp_sub t5 on (t5.mp_id = t1.mp_id and t5.att_id = 'MP0007' and att_cdh = 'MP0007' and att_cdd = '10') "
         query += "  where t1.mp_id = '" + l_mp_id + "' "
-        query += "    and t1.apl_no = '" + apl_no + "' "
+        query += "    and t4.apl_id = '" + apl_id + "' "
 
         print(query)
 
@@ -11761,7 +11763,7 @@ class MP0103M_list_v1(generics.ListAPIView):
         query += " WHERE t1.mp_id = '"+l_mp_id+"' "
         query += " AND t1.apl_id='"+l_apl_id+"' "
 
-
+        print(query)
         queryset = mp_sub.objects.raw(query)
 
         serializer_class = self.get_serializer_class()
@@ -12003,7 +12005,6 @@ def MP0103M_Update(request):
                          , upd_dt = now() 
                          , upd_pgm = '{upd_pgm}' 
                      WHERE mp_id = '{mp_id}' 
-                       AND apl_no = '{apl_no}' 
                        AND apl_no = '{apl_no}' 
                        AND pln_no = '{pln_no}'
                     ;
@@ -16350,6 +16351,7 @@ def TE0204_update(request,pk):
 # 계획서 승인 리스트 ###################################################
 class TT0105_list_Serializer(serializers.ModelSerializer):
     mntr_id = serializers.SerializerMethodField()
+    apl_id = serializers.SerializerMethodField()
     apl_nm = serializers.SerializerMethodField()
     unv_nm = serializers.SerializerMethodField()
     dept_nm = serializers.SerializerMethodField()
@@ -16364,6 +16366,8 @@ class TT0105_list_Serializer(serializers.ModelSerializer):
 
     def get_mntr_id(self,obj):
         return obj.mntr_id  
+    def get_apl_id(self,obj):
+        return obj.apl_id
     def get_apl_nm(self,obj):
         return obj.apl_nm
     def get_unv_nm(self,obj):
@@ -16395,6 +16399,7 @@ class TT0105_list(generics.ListAPIView):
         query += "     , t4.mp_id as mp_id"
         query += "     , t4.apl_no as apl_no"
         query += "     , t1.mntr_id as mntr_id"
+        query += "     , t1.apl_id as apl_id"
         query += "     , t1.apl_nm as apl_nm"
         query += "     , t1.unv_nm as unv_nm"
         query += "     , t1.dept_nm as dept_nm"
