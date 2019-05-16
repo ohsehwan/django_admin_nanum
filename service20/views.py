@@ -11095,39 +11095,86 @@ class MP0102M_mentee_list(generics.ListAPIView):
 # 학습외신청(멘토) 학습외 신청 및 취소 ###################################################
 @csrf_exempt
 def MP0102M_mento_update(request):
-    l_mp_id = request.POST.get('mp_id', "")    
-    l_apl_no = request.POST.get('apl_no', "")
-    l_spc_no = request.POST.get('spc_no', "")
-    l_spc_apl_no = request.POST.get('spc_apl_no', "")
-    l_spc_status = request.POST.get('spc_status', "")
-    l_cncl_rsn = request.POST.get('cncl_rsn', "")
-
-    ins_id = request.POST.get('ins_id', "")
-    ins_ip = request.POST.get('ins_ip', "")
-    ins_dt = request.POST.get('ins_dt', "")
-    ins_pgm = request.POST.get('ins_pgm', "")
-    upd_id = request.POST.get('upd_id', "")
-    upd_ip = request.POST.get('upd_ip', "")
-    upd_dt = request.POST.get('upd_dt', "")
-    upd_pgm = request.POST.get('upd_pgm', "")
-
-    client_ip = request.META['REMOTE_ADDR']
+    req = request
+    DIR = os.getcwd()
+    UPLOAD_DIR = '/NANUM/www/img/spc/mtr/'
+    # UPLOAD_DIR = 'img'
     
-    query = " /* 학습외 신청 및 취소 */ "
-    query += " update service20_mp_spc_mtr "
-    query += "   set status = '" + l_spc_status + "' "
-    query += "     , cncl_rsn = '" + l_cncl_rsn + "' "
-    query += "     , upd_id = '" + upd_id + "' "
-    query += "     , upd_ip = '" + client_ip + "' "
-    query += "     , upd_dt = now() "
-    query += "     , upd_pgm = '" + upd_pgm + "' "
-    query += " where mp_id = '" + l_mp_id + "' "
-    query += "   and apl_no = '" + l_apl_no + "' "
-    query += "   and spc_no = '" + l_spc_no + "' "
-    query += "   and spc_apl_no = '" + l_spc_apl_no + "' "
+    if request.method == 'POST':
+        l_no = request.POST.get('mtr_no', "")
+        l_mp_id = request.POST.get('mtr_mp_id', "")    
+        l_apl_no = request.POST.get('mtr_apl_no', "")
+        l_spc_no = request.POST.get('mtr_spc_no', "")
+        l_spc_apl_no = request.POST.get('mtr_spc_apl_no', "")
+        l_spc_status = request.POST.get('mtr_spc_status', "")
+        l_cncl_rsn = request.POST.get('mtr_cncl_rsn', "")
+
+        ins_id = request.POST.get('ins_id', "")
+        ins_ip = request.POST.get('ins_ip', "")
+        ins_dt = request.POST.get('ins_dt', "")
+        ins_pgm = request.POST.get('ins_pgm', "")
+        upd_id = request.POST.get('upd_id', "")
+        upd_ip = request.POST.get('upd_ip', "")
+        upd_dt = request.POST.get('upd_dt', "")
+        upd_pgm = request.POST.get('upd_pgm', "")
+
+        client_ip = request.META['REMOTE_ADDR']
         
-    cursor = connection.cursor()
-    query_result = cursor.execute(query) 
+        try:
+            file = request.FILES['mtr_appr_file' + str(l_no)]
+        except MultiValueDictKeyError:
+            file = False
+
+        if file != False:
+            print(file)
+            filename = file._name
+            n_filename = str(l_mp_id) + str(l_apl_no) + str(l_spc_no) + str(l_spc_apl_no) + os.path.splitext(filename)[1]
+            print(n_filename)
+            print (UPLOAD_DIR)
+        
+            fp = open('%s/%s' % (UPLOAD_DIR, n_filename) , 'wb')
+            for chunk in file.chunks():
+                fp.write(chunk)
+            fp.close()
+
+            cursor = connection.cursor()
+            fullFile = str(UPLOAD_DIR) + str(n_filename)
+            fullFile = "/img/spc/mtr/"+ str(n_filename)
+
+            query = " /* 학습외 신청 및 취소 */ "
+            query += " update service20_mp_spc_mtr "
+            query += "   set status = '" + l_spc_status + "' "
+            query += "     , cncl_rsn = '" + l_cncl_rsn + "' "
+            query += "     , appr_file = '" + str(fullFile) + "' "
+            query += "     , upd_id = '" + upd_id + "' "
+            query += "     , upd_ip = '" + client_ip + "' "
+            query += "     , upd_dt = now() "
+            query += "     , upd_pgm = '" + upd_pgm + "' "
+            query += " where mp_id = '" + l_mp_id + "' "
+            query += "   and apl_no = '" + l_apl_no + "' "
+            query += "   and spc_no = '" + l_spc_no + "' "
+            query += "   and spc_apl_no = '" + l_spc_apl_no + "' "
+
+            cursor.execute(query)
+        else:
+            cursor = connection.cursor()
+
+            query = " /* 학습외 신청 및 취소 */ "
+            query += " update service20_mp_spc_mtr "
+            query += "   set status = '" + l_spc_status + "' "
+            query += "     , cncl_rsn = '" + l_cncl_rsn + "' "
+            query += "     , mgr_dt = null "
+            query += "     , appr_file = null "
+            query += "     , upd_id = '" + upd_id + "' "
+            query += "     , upd_ip = '" + client_ip + "' "
+            query += "     , upd_dt = now() "
+            query += "     , upd_pgm = '" + upd_pgm + "' "
+            query += " where mp_id = '" + l_mp_id + "' "
+            query += "   and apl_no = '" + l_apl_no + "' "
+            query += "   and spc_no = '" + l_spc_no + "' "
+            query += "   and spc_apl_no = '" + l_spc_apl_no + "' "
+            
+            cursor.execute(query)
 
     context = {'message': 'Ok'}
 
@@ -11138,16 +11185,16 @@ def MP0102M_mento_update(request):
 def MP0102M_mentee_update(request):
     req = request
     DIR = os.getcwd()
-    UPLOAD_DIR = '/NANUM/www/img/spc/'
-    UPLOAD_DIR = 'img'
+    UPLOAD_DIR = '/NANUM/www/img/spc/mte/'
+    # UPLOAD_DIR = 'img'
     
     if request.method == 'POST':
-        l_no = request.POST.get('no', "")
-        l_mp_id = request.POST.get('mp_id', "")
-        l_mnte_no = request.POST.get('mnte_no', "")
-        l_spc_no = request.POST.get('spc_no', "")
-        l_spc_apl_no = request.POST.get('spc_apl_no', "")
-        l_spc_status = request.POST.get('spc_status', "")
+        l_no = request.POST.get('mte_no', "")
+        l_mp_id = request.POST.get('mte_mp_id', "")
+        l_mnte_no = request.POST.get('mte_mnte_no', "")
+        l_spc_no = request.POST.get('mte_spc_no', "")
+        l_spc_apl_no = request.POST.get('mte_spc_apl_no', "")
+        l_spc_status = request.POST.get('mte_spc_status', "")
         # l_cncl_rsn = request.POST.get('cncl_rsn', "")
 
         ins_id = request.POST.get('ins_id', "")
@@ -11171,7 +11218,7 @@ def MP0102M_mentee_update(request):
             if l_spc_status == '49':
                 cursor = connection.cursor()
                 fullFile = str(UPLOAD_DIR) + str(n_filename)
-                fullFile = "/img/spc/"+ str(n_filename)
+                fullFile = "/img/spc/mte/"+ str(n_filename)
 
                 query = " /* 학습외 신청 */ "
                 query += " update service20_mp_spc_mte "
@@ -11204,7 +11251,7 @@ def MP0102M_mentee_update(request):
 
                 cursor = connection.cursor()
                 fullFile = str(UPLOAD_DIR) + str(n_filename)
-                fullFile = "/img/spc/"+ str(n_filename)
+                fullFile = "/img/spc/mte/"+ str(n_filename)
 
                 query = " /* 학습외 신청 */ "
                 query += " update service20_mp_spc_mte "
