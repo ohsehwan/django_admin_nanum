@@ -16635,7 +16635,7 @@ class TT0107M_list(generics.ListAPIView):
 
         queryset = self.get_queryset()
 
-        query = " select t1.id "
+        query = " select distinct t1.id "
         query += " , t1.mp_id     /* 멘토링 프로그램id */ "
         query += " , t3.yr"
         query += " , t3.apl_term"
@@ -16686,6 +16686,7 @@ class TT0107M_list(generics.ListAPIView):
         query += "    or t4.mnte_id = '"+l_user_id+"')"
 
 
+        print(query)
         queryset = mp_rep.objects.raw(query)
 
         serializer_class = self.get_serializer_class()
@@ -16696,7 +16697,7 @@ class TT0107M_list(generics.ListAPIView):
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        return Response(serializer.data)      
+        return Response(serializer.data)        
 
 # 보고서 현황 save
 @csrf_exempt
