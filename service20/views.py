@@ -15638,6 +15638,7 @@ class TE0202_detail_Serializer(serializers.ModelSerializer):
     # mnte_id = serializers.SerializerMethodField()
     mp_div_nm = serializers.SerializerMethodField()
     # mnte_nm = serializers.SerializerMethodField()
+    apl_id = serializers.SerializerMethodField()
 
     class Meta:
         model = mp_att
@@ -15661,6 +15662,8 @@ class TE0202_detail_Serializer(serializers.ModelSerializer):
         return obj.mp_div_nm
     # def get_mnte_nm(self,obj):
     #     return obj.mnte_nm
+    def get_apl_id(self,obj):
+        return obj.apl_id
 
 class TE0202_detail(generics.ListAPIView):
     queryset = mp_att.objects.all()
@@ -15688,6 +15691,7 @@ class TE0202_detail(generics.ListAPIView):
         query = " select t1.id as id "
         query += "      , t1.mp_id as mp_id "
         query += "      , t1.apl_no as apl_no "
+        query += "      , t2.apl_id as apl_id "
         query += "      , t1.att_no as att_no   /* 출석순서(seq) */"
         query += "     , t1.mp_div as mp_div"
         query += "     , c1.std_detl_code_nm   as mp_div_nm "
