@@ -11098,7 +11098,7 @@ def MP0102M_mento_update(request):
     req = request
     DIR = os.getcwd()
     UPLOAD_DIR = '/NANUM/www/img/spc/mtr/'
-    # UPLOAD_DIR = 'img'
+    UPLOAD_DIR = 'img'
     
     if request.method == 'POST':
         l_no = request.POST.get('mtr_no', "")
@@ -11126,36 +11126,58 @@ def MP0102M_mento_update(request):
             file = False
 
         if file != False:
-            print(file)
-            filename = file._name
-            n_filename = str(l_mp_id) + str(l_apl_no) + str(l_spc_no) + str(l_spc_apl_no) + os.path.splitext(filename)[1]
-            print(n_filename)
-            print (UPLOAD_DIR)
-        
-            fp = open('%s/%s' % (UPLOAD_DIR, n_filename) , 'wb')
-            for chunk in file.chunks():
-                fp.write(chunk)
-            fp.close()
+            # 불참
+            if l_spc_status == '49':
+                cursor = connection.cursor()
+                fullFile = str(UPLOAD_DIR) + str(n_filename)
+                fullFile = "/img/spc/mtr/"+ str(n_filename)
 
-            cursor = connection.cursor()
-            fullFile = str(UPLOAD_DIR) + str(n_filename)
-            fullFile = "/img/spc/mtr/"+ str(n_filename)
+                query = " /* 학습외 신청 불참 */ "
+                query += " update service20_mp_spc_mtr "
+                query += "   set status = '" + l_spc_status + "' "
+                query += "     , mgr_dt = null "
+                query += "     , appr_file = null "
+                query += "     , upd_id = '" + upd_id + "' "
+                query += "     , upd_ip = '" + client_ip + "' "
+                query += "     , upd_dt = now() "
+                query += "     , upd_pgm = '" + upd_pgm + "' "
+                query += " where mp_id = '" + l_mp_id + "' "
+                query += "   and apl_no = '" + l_apl_no + "' "
+                query += "   and spc_no = '" + l_spc_no + "' "
+                query += "   and spc_apl_no = '" + l_spc_apl_no + "' "
 
-            query = " /* 학습외 신청 및 취소 */ "
-            query += " update service20_mp_spc_mtr "
-            query += "   set status = '" + l_spc_status + "' "
-            query += "     , cncl_rsn = '" + l_cncl_rsn + "' "
-            query += "     , appr_file = '" + str(fullFile) + "' "
-            query += "     , upd_id = '" + upd_id + "' "
-            query += "     , upd_ip = '" + client_ip + "' "
-            query += "     , upd_dt = now() "
-            query += "     , upd_pgm = '" + upd_pgm + "' "
-            query += " where mp_id = '" + l_mp_id + "' "
-            query += "   and apl_no = '" + l_apl_no + "' "
-            query += "   and spc_no = '" + l_spc_no + "' "
-            query += "   and spc_apl_no = '" + l_spc_apl_no + "' "
+                cursor.execute(query)
+            else:
+                print(file)
+                filename = file._name
+                n_filename = str(l_mp_id) + str(l_apl_no) + str(l_spc_no) + str(l_spc_apl_no) + os.path.splitext(filename)[1]
+                print(n_filename)
+                print (UPLOAD_DIR)
+            
+                fp = open('%s/%s' % (UPLOAD_DIR, n_filename) , 'wb')
+                for chunk in file.chunks():
+                    fp.write(chunk)
+                fp.close()
 
-            cursor.execute(query)
+                cursor = connection.cursor()
+                fullFile = str(UPLOAD_DIR) + str(n_filename)
+                fullFile = "/img/spc/mtr/"+ str(n_filename)
+
+                query = " /* 학습외 신청 및 취소 */ "
+                query += " update service20_mp_spc_mtr "
+                query += "   set status = '" + l_spc_status + "' "
+                query += "     , cncl_rsn = '" + l_cncl_rsn + "' "
+                query += "     , appr_file = '" + str(fullFile) + "' "
+                query += "     , upd_id = '" + upd_id + "' "
+                query += "     , upd_ip = '" + client_ip + "' "
+                query += "     , upd_dt = now() "
+                query += "     , upd_pgm = '" + upd_pgm + "' "
+                query += " where mp_id = '" + l_mp_id + "' "
+                query += "   and apl_no = '" + l_apl_no + "' "
+                query += "   and spc_no = '" + l_spc_no + "' "
+                query += "   and spc_apl_no = '" + l_spc_apl_no + "' "
+
+                cursor.execute(query)
         else:
             cursor = connection.cursor()
 
@@ -13018,7 +13040,7 @@ def MP01041M_Insert(request):
                , att_edist
                , elap_tm
                , appr_tm
-               , mtr_desc
+               /*, mtr_desc*/
                , mtr_pic
                , appr_id
                , appr_nm
@@ -13059,7 +13081,7 @@ def MP01041M_Insert(request):
                , null
                , concat('{l_elap_tm}', ':00')
                , '{l_appr_tm}'
-               , '{l_mtr_desc}'
+               /*, '{l_mtr_desc}'*/
                , '{l_mtr_pic}'
                , null
                , null
@@ -13085,6 +13107,7 @@ def MP01041M_Insert(request):
     print(query)
     cursor = connection.cursor()
     query_result = cursor.execute(query)
+    mp_att.objects.filter(mp_id=str(l_mp_id),apl_no=str(l_apl_no),att_no=str(att_no)).update(mtr_desc=str(l_mtr_desc))    
 
     query = f"""
             /* 소명 추가 */
@@ -13109,7 +13132,7 @@ def MP01041M_Insert(request):
                , f_att_edist
                , f_elap_tm
                , f_appr_tm
-               , f_mtr_desc
+               /*, f_mtr_desc*/
                , f_mtr_pic
                , f_mtr_pic2
                , f_mtr_pic3
@@ -13120,7 +13143,7 @@ def MP01041M_Insert(request):
                , f_appr_dt
                , f_mgr_id
                , f_mgr_dt
-               , t_req_desc
+               /*, t_req_desc*/
                , t_att_div
                , t_att_sts
                , t_att_sdt
@@ -13135,7 +13158,7 @@ def MP01041M_Insert(request):
                , t_att_edist
                , t_elap_tm
                , t_appr_tm
-               , t_mtr_desc
+               /*, t_mtr_desc*/
                , t_mtr_pic
                , t_mtr_pic2
                , t_mtr_pic3
@@ -13175,7 +13198,7 @@ def MP01041M_Insert(request):
                 , att_edist as f_att_edist
                 , '{l_elap_tm}' as f_elap_tm
                 , '{l_appr_tm}' as f_appr_tm
-                , '{l_mtr_desc}' as f_mtr_desc
+                /*, '{l_mtr_desc}' as f_mtr_desc*/
                 , mtr_pic as f_mtr_pic
                 , mtr_pic2 as f_mtr_pic2
                 , mtr_pic3 as f_mtr_pic3
@@ -13186,7 +13209,7 @@ def MP01041M_Insert(request):
                 , null as f_appr_dt
                 , null as f_mgr_id
                 , null as f_mgr_dt
-                , '{l_req_desc}' as t_req_desc
+                /*, '{l_req_desc}' as t_req_desc*/
                 , '{l_att_div}' as t_att_div 
                 , 'B' as t_att_sts
                 , concat('{l_att_sdt}', ' {l_att_stm_h}', ':', '{l_att_stm_m}', ':00') as t_att_sdt
@@ -13201,7 +13224,7 @@ def MP01041M_Insert(request):
                 , att_edist as t_att_edist
                 , '{l_elap_tm}' as t_elap_tm
                 , '{l_appr_tm}' as t_appr_tm
-                , '{l_mtr_desc}' as t_mtr_desc
+                /*, '{l_mtr_desc}' as t_mtr_desc*/
                 , null as t_mtr_pic
                 , null as t_mtr_pic2
                 , null as t_mtr_pic3
@@ -13229,7 +13252,8 @@ def MP01041M_Insert(request):
     print(query)
     cursor = connection.cursor()
     query_result = cursor.execute(query)
-
+    mp_att_req.objects.filter(mp_id=str(l_mp_id),apl_no=str(l_apl_no),req_no=str(req_no),att_no=str(att_no)).update(f_mtr_desc=str(l_mtr_desc),t_mtr_desc=str(l_mtr_desc),t_req_desc=str(l_req_desc))
+    
     # 출석 추가
     # query = "/* 출석 추가 */"
     # query += " insert into service20_mp_att ("
@@ -13505,7 +13529,11 @@ def MP01041M_req(request):
 
     client_ip = request.META['REMOTE_ADDR']
 
-    max_req_query = "(select ifnull(max(req_no), 0) + 1 from service20_mp_att_req t1 where t1.mp_id = '" + str(l_mp_id) + "' and t1.apl_no = '" + str(l_apl_no) + "')"
+    req_query = "select ifnull(max(req_no), 0) + 1 as req_no from service20_mp_att_req t1 where t1.mp_id = '" + str(l_mp_id) + "' and t1.apl_no = '" + str(l_apl_no) + "'"
+    cursor = connection.cursor()
+    cursor.execute(req_query)    
+    results = namedtuplefetchall(cursor)    
+    req_no = int(results[0].req_no)
 
 
     # 소명 최초 추가
@@ -13531,7 +13559,7 @@ def MP01041M_req(request):
     query += "    , f_att_edist"
     query += "    , f_elap_tm"
     query += "    , f_appr_tm"
-    query += "    , f_mtr_desc"
+    # query += "    , f_mtr_desc"
     query += "    , f_mtr_pic"
     query += "    , f_mtr_pic2"
     query += "    , f_mtr_pic3"
@@ -13542,7 +13570,7 @@ def MP01041M_req(request):
     query += "    , f_appr_dt"
     query += "    , f_mgr_id"
     query += "    , f_mgr_dt"
-    query += "    , t_req_desc"
+    # query += "    , t_req_desc"
     query += "    , t_att_div"
     query += "    , t_att_sts"
     query += "    , t_att_sdt"
@@ -13557,7 +13585,7 @@ def MP01041M_req(request):
     query += "    , t_att_edist"
     query += "    , t_elap_tm"
     query += "    , t_appr_tm"
-    query += "    , t_mtr_desc"
+    # query += "    , t_mtr_desc"
     query += "    , t_mtr_pic"
     query += "    , t_mtr_pic2"
     query += "    , t_mtr_pic3"
@@ -13579,11 +13607,11 @@ def MP01041M_req(request):
     query += " )"
     query += " select mp_id as mp_id"
     query += "     , apl_no as apl_no"
-    query += "     , (select ifnull(max(req_no), 0) + 1 from service20_mp_att_req t1 where t1.mp_id = '" + str(l_mp_id) + "' and t1.apl_no = '" + str(l_apl_no) + "') as req_no"
+    query += "     , '" + str(req_no) + "' "
     query += "     , att_no as att_no"
     query += "     , '" + str(l_mp_div) + "' as mp_div"
     query += "     , 0 as spc_no "
-    query += "     , '" + l_att_div + "' as f_att_div "
+    query += "     , '" + str(l_att_div) + "' as f_att_div "
     query += "     , 'B' as f_att_sts"
     query += "     , concat('" + str(l_att_sdt) + "', ' " + str(l_att_stm_h) + "', ':', '" + str(l_att_stm_m) + "', ':00') as f_att_sdt"
     query += "     , att_saddr as f_att_saddr"
@@ -13597,7 +13625,7 @@ def MP01041M_req(request):
     query += "     , att_edist as f_att_edist"
     query += "     , '" + l_elap_tm + "' as f_elap_tm"
     query += "     , '" + l_appr_tm + "' as f_appr_tm"
-    query += "     , '" + l_mtr_desc + "' as f_mtr_desc"
+    # query += "     , '" + l_mtr_desc + "' as f_mtr_desc"
     query += "     , mtr_pic as f_mtr_pic"
     query += "     , mtr_pic2 as f_mtr_pic2"
     query += "     , mtr_pic3 as f_mtr_pic3"
@@ -13608,7 +13636,7 @@ def MP01041M_req(request):
     query += "     , null as f_appr_dt"
     query += "     , null as f_mgr_id"
     query += "     , null as f_mgr_dt"
-    query += "     , '" + l_req_desc + "' as t_req_desc"
+    # query += "     , '" + l_req_desc + "' as t_req_desc"
     query += "     , '" + l_att_div + "' as t_att_div "
     query += "     , 'B' as t_att_sts"
     query += "     , concat('" + str(l_att_sdt) + "', ' " + str(l_att_stm_h) + "', ':', '" + str(l_att_stm_m) + "', ':00') as t_att_sdt"
@@ -13623,7 +13651,7 @@ def MP01041M_req(request):
     query += "     , att_edist as t_att_edist"
     query += "     , '" + l_elap_tm + "' as t_elap_tm"
     query += "     , '" + l_appr_tm + "' as t_appr_tm"
-    query += "     , '" + l_mtr_desc + "' as t_mtr_desc"
+    # query += "     , '" + l_mtr_desc + "' as t_mtr_desc"
     query += "     , null as t_mtr_pic"
     query += "     , null as t_mtr_pic2"
     query += "     , null as t_mtr_pic3"
@@ -13645,12 +13673,13 @@ def MP01041M_req(request):
     query += "  from service20_mp_att"
     query += " where mp_id = '" + str(l_mp_id) + "'"
     query += "   and apl_no = '" + str(l_apl_no) + "'"
-    query += "   and att_no = (select max(att_no) from service20_mp_att where mp_id = '" + str(l_mp_id) + "' and apl_no = '" + str(l_apl_no) + "')"
+    query += "   and att_no = '" + str(l_att_no) +  "' "
     # query += "   and att_no in (select max(att_no) from service20_mp_att where mp_id = '" + str(l_mp_id) + "' and apl_no = '" + str(l_apl_no) + "')"
 
     print(query)
     cursor = connection.cursor()
     query_result = cursor.execute(query)    
+    mp_att_req.objects.filter(mp_id=str(l_mp_id),apl_no=str(l_apl_no),req_no=str(req_no),att_no=str(l_att_no)).update(f_mtr_desc=str(l_mtr_desc),t_mtr_desc=str(l_mtr_desc),t_req_desc=str(l_req_desc))
 
     # 출석 소명 수정
     # query = "/* 출석 소명 수정 */"
@@ -13685,7 +13714,7 @@ def MP01041M_req(request):
     query += "     , att_edt = concat('" + str(l_att_edt) + "', ' " + str(l_att_etm_h) + "', ':', '" + str(l_att_etm_m) + "', ':00')"
     query += "     , elap_tm = concat('" + str(l_elap_tm) + "', ':00')"
     query += "     , appr_tm = '" + str(l_appr_tm) + "'"
-    query += "     , mtr_desc = '" + str(l_mtr_desc) + "'"
+    # query += "     , mtr_desc = '" + str(l_mtr_desc) + "'"
     # if i > 0:
     #     if not l_mtr_pic[i]:
     #         query += "     , mtr_pic = '" + str(i+1) + str(l_mtr_pic[i]) + "'"
@@ -13699,6 +13728,7 @@ def MP01041M_req(request):
     print(query)
     cursor = connection.cursor()
     query_result = cursor.execute(query)
+    mp_att.objects.filter(mp_id=str(l_mp_id),apl_no=str(l_apl_no),att_no=str(l_att_no)).update(mtr_desc=str(l_mtr_desc))
 
     context = {'message': 'Ok'}
 
@@ -16639,57 +16669,118 @@ class TT0107M_list(generics.ListAPIView):
 
         queryset = self.get_queryset()
 
-        query = " select distinct t1.id "
-        query += " , t1.mp_id     /* 멘토링 프로그램id */ "
-        query += " , t3.yr"
-        query += " , t3.apl_term"
-        query += " , t2.unv_nm          /* 지원자 대학교 명 */ "
-        query += " , t2.cllg_nm         /* 지원자 대학 명 */ "
-        query += " , t2.dept_nm         /* 지원자 학부/학과 명 */ "
-        query += " , t2.apl_id          /* 지원자(멘토,학생) 학번 */ "
-        query += " , t2.apl_nm          /* 지원자(멘토,학생) 명 */ "
-        query += " , t1.rep_div         /* 보고서 구분(mp0062) */ "
-        query += " , c2.std_detl_code_nm   as rep_div_nm "
-        query += " , t1.status          /* 상태(mp0070) */ "
-        query += " , c1.std_detl_code_nm   as status_nm "
-        query += " , t1.rep_ttl   /* 보고서 제목 : 내용 */ "
-        query += " , t1.apl_no    /* 멘토 지원 no */ "
-        query += " , t1.rep_no    /* 보고서 no */ "
-        query += " , t1.rep_div   /* 보고서 구분(mp0062) */ "
-        query += " , t1.mtr_obj   /* 학습목표 */ "
-        query += " , t1.rep_dt    /* 보고서작성일 */ "
-        query += " , substring(t1.req_dt,  1, 10) req_dt    /* 승인요청일 */ "
-        query += " , t1.mtr_desc  /* 학습내용 */ "
-        query += " , t1.coatching /* 학습외 지도(상담) */ "
-        query += " , t1.spcl_note /* 특이사항 */ "
-        query += " , t1.mtr_revw  /* 소감문 */ "
-        query += " , t1.appr_id   /* 승인자id */ "
-        query += " , t1.appr_nm   /* 승인자명 */ "
-        query += " , substring(t1.appr_dt, 1, 10) appr_dt   /* 보호자 승인일시 */ "
-        query += " , t1.mgr_id    /* 관리자id */ "
-        query += " , substring(t1.mgr_dt,  1, 10) mgr_dt   /* 관리자 승인일시 */ "
-        query += " , t1.rep_ym     "
-        query += " from service20_mp_rep t1     /* 프로그램 보고서 */ "
-        query += " left join service20_mp_mtr t2 on (t2.mp_id   = t1.mp_id "
-        query += " and t2.apl_no = t1.apl_no)       /* 지원 멘토 */ "
-        query += " left join service20_mpgm t3 on (t3.mp_id   = t1.mp_id)  /*지원 멘토*/  "
-        query += "  left join service20_mp_mte t4 on (t4.mp_id     = t2.mp_id"
-        query += "                                   and t4.apl_no = t2.apl_no )    "        
-        query += " left join service20_com_cdd c1 on (c1.std_grp_code  = 'MP0070'  /* 상태(mp0070) */ "
-        query += " and c1.std_detl_code = t1.status) "
-        query += " left join service20_com_cdd c2 on (c2.std_grp_code  = 'MP0062'  /* 보고서 구분(mp0062) */ "
-        query += " and c2.std_detl_code = t1.rep_div) "
-        query += " where 1=1 "
-        query += " and t3.yr        = '"+l_yr+"'"
-        query += " and t3.apl_term  = '"+l_apl_term+"'"
-        query += " and t1.status    >= 20"
-        query += " and t1.status like Ifnull(Nullif('"+str(l_status)+"', ''), '%%')  "
-        query += " and t1.rep_div   = '"+l_rep_div+"'"
-        query += " and t1.mp_id     = '"+l_mp_id+"'"
-        query += " and ( t1.appr_id = '"+l_user_id+"'"
-        query += "    or t4.mnte_id = '"+l_user_id+"')"
+        # query = " select distinct t1.id "
+        # query += " , t1.mp_id     /* 멘토링 프로그램id */ "
+        # query += " , t3.yr"
+        # query += " , t3.apl_term"
+        # query += " , t2.unv_nm          /* 지원자 대학교 명 */ "
+        # query += " , t2.cllg_nm         /* 지원자 대학 명 */ "
+        # query += " , t2.dept_nm         /* 지원자 학부/학과 명 */ "
+        # query += " , t2.apl_id          /* 지원자(멘토,학생) 학번 */ "
+        # query += " , t2.apl_nm          /* 지원자(멘토,학생) 명 */ "
+        # query += " , t1.rep_div         /* 보고서 구분(mp0062) */ "
+        # query += " , c2.std_detl_code_nm   as rep_div_nm "
+        # query += " , t1.status          /* 상태(mp0070) */ "
+        # query += " , c1.std_detl_code_nm   as status_nm "
+        # query += " , t1.rep_ttl   /* 보고서 제목 : 내용 */ "
+        # query += " , t1.apl_no    /* 멘토 지원 no */ "
+        # query += " , t1.rep_no    /* 보고서 no */ "
+        # query += " , t1.rep_div   /* 보고서 구분(mp0062) */ "
+        # query += " , t1.mtr_obj   /* 학습목표 */ "
+        # query += " , t1.rep_dt    /* 보고서작성일 */ "
+        # query += " , substring(t1.req_dt,  1, 10) req_dt    /* 승인요청일 */ "
+        # query += " , t1.mtr_desc  /* 학습내용 */ "
+        # query += " , t1.coatching /* 학습외 지도(상담) */ "
+        # query += " , t1.spcl_note /* 특이사항 */ "
+        # query += " , t1.mtr_revw  /* 소감문 */ "
+        # query += " , t1.appr_id   /* 승인자id */ "
+        # query += " , t1.appr_nm   /* 승인자명 */ "
+        # query += " , substring(t1.appr_dt, 1, 10) appr_dt   /* 보호자 승인일시 */ "
+        # query += " , t1.mgr_id    /* 관리자id */ "
+        # query += " , substring(t1.mgr_dt,  1, 10) mgr_dt   /* 관리자 승인일시 */ "
+        # query += " , t1.rep_ym     "
+        # query += " from service20_mp_rep t1     /* 프로그램 보고서 */ "
+        # query += " left join service20_mp_mtr t2 on (t2.mp_id   = t1.mp_id "
+        # query += " and t2.apl_no = t1.apl_no)       /* 지원 멘토 */ "
+        # query += " left join service20_mpgm t3 on (t3.mp_id   = t1.mp_id)  /*지원 멘토*/  "
+        # query += "  left join service20_mp_mte t4 on (t4.mp_id     = t2.mp_id"
+        # query += "                                   and t4.apl_no = t2.apl_no )    "        
+        # query += " left join service20_com_cdd c1 on (c1.std_grp_code  = 'MP0070'  /* 상태(mp0070) */ "
+        # query += " and c1.std_detl_code = t1.status) "
+        # query += " left join service20_com_cdd c2 on (c2.std_grp_code  = 'MP0062'  /* 보고서 구분(mp0062) */ "
+        # query += " and c2.std_detl_code = t1.rep_div) "
+        # query += " where 1=1 "
+        # query += " and t3.yr        = '"+l_yr+"'"
+        # query += " and t3.apl_term  = '"+l_apl_term+"'"
+        # query += " and t1.status    >= 20"
+        # query += " and t1.status like Ifnull(Nullif('"+str(l_status)+"', ''), '%%')  "
+        # query += " and t1.rep_div   = '"+l_rep_div+"'"
+        # query += " and t1.mp_id     = '"+l_mp_id+"'"
+        # query += " and ( t4.tchr_id = '"+l_user_id+"'"
+        # query += "    or t4.mnte_id = '"+l_user_id+"')"
 
-
+        query = f"""
+                SELECT DISTINCT 
+                    t1.id  
+                    , t1.mp_id     /* 멘토링 프로그램id */
+                    , t1.status    /* 멘토 상태 */
+                    , c3.std_detl_code_nm   AS mrt_sts_nm   /* 멘토 상태 */
+                    , t4.yr
+                    , t4.apl_term 
+                    , t1.unv_nm          /* 지원자 대 학교 명 */  
+                    , t1.cllg_nm         /* 지원자 대학 명 */  
+                    , t1.dept_nm         /* 지원자 학부/학과 명 */  
+                    , t1.apl_id          /* 지원자(멘토,학생) 학번 */  
+                    , t1.apl_nm          /* 지원자(멘토,학생) 명 */  
+                    , t3.rep_div         /* 보고서 구분(mp0062) */  
+                    , c2.std_detl_code_nm   AS rep_div_nm  
+                    , t3.status          /* 상태(mp0070) */  
+                    , CASE WHEN t3.status IS NULL THEN '미작성' ELSE c1.std_detl_code_nm END status_nm  /* 미작성 추가 */
+                    , fn_mp_mte_select_01(t1.mp_id, t1.apl_no) mnte_nm /* 매칭 멘티 */
+                    , c1.std_detl_code_nm   AS status_nm1
+                    , t3.rep_ttl   /* 보고서 제목 : 내용 */  
+                    , t3.apl_no    /* 멘토 지원 no */  
+                    , t3.rep_no    /* 보고서 no */  
+                    , t3.rep_div   /* 보고서 구분(mp0062) */  
+                    , t3.mtr_obj   /* 학습목표 */  
+                    , t3.rep_dt    /* 보고서작성일 */  
+                    , SUBSTRING(t3.req_dt,  1, 10) req_dt    /* 승인요청일 */  
+                    , t3.mtr_desc  /* 학습내용 */  
+                    , t3.coatching /* 학습외 지도(상담) */  
+                    , t3.spcl_note /* 특이사항 */  
+                    , t3.mtr_revw  /* 소감문 */  
+                    , t3.appr_id   /* 승인자id */  
+                    , t3.appr_nm   /* 승인자명 */  
+                    , SUBSTRING(t3.appr_dt, 1, 10) appr_dt   /* 보호자 승인일시 */  
+                    , CASE WHEN t3.status IS NULL THEN '' WHEN appr_dt IS NULL THEN '승인' ELSE SUBSTRING(t3.appr_dt, 1, 10) END appr_div /* 미작성 시 '', 미승인 시 [승인], 승인 시 승인일시 */
+                    , t3.mgr_id    /* 관리자id */  
+                    , SUBSTRING(t3.mgr_dt,  1, 10) mgr_dt   /* 관리자 승인일시 */  
+                    , t3.rep_ym
+                FROM service20_mp_mtr t1
+                INNER JOIN (SELECT DISTINCT s1.mp_id, s1.apl_no, s1.sch_nm, s1.tchr_nm
+                            FROM service20_mp_mte s1
+                            WHERE s1.mp_id     = '{l_mp_id}'
+                                AND (s1.tchr_id  = '{l_user_id}'
+                                OR s1.mnte_id  = '{l_user_id}')) t2 ON (t2.mp_id  = t1.mp_id
+                                                                    AND t2.apl_no = t1.apl_no)
+                LEFT JOIN service20_mp_rep t3 ON (t3.mp_id   = t1.mp_id
+                                                AND t3.apl_no  = t1.apl_no
+                                                /*AND t3.rep_ym  = '201904'*/
+                                                /*AND t3.rep_div = 'M'*/)
+                INNER JOIN service20_mpgm t4 ON (t4.mp_id   = t1.mp_id)  /*지원 멘토*/
+                LEFT JOIN service20_com_cdd c1 ON (c1.std_grp_code  = 'MP0070'  /* 상태(mp0070) */
+                                                AND c1.std_detl_code = t3.status)
+                LEFT JOIN service20_com_cdd c2 ON (c2.std_grp_code  = 'MP0062'  /* 보고서 구분(mp0062) */  
+                                                AND c2.std_detl_code = t3.rep_div)
+                LEFT JOIN service20_com_cdd c3 ON (c3.std_grp_code  = 'MP0053'  /* ** 멘토상태 (MP0053) */  
+                                                AND c3.std_detl_code = t1.status)
+                WHERE 1=1
+                AND t4.yr        = '{l_yr}' 
+                AND t4.apl_term  = '{l_apl_term}'
+                AND t4.mp_id     = '{l_mp_id}'
+                AND t3.rep_div   = '{l_rep_div}'
+                and t3.status like Ifnull(Nullif('{l_status}', ''), '%%')  
+        """
         print(query)
         queryset = mp_rep.objects.raw(query)
 
@@ -16701,7 +16792,7 @@ class TT0107M_list(generics.ListAPIView):
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        return Response(serializer.data)        
+        return Response(serializer.data)            
 
 # 보고서 현황 save
 @csrf_exempt
