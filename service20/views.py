@@ -11098,7 +11098,7 @@ def MP0102M_mento_update(request):
     req = request
     DIR = os.getcwd()
     UPLOAD_DIR = '/NANUM/www/img/spc/mtr/'
-    UPLOAD_DIR = 'img'
+    # UPLOAD_DIR = 'img'
     
     if request.method == 'POST':
         l_no = request.POST.get('mtr_no', "")
