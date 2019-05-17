@@ -11851,32 +11851,6 @@ def MP0103M_Insert(request):
     
     client_ip = request.META['REMOTE_ADDR']
 
-    update_text = " update service20_mp_plnh a "
-    update_text += " , service20_mpgm b "
-    update_text += " , service20_mp_mte c "
-    update_text += " , (SELECT mp_id "
-    update_text += " , apl_no "
-    update_text += " , apl_id "
-    update_text += " , apl_nm "
-    update_text += " FROM service20_mp_mtr "
-    update_text += " WHERE apl_id = '"+apl_id+"' "
-    update_text += " AND apl_no = '"+apl_no+"') d "
-    update_text += " SET a.pln_dt = NOW() "
-    update_text += "   , a.status = '10' "
-    update_text += "   , a.upd_id = '" + upd_id + "' "
-    update_text += "   , a.upd_ip = '" + client_ip + "' "
-    update_text += "   , a.upd_pgm = '" + upd_pgm + "' "
-    update_text += "   , a.upd_dt = now() "
-    update_text += " WHERE a.mp_id = b.mp_id "
-    update_text += " AND a.mp_id = c.mp_id "
-    update_text += " AND a.mp_id = d.mp_id "
-    update_text += " AND a.apl_no = d.apl_no "
-    update_text += " AND d.apl_no = c.apl_no "
-    
-    cursor = connection.cursor()
-    query_result = cursor.execute(update_text)
-
-    
     row_max = int(maxRow)
     insert_text = ""
     for i in range(0,row_max):
@@ -11896,14 +11870,14 @@ def MP0103M_Insert(request):
         mtr_desc = request.POST.get('mtr_desc'+str(i), "")
         pln_no = request.POST.get('pln_no'+str(i+1), "")
 
-        insert_text += f"""
+        insert_text = f"""
                         insert into service20_mp_plnd (
                         mp_id 
                         , apl_no
                         , pln_no 
                         , pln_sdt 
                         , pln_edt 
-                        , mtr_desc 
+                        /*, mtr_desc */
                         , ins_id 
                         , ins_ip 
                         , ins_dt 
@@ -11919,7 +11893,7 @@ def MP0103M_Insert(request):
                         , '{pln_no}' 
                         , adddate(t2.mnt_fr_dt, 7*({pln_no}*1-1) + 0) pln_sdt 
                         , adddate(t2.mnt_fr_dt, 7*({pln_no}*1-1) + 6) pln_edt 
-                        , '{mtr_desc}' 
+                        /*, '{mtr_desc}' */
                         , '{apl_id}' 
                         , '{client_ip}' 
                         , now() 
@@ -11973,11 +11947,36 @@ def MP0103M_Insert(request):
         print("ins_1")
         print(insert_text)
 
+        cursor = connection.cursor()
+        query_result = cursor.execute(insert_text)    
+
+        mp_plnd.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no),pln_no=str(pln_no)).update(mtr_desc=str(mtr_desc))
+
+    update_text = " update service20_mp_plnh a "
+    update_text += " , service20_mpgm b "
+    update_text += " , service20_mp_mte c "
+    update_text += " , (SELECT mp_id "
+    update_text += " , apl_no "
+    update_text += " , apl_id "
+    update_text += " , apl_nm "
+    update_text += " FROM service20_mp_mtr "
+    update_text += " WHERE apl_id = '"+apl_id+"' "
+    update_text += " AND apl_no = '"+apl_no+"') d "
+    update_text += " SET a.pln_dt = NOW() "
+    update_text += "   , a.status = '10' "
+    update_text += "   , a.upd_id = '" + upd_id + "' "
+    update_text += "   , a.upd_ip = '" + client_ip + "' "
+    update_text += "   , a.upd_pgm = '" + upd_pgm + "' "
+    update_text += "   , a.upd_dt = now() "
+    update_text += " WHERE a.mp_id = b.mp_id "
+    update_text += " AND a.mp_id = c.mp_id "
+    update_text += " AND a.mp_id = d.mp_id "
+    update_text += " AND a.apl_no = d.apl_no "
+    update_text += " AND d.apl_no = c.apl_no "
+    
     cursor = connection.cursor()
-    query_result = cursor.execute(insert_text)    
-
-        # mp_plnd.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no),pln_no=str(pln_no)).update(mtr_desc=str(mtr_desc))
-
+    query_result = cursor.execute(update_text)
+    
     context = {'message': 'Ok'}
 
     return JsonResponse(context,json_dumps_params={'ensure_ascii': True})
@@ -12014,10 +12013,10 @@ def MP0103M_Update(request):
     # 1번쿼리
     ####################################
     update_text = " update service20_mp_plnh "
-    update_text += " SET mtr_sub = '"+str(mtr_sub)+"' "
+    # update_text += " SET mtr_sub = '"+str(mtr_sub)+"' "
     # update_text += " , pln_sdt = ifnull(trim(NULLIF('"+str(mtr_pln_sdt)+"','')),DATE_FORMAT(now(),'%Y-%m-%d')) "
     # update_text += " , pln_edt = ifnull(trim(NULLIF('"+str(mtr_pln_edt)+"','')),DATE_FORMAT(now(),'%Y-%m-%d')) "
-    update_text += " , pln_dt = now() "
+    update_text += " set pln_dt = now() "
     update_text += " , upd_id = '"+str(apl_id)+"' "
     update_text += " , upd_ip = '"+str(client_ip)+"' "
     update_text += " , upd_dt = now() "
@@ -12026,6 +12025,7 @@ def MP0103M_Update(request):
     # update_text += " AND apl_no = '"+str(apl_no)+"' "
     update_text += " AND apl_no = '"+str(apl_no)+"' "
 
+    mp_plnh.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no)).update(mtr_sub=str(mtr_sub))
 
     print(update_text)
     cursor = connection.cursor()
@@ -12044,10 +12044,10 @@ def MP0103M_Update(request):
         ####################################
         # 2번쿼리
         ####################################
-        update_text += f"""
+        update_text = f"""
                     update service20_mp_plnd 
-                       SET mtr_desc = '{mtr_desc}' 
-                         , upd_id = '{apl_id}' 
+                       /*SET mtr_desc = '{mtr_desc}' */
+                         set upd_id = '{apl_id}' 
                          , upd_ip = '{client_ip}' 
                          , upd_dt = now() 
                          , upd_pgm = '{upd_pgm}' 
@@ -12070,13 +12070,13 @@ def MP0103M_Update(request):
         # update_text += " AND pln_no = '"+str(pln_no)+"' "
 
         print(update_text)
-    cursor = connection.cursor()
-    query_result = cursor.execute(update_text)    
+        cursor = connection.cursor()
+        query_result = cursor.execute(update_text)    
         ####################################
         # 2번쿼리
         ####################################
         
-    # mp_plnd.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no),pln_no=str(pln_no)).update(mtr_desc=str(mtr_desc))        
+        mp_plnd.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no),pln_no=str(pln_no)).update(mtr_desc=str(mtr_desc))     
 
     context = {'message': 'Ok'}
 
