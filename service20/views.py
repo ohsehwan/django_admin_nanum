@@ -10827,6 +10827,7 @@ class MP0102M_list_Serializer(serializers.ModelSerializer):
     cncl_rsn = serializers.SerializerMethodField()
     cncl_nm = serializers.SerializerMethodField()
     sati_status = serializers.SerializerMethodField()
+    appr_file = serializers.SerializerMethodField()
     # partici = serializers.SerializerMethodField()
 
     class Meta:
@@ -10873,6 +10874,8 @@ class MP0102M_list_Serializer(serializers.ModelSerializer):
         return obj.cncl_nm
     def get_sati_status(self, obj):
         return obj.sati_status
+    def get_appr_file(self, obj):
+        return obj.appr_file
     # def get_partici(self, obj):
     #     return obj.partici
 
@@ -10994,6 +10997,7 @@ class MP0102M_list(generics.ListAPIView):
                     , SUBSTRING(t1.cnf_dt, 1, 10) AS cnf_dt
                     , t4.att_sts AS att_status
                     , t4.att_no AS att_no
+                    , t2.appr_file as appr_file
                     , (select st2.status
                         from service20_cm_surv_a st1
                         left join service20_cm_surv_h st2 on (st2.pgm_id = st1.pgm_id and st2.surv_seq = st1.surv_seq and st2.ansr_id = st1.ansr_id)
