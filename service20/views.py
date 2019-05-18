@@ -13094,7 +13094,7 @@ def MP01041M_Insert(request):
                , null
                , 'N'
                , null
-               , 'Y'
+               , 'N'
                , (select exp_no from service20_mp_exp where mp_id = '{l_mp_id}' and apl_no = '{l_apl_no}' and exp_mon = substring(replace('{l_att_sdt}', '-', ''), 1, 6))
                , null
                , null
@@ -14154,6 +14154,7 @@ class MP0105M_detail(generics.ListAPIView):
         query += " , t1.appr_id                                       /* 승인자id            */ "
         query += " , (case when date_format(last_day(concat(t1.rep_ym,'01')),'%%Y%%m%%d') > date_format(now(),'%%Y%%m%%d') then 'N' else 'Y' end) as appr_yn "        
         query += " , last_day(concat(t1.rep_ym,'01')) as last_day "        
+        query += " , fn_mp_att_select_01(t2.mp_id, t2.apl_id, t1.rep_ym ) AS att "
         query += " from service20_mp_rep t1                              /* 프로그램 보고서      */ "
         query += " left join service20_mp_mtr t2  on (t2.mp_id   = t1.mp_id and t2.apl_no = t1.apl_no) "
         query += " left join service20_com_cdd c1 on (c1.std_grp_code  = 'MP0070'  and c1.std_detl_code = t1.status)  "
