@@ -11907,6 +11907,7 @@ def MP0103M_Insert(request):
             
             cursor = connection.cursor()
             query_result = cursor.execute(update_text)
+
             for i in range(0,row_max):
             
                 # pln_no_max = mp_plnd.objects.all().aggregate(vlMax=Max('pln_no'))
@@ -12002,11 +12003,11 @@ def MP0103M_Insert(request):
 
                 cursor = connection.cursor()
                 query_result = cursor.execute(insert_text)    
-                
+
                 mp_plnd.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no),pln_no=str(pln_no)).update(mtr_desc=str(mtr_desc))
         
         context = {'message': 'true'}
-    except:
+    except Exception:
         context = {'message': 'false'}
 
     return JsonResponse(context,json_dumps_params={'ensure_ascii': True})
