@@ -13,6 +13,7 @@ from polls.models import Choice, Question
 from django.db.models import Max
 from collections import namedtuple
 from django.utils.datastructures import MultiValueDictKeyError
+from django.db import DatabaseError, IntegrityError, transaction
 
 from django.db import connection
 from collections  import OrderedDict
@@ -11852,6 +11853,7 @@ class MP0103M_list_v1(generics.ListAPIView):
 
 # 프로그램 수행계획서 Insert
 @csrf_exempt
+@transaction.atomic
 def MP0103M_Insert(request):
     mp_id = request.POST.get('mp_id', "")
     apl_id = request.POST.get('apl_id', "")
@@ -11879,131 +11881,133 @@ def MP0103M_Insert(request):
 
     row_max = int(maxRow)
     insert_text = ""
-    for i in range(0,row_max):
-    
-        # pln_no_max = mp_plnd.objects.all().aggregate(vlMax=Max('pln_no'))
+    try:
+        with transaction.atomic():
+            update_text = " update service20_mp_plnh a "
+            update_text += " , service20_mpgm b "
+            update_text += " , service20_mp_mte c "
+            update_text += " , (SELECT mp_id "
+            update_text += " , apl_no "
+            update_text += " , apl_id "
+            update_text += " , apl_nm "
+            update_text += " FROM service20_mp_mtr "
+            update_text += " WHERE apl_id = '"+apl_id+"' "
+            update_text += " AND apl_no = '"+apl_no+"') d "
+            update_text += " SET a.pln_dt = NOW() "
+            update_text += "   , a.status = '10' "
+            update_text += "   , a.upd_id = '" + upd_id + "' "
+            update_text += "   , a.upd_ip = '" + client_ip + "' "
+            update_text += "   , a.upd_pgm = '" + upd_pgm + "' "
+            update_text += "   , a.upd_dt = now() "
+            update_text += " WHERE a.mp_id = b.mp_id "
+            update_text += " AND a.mp_id = c.mp_id "
+            update_text += " AND a.mp_id = d.mp_id "
+            update_text += " AND a.apl_no = d.apl_no "
+            update_text += " AND d.apl_no = c.apl_no "
+            
+            cursor = connection.cursor()
+            query_result = cursor.execute(update_text)
+            for i in range(0,row_max):
+            
+                # pln_no_max = mp_plnd.objects.all().aggregate(vlMax=Max('pln_no'))
+                
+                # apl_no = 0
+                
+                # max_no = mp_plnd_max['vlMax']    
+
+                # if max_no == None:
+                #     apl_no = 0
+                # else:
+                #     apl_no = mp_plnd_max['vlMax']
+                #     apl_no = apl_no + 1
+
+                mtr_desc = request.POST.get('mtr_desc'+str(i), "")
+                pln_no = request.POST.get('pln_no'+str(i+1), "")
+
+                insert_text = f"""
+                                insert into service20_mp_plnd (
+                                mp_id 
+                                , apl_no
+                                , pln_no 
+                                , pln_sdt 
+                                , pln_edt 
+                                /*, mtr_desc*/
+                                , ins_id 
+                                , ins_ip 
+                                , ins_dt 
+                                , ins_pgm 
+                                , upd_id 
+                                , upd_ip 
+                                , upd_dt 
+                                , upd_pgm 
+                                ) 
+                                ( select 
+                                '{mp_id}' 
+                                , '{apl_no}' 
+                                , '{pln_no}' 
+                                , adddate(t2.mnt_fr_dt, 7*({pln_no}*1-1) + 0) pln_sdt 
+                                , adddate(t2.mnt_fr_dt, 7*({pln_no}*1-1) + 6) pln_edt 
+                                /*, '{mtr_desc}'*/
+                                , '{apl_id}' 
+                                , '{client_ip}' 
+                                , now() 
+                                , '{ins_pgm}' 
+                                , '{apl_id}' 
+                                , '{client_ip}' 
+                                , now() 
+                                , '{upd_pgm}'
+                                from service20_mp_mtr t1 
+                                left join service20_mpgm t2 on (t2.mp_id = t1.mp_id) 
+                                where t1.mp_id = '{mp_id}' 
+                                and apl_id = '{apl_id}' 
+                                );
+                """
+                # insert_text += " insert into service20_mp_plnd ( "
+                # insert_text += " mp_id "
+                # insert_text += " , apl_no "
+                # insert_text += " , pln_no "
+                # insert_text += " , pln_sdt "
+                # insert_text += " , pln_edt "
+                # insert_text += " , mtr_desc "
+                # insert_text += " , ins_id "
+                # insert_text += " , ins_ip "
+                # insert_text += " , ins_dt "
+                # insert_text += " , ins_pgm "
+                # insert_text += " , upd_id "
+                # insert_text += " , upd_ip "
+                # insert_text += " , upd_dt "
+                # insert_text += " , upd_pgm "
+                # insert_text += " ) "
+                # insert_text += "  ( select "
+                # insert_text += " '"+str(mp_id)+"' "
+                # insert_text += " , '"+str(apl_no)+"' "
+                # insert_text += " , '"+str(pln_no)+"' "
+                # insert_text += " , adddate(t2.mnt_fr_dt, 7*('"+str(pln_no)+"'*1-1) + 0) pln_sdt "
+                # insert_text += " , adddate(t2.mnt_fr_dt, 7*('"+str(pln_no)+"'*1-1) + 6) pln_edt "
+                # insert_text += " , '"+str(mtr_desc)+"' "
+                # insert_text += " , '"+str(apl_id)+"' "
+                # insert_text += " , '"+str(client_ip)+"' "
+                # insert_text += " , now() "
+                # insert_text += " , '"+str(ins_pgm)+"' "
+                # insert_text += " , '"+str(apl_id)+"' "
+                # insert_text += " , '"+str(client_ip)+"' "
+                # insert_text += " , now() "
+                # insert_text += " , '"+str(upd_pgm)+"' "
+                # insert_text += " from service20_mp_mtr t1 "
+                # insert_text += " left join service20_mpgm t2 on (t2.mp_id = t1.mp_id) "
+                # insert_text += " where t1.mp_id = '"+str(mp_id)+"' "
+                # insert_text += " and apl_id = '"+str(apl_id)+"' "
+                # insert_text += " ) "
+                print(insert_text)
+
+                cursor = connection.cursor()
+                query_result = cursor.execute(insert_text)    
+                
+                mp_plnd.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no),pln_no=str(pln_no)).update(mtr_desc=str(mtr_desc))
         
-        # apl_no = 0
-        
-        # max_no = mp_plnd_max['vlMax']    
-
-        # if max_no == None:
-        #     apl_no = 0
-        # else:
-        #     apl_no = mp_plnd_max['vlMax']
-        #     apl_no = apl_no + 1
-
-        mtr_desc = request.POST.get('mtr_desc'+str(i), "")
-        pln_no = request.POST.get('pln_no'+str(i+1), "")
-
-        insert_text = f"""
-                        insert into service20_mp_plnd (
-                        mp_id 
-                        , apl_no
-                        , pln_no 
-                        , pln_sdt 
-                        , pln_edt 
-                        /*, mtr_desc */
-                        , ins_id 
-                        , ins_ip 
-                        , ins_dt 
-                        , ins_pgm 
-                        , upd_id 
-                        , upd_ip 
-                        , upd_dt 
-                        , upd_pgm 
-                        ) 
-                         ( select 
-                        '{mp_id}' 
-                        , '{apl_no}' 
-                        , '{pln_no}' 
-                        , adddate(t2.mnt_fr_dt, 7*({pln_no}*1-1) + 0) pln_sdt 
-                        , adddate(t2.mnt_fr_dt, 7*({pln_no}*1-1) + 6) pln_edt 
-                        /*, '{mtr_desc}' */
-                        , '{apl_id}' 
-                        , '{client_ip}' 
-                        , now() 
-                        , '{ins_pgm}' 
-                        , '{apl_id}' 
-                        , '{client_ip}' 
-                        , now() 
-                        , '{upd_pgm}'
-                        from service20_mp_mtr t1 
-                        left join service20_mpgm t2 on (t2.mp_id = t1.mp_id) 
-                        where t1.mp_id = '{mp_id}' 
-                        and apl_id = '{apl_id}' 
-                        );
-        """
-        # insert_text += " insert into service20_mp_plnd ( "
-        # insert_text += " mp_id "
-        # insert_text += " , apl_no "
-        # insert_text += " , pln_no "
-        # insert_text += " , pln_sdt "
-        # insert_text += " , pln_edt "
-        # insert_text += " , mtr_desc "
-        # insert_text += " , ins_id "
-        # insert_text += " , ins_ip "
-        # insert_text += " , ins_dt "
-        # insert_text += " , ins_pgm "
-        # insert_text += " , upd_id "
-        # insert_text += " , upd_ip "
-        # insert_text += " , upd_dt "
-        # insert_text += " , upd_pgm "
-        # insert_text += " ) "
-        # insert_text += "  ( select "
-        # insert_text += " '"+str(mp_id)+"' "
-        # insert_text += " , '"+str(apl_no)+"' "
-        # insert_text += " , '"+str(pln_no)+"' "
-        # insert_text += " , adddate(t2.mnt_fr_dt, 7*('"+str(pln_no)+"'*1-1) + 0) pln_sdt "
-        # insert_text += " , adddate(t2.mnt_fr_dt, 7*('"+str(pln_no)+"'*1-1) + 6) pln_edt "
-        # insert_text += " , '"+str(mtr_desc)+"' "
-        # insert_text += " , '"+str(apl_id)+"' "
-        # insert_text += " , '"+str(client_ip)+"' "
-        # insert_text += " , now() "
-        # insert_text += " , '"+str(ins_pgm)+"' "
-        # insert_text += " , '"+str(apl_id)+"' "
-        # insert_text += " , '"+str(client_ip)+"' "
-        # insert_text += " , now() "
-        # insert_text += " , '"+str(upd_pgm)+"' "
-        # insert_text += " from service20_mp_mtr t1 "
-        # insert_text += " left join service20_mpgm t2 on (t2.mp_id = t1.mp_id) "
-        # insert_text += " where t1.mp_id = '"+str(mp_id)+"' "
-        # insert_text += " and apl_id = '"+str(apl_id)+"' "
-        # insert_text += " ) "
-        print("ins_1")
-        print(insert_text)
-
-        cursor = connection.cursor()
-        query_result = cursor.execute(insert_text)    
-
-        mp_plnd.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no),pln_no=str(pln_no)).update(mtr_desc=str(mtr_desc))
-
-    update_text = " update service20_mp_plnh a "
-    update_text += " , service20_mpgm b "
-    update_text += " , service20_mp_mte c "
-    update_text += " , (SELECT mp_id "
-    update_text += " , apl_no "
-    update_text += " , apl_id "
-    update_text += " , apl_nm "
-    update_text += " FROM service20_mp_mtr "
-    update_text += " WHERE apl_id = '"+apl_id+"' "
-    update_text += " AND apl_no = '"+apl_no+"') d "
-    update_text += " SET a.pln_dt = NOW() "
-    update_text += "   , a.status = '10' "
-    update_text += "   , a.upd_id = '" + upd_id + "' "
-    update_text += "   , a.upd_ip = '" + client_ip + "' "
-    update_text += "   , a.upd_pgm = '" + upd_pgm + "' "
-    update_text += "   , a.upd_dt = now() "
-    update_text += " WHERE a.mp_id = b.mp_id "
-    update_text += " AND a.mp_id = c.mp_id "
-    update_text += " AND a.mp_id = d.mp_id "
-    update_text += " AND a.apl_no = d.apl_no "
-    update_text += " AND d.apl_no = c.apl_no "
-    
-    cursor = connection.cursor()
-    query_result = cursor.execute(update_text)
-    
-    context = {'message': 'Ok'}
+        context = {'message': 'true'}
+    except:
+        context = {'message': 'false'}
 
     return JsonResponse(context,json_dumps_params={'ensure_ascii': True})
 
