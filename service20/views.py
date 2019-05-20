@@ -14060,6 +14060,7 @@ class MP0105M_detail_Serializer(serializers.ModelSerializer):
     mnte_id = serializers.SerializerMethodField()
     appr_yn = serializers.SerializerMethodField()
     last_day = serializers.SerializerMethodField()
+    att = serializers.SerializerMethodField()
 
     req_dt = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
     appr_dt = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
@@ -14100,6 +14101,8 @@ class MP0105M_detail_Serializer(serializers.ModelSerializer):
         return obj.appr_yn  
     def get_last_day(self,obj):    
         return obj.last_day  
+    def get_att(self,obj):    
+        return obj.att  
 
 class MP0105M_detail(generics.ListAPIView):
     queryset = mp_rep.objects.all()
