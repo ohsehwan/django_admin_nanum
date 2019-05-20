@@ -12015,6 +12015,7 @@ def MP0103M_Insert(request):
 
 # 프로그램 수행계획서 Update
 @csrf_exempt
+@transaction.atomic
 def MP0103M_Update(request):
     mp_id = request.POST.get('mp_id', "")
     apl_id = request.POST.get('apl_id', "")
@@ -12039,77 +12040,80 @@ def MP0103M_Update(request):
 
     row_max = int(maxRow)
 
+    try:
+        with transaction.atomic():
+            ####################################
+            # 1번쿼리
+            ####################################
+            update_text = " update service20_mp_plnh "
+            # update_text += " SET mtr_sub = '"+str(mtr_sub)+"' "
+            # update_text += " , pln_sdt = ifnull(trim(NULLIF('"+str(mtr_pln_sdt)+"','')),DATE_FORMAT(now(),'%Y-%m-%d')) "
+            # update_text += " , pln_edt = ifnull(trim(NULLIF('"+str(mtr_pln_edt)+"','')),DATE_FORMAT(now(),'%Y-%m-%d')) "
+            update_text += " set pln_dt = now() "
+            update_text += " , upd_id = '"+str(apl_id)+"' "
+            update_text += " , upd_ip = '"+str(client_ip)+"' "
+            update_text += " , upd_dt = now() "
+            update_text += " , upd_pgm = '"+str(upd_pgm)+"' "
+            update_text += " WHERE mp_id = '"+str(mp_id)+"' "
+            # update_text += " AND apl_no = '"+str(apl_no)+"' "
+            update_text += " AND apl_no = '"+str(apl_no)+"' "
 
-    ####################################
-    # 1번쿼리
-    ####################################
-    update_text = " update service20_mp_plnh "
-    # update_text += " SET mtr_sub = '"+str(mtr_sub)+"' "
-    # update_text += " , pln_sdt = ifnull(trim(NULLIF('"+str(mtr_pln_sdt)+"','')),DATE_FORMAT(now(),'%Y-%m-%d')) "
-    # update_text += " , pln_edt = ifnull(trim(NULLIF('"+str(mtr_pln_edt)+"','')),DATE_FORMAT(now(),'%Y-%m-%d')) "
-    update_text += " set pln_dt = now() "
-    update_text += " , upd_id = '"+str(apl_id)+"' "
-    update_text += " , upd_ip = '"+str(client_ip)+"' "
-    update_text += " , upd_dt = now() "
-    update_text += " , upd_pgm = '"+str(upd_pgm)+"' "
-    update_text += " WHERE mp_id = '"+str(mp_id)+"' "
-    # update_text += " AND apl_no = '"+str(apl_no)+"' "
-    update_text += " AND apl_no = '"+str(apl_no)+"' "
+            mp_plnh.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no)).update(mtr_sub=str(mtr_sub))
 
-    mp_plnh.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no)).update(mtr_sub=str(mtr_sub))
+            print(update_text)
+            cursor = connection.cursor()
+            query_result = cursor.execute(update_text)    
+            
+            ####################################
+            # 1번쿼리
+            ####################################
 
-    print(update_text)
-    cursor = connection.cursor()
-    query_result = cursor.execute(update_text)    
-    
-    ####################################
-    # 1번쿼리
-    ####################################
+            update_text = ""
+            for i in range(0,row_max):
 
-    update_text = ""
-    for i in range(0,row_max):
+                mtr_desc = request.POST.get('mtr_desc'+str(i), "")
+                pln_no = request.POST.get('pln_no'+str(i+1), "")
 
-        mtr_desc = request.POST.get('mtr_desc'+str(i), "")
-        pln_no = request.POST.get('pln_no'+str(i+1), "")
+                ####################################
+                # 2번쿼리
+                ####################################
+                update_text = f"""
+                            update service20_mp_plnd 
+                            /*SET mtr_desc = '{mtr_desc}' */
+                                set upd_id = '{apl_id}' 
+                                , upd_ip = '{client_ip}' 
+                                , upd_dt = now() 
+                                , upd_pgm = '{upd_pgm}' 
+                            WHERE mp_id = '{mp_id}' 
+                            AND apl_no = '{apl_no}' 
+                            AND pln_no = '{pln_no}'
+                            ;
+                """
+                # update_text += " update service20_mp_plnd "
+                # update_text += " SET mtr_desc = '"+str(mtr_desc)+"' "
+                # # update_text += " , pln_sdt = ifnull(trim(NULLIF('"+str(mtr_pln_sdt)+"','')),DATE_FORMAT(now(),'%Y-%m-%d')) "
+                # # update_text += " , pln_edt = ifnull(trim(NULLIF('"+str(mtr_pln_edt)+"','')),DATE_FORMAT(now(),'%Y-%m-%d')) "        
+                # update_text += " , upd_id = '"+str(apl_id)+"' "
+                # update_text += " , upd_ip = '"+str(client_ip)+"' "
+                # update_text += " , upd_dt = now() "
+                # update_text += " , upd_pgm = '"+str(upd_pgm)+"' "
+                # update_text += " WHERE mp_id = '"+str(mp_id)+"' "
+                # # update_text += " AND apl_no = '"+str(apl_no)+"' "
+                # update_text += " AND apl_no = '"+str(apl_no)+"' "
+                # update_text += " AND pln_no = '"+str(pln_no)+"' "
 
-        ####################################
-        # 2번쿼리
-        ####################################
-        update_text = f"""
-                    update service20_mp_plnd 
-                       /*SET mtr_desc = '{mtr_desc}' */
-                         set upd_id = '{apl_id}' 
-                         , upd_ip = '{client_ip}' 
-                         , upd_dt = now() 
-                         , upd_pgm = '{upd_pgm}' 
-                     WHERE mp_id = '{mp_id}' 
-                       AND apl_no = '{apl_no}' 
-                       AND pln_no = '{pln_no}'
-                    ;
-        """
-        # update_text += " update service20_mp_plnd "
-        # update_text += " SET mtr_desc = '"+str(mtr_desc)+"' "
-        # # update_text += " , pln_sdt = ifnull(trim(NULLIF('"+str(mtr_pln_sdt)+"','')),DATE_FORMAT(now(),'%Y-%m-%d')) "
-        # # update_text += " , pln_edt = ifnull(trim(NULLIF('"+str(mtr_pln_edt)+"','')),DATE_FORMAT(now(),'%Y-%m-%d')) "        
-        # update_text += " , upd_id = '"+str(apl_id)+"' "
-        # update_text += " , upd_ip = '"+str(client_ip)+"' "
-        # update_text += " , upd_dt = now() "
-        # update_text += " , upd_pgm = '"+str(upd_pgm)+"' "
-        # update_text += " WHERE mp_id = '"+str(mp_id)+"' "
-        # # update_text += " AND apl_no = '"+str(apl_no)+"' "
-        # update_text += " AND apl_no = '"+str(apl_no)+"' "
-        # update_text += " AND pln_no = '"+str(pln_no)+"' "
+                print(update_text)
+                cursor = connection.cursor()
+                query_result = cursor.execute(update_text)    
+                ####################################
+                # 2번쿼리
+                ####################################
+                
+                mp_plnd.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no),pln_no=str(pln_no)).update(mtr_desc=str(mtr_desc))   
 
-        print(update_text)
-        cursor = connection.cursor()
-        query_result = cursor.execute(update_text)    
-        ####################################
-        # 2번쿼리
-        ####################################
-        
-        mp_plnd.objects.filter(mp_id=str(mp_id),apl_no=str(apl_no),pln_no=str(pln_no)).update(mtr_desc=str(mtr_desc))     
-
-    context = {'message': 'Ok'}
+        context = {'message': 'true'}
+    except Exception:
+        context = {'message': 'false'}
 
     return JsonResponse(context,json_dumps_params={'ensure_ascii': True})
 ######################################################################
