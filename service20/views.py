@@ -6146,7 +6146,6 @@ class MP0101M_list_all_Serializer(serializers.ModelSerializer):
     statusCode = serializers.SerializerMethodField()
     status_nm  = serializers.SerializerMethodField()
     sup_org_nm = serializers.SerializerMethodField()
-    apl_id = serializers.SerializerMethodField()
     cert_en = serializers.SerializerMethodField()
     apl_status = serializers.SerializerMethodField()
     apl_status_nm = serializers.SerializerMethodField()
@@ -6179,7 +6178,6 @@ class MP0101M_list_all_Serializer(serializers.ModelSerializer):
             'applyFlagNm',
             'sup_org_nm',
             'mgr_nm',
-            'apl_id',
             'cert_en',
             'apl_status',
             'apl_status_nm',
@@ -6213,8 +6211,6 @@ class MP0101M_list_all_Serializer(serializers.ModelSerializer):
         return obj.sup_org_nm
 
 
-    def get_apl_id(self, obj):
-        return obj.apl_id
     def get_cert_en(self, obj):
         return obj.cert_en
     def get_apl_status(self, obj):
