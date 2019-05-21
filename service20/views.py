@@ -6146,9 +6146,9 @@ class MP0101M_list_all_Serializer(serializers.ModelSerializer):
     statusCode = serializers.SerializerMethodField()
     status_nm  = serializers.SerializerMethodField()
     sup_org_nm = serializers.SerializerMethodField()
-    cert_en = serializers.SerializerMethodField()
-    apl_status = serializers.SerializerMethodField()
-    apl_status_nm = serializers.SerializerMethodField()
+    # cert_en = serializers.SerializerMethodField()
+    # apl_status = serializers.SerializerMethodField()
+    # apl_status_nm = serializers.SerializerMethodField()
 
     apl_fr_dt = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
     apl_to_dt = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
@@ -6178,9 +6178,9 @@ class MP0101M_list_all_Serializer(serializers.ModelSerializer):
             'applyFlagNm',
             'sup_org_nm',
             'mgr_nm',
-            'cert_en',
-            'apl_status',
-            'apl_status_nm',
+            # 'cert_en',
+            # 'apl_status',
+            # 'apl_status_nm',
         )
 
     def get_applyFlag(self, obj):
@@ -6211,12 +6211,12 @@ class MP0101M_list_all_Serializer(serializers.ModelSerializer):
         return obj.sup_org_nm
 
 
-    def get_cert_en(self, obj):
-        return obj.cert_en
-    def get_apl_status(self, obj):
-        return obj.apl_status
-    def get_apl_status_nm(self, obj):
-        return obj.apl_status_nm                
+    # def get_cert_en(self, obj):
+    #     return obj.cert_en
+    # def get_apl_status(self, obj):
+    #     return obj.apl_status
+    # def get_apl_status_nm(self, obj):
+    #     return obj.apl_status_nm                
 
 
 class MP0101M_list_all(generics.ListAPIView):
