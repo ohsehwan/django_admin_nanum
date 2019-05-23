@@ -4860,6 +4860,22 @@ class MS0101M_adm_quest(generics.ListAPIView):
         l_exist = ms_sub.objects.filter(ms_id=key1).exists()
         
         query = "select B.std_detl_code,B.std_detl_code_nm,B.rmrk,A.* from service20_ms_ans A, service20_com_cdd B where A.ques_no = B.std_detl_code and B.use_indc = 'Y' and B.std_grp_code in (select att_cdh from service20_ms_sub where att_id='MS0014' and ms_id = '"+str(key1)+"') and A.ms_id = '"+str(key1)+"' and apl_id = '"+str(l_user_id)+"' order by A.sort_seq"
+
+        query = "select  "
+        query += "     t3.std_detl_code, "
+        query += "     t3.std_detl_code_nm, "
+        query += "     t3.rmrk, "
+        query += "     fn_ms_sub_att_val_select_01(t1.ms_id, t1.att_id, 'MS0028', t1.att_cdd) ans_min_len, "
+        query += "     fn_ms_sub_att_val_select_01(t1.ms_id, t1.att_id, 'MS0029', t1.att_cdd) ans_max_len, "
+        query += "     t1.* "
+        query += "FROM service20_ms_sub t1 "
+        query += "LEFT JOIN service20_com_cdd t3 ON (t3.std_grp_code  = t1.att_cdh "
+        query += "                               AND t3.std_detl_code = t1.att_cdd) "
+        query += "WHERE t1.ms_id   = '"+key1+"' "
+        query += " AND t1.att_id  = 'MS0014' "
+        query += " AND t1.att_cdh = 'MS0014' "
+        query += "ORDER BY t1.sort_seq "
+        
         queryset = ms_ans.objects.raw(query)
         
 
