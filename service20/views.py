@@ -6653,18 +6653,20 @@ def MP0101M_save(request):
             )
         model_instance.save()
         
-        model_instance_team_mem = mp_team_mem(
-            mp_id=mp_id, 
-            team_id=str(team_no),
-            apl_no=apl_no,
-            ins_id=apl_id,
-            ins_ip=str(client_ip),
-            ins_dt=datetime.datetime.today(),
-            upd_id=apl_id,
-            upd_ip=str(client_ip),
-            upd_dt=datetime.datetime.today(),
-            )
-        model_instance_team_mem.save()
+        # 팀단위 추가.
+        if indv_div == 'T':
+            model_instance_team_mem = mp_team_mem(
+                mp_id=mp_id, 
+                team_id=str(team_no),
+                apl_no=apl_no,
+                ins_id=apl_id,
+                ins_ip=str(client_ip),
+                ins_dt=datetime.datetime.today(),
+                upd_id=apl_id,
+                upd_ip=str(client_ip),
+                upd_dt=datetime.datetime.today(),
+                )
+            model_instance_team_mem.save()
 
         apl_max = int(apl_max)
 
