@@ -11047,6 +11047,7 @@ class MP0102M_mentee_list_Serializer(serializers.ModelSerializer):
 
     mnte_nm = serializers.SerializerMethodField()
     sati_status = serializers.SerializerMethodField()
+    atc_file_url = serializers.SerializerMethodField()
 
     class Meta:
         model = mp_spc_mte
@@ -11056,6 +11057,8 @@ class MP0102M_mentee_list_Serializer(serializers.ModelSerializer):
         return obj.mnte_nm
     def get_sati_status(self, obj):
         return obj.sati_status
+    def get_atc_file_url(self, obj):
+        return obj.atc_file_url
 
 class MP0102M_mentee_list(generics.ListAPIView):
     queryset = mp_spc_mte.objects.all()
@@ -11086,6 +11089,7 @@ class MP0102M_mentee_list(generics.ListAPIView):
                         left join service20_cm_surv_p st3 on (st3.pgm_id = st1.pgm_id)
                         where st3.spc_no = t1.spc_no
                         AND st1.ansr_id = t1.mnte_id) AS sati_status
+                    , (select atc_file_url from service20_mp_spc where mp_id = t1.mp_id and spc_no = t1.spc_no) as atc_file_url
                 FROM service20_mp_spc_mte t1
                 LEFT JOIN service20_mp_mte t2 ON (t2.mp_id = t1.mp_id AND t2.mnte_no = t1.mnte_no)
                 LEFT JOIN service20_com_cdd t3 ON (t3.std_detl_code = "MP0085" AND t3.std_detl_code = t1.status)
