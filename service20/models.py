@@ -1566,7 +1566,8 @@ class mp_spc(models.Model):
   upd_dt = models.DateTimeField(null=True, blank=True, verbose_name='수정일시' )
   upd_pgm = models.CharField(max_length=20, null=True, blank=True, verbose_name='수정프로그램ID' )
   day_rand = models.CharField(max_length=10, null=True, blank=True, verbose_name='일별 출석용 난수' )
-
+  atc_file_url = models.FileField(upload_to='files',null=True,blank=True,verbose_name='파일경로')
+  
   class Meta:
     verbose_name = '학습외 프로그램'
     verbose_name_plural =  verbose_name
