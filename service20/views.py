@@ -6269,6 +6269,7 @@ class MP0101M_list_all(generics.ListAPIView):
         query += " end                                         AS applyFlagNm,  "
         query += " c1.std_detl_code_nm   AS sup_org_nm, "
         query += "        A.*  "
+        query += "      , B.apl_id as apl_id  "
         query += " FROM   service20_mpgm A  "
         query += "        LEFT JOIN service20_mp_mtr B  "
         query += "               ON ( A.mp_id = B.mp_id  "
