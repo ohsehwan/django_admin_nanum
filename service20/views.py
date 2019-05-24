@@ -4875,7 +4875,7 @@ class MS0101M_adm_quest(generics.ListAPIView):
         query += " AND t1.att_id  = 'MS0014' "
         query += " AND t1.att_cdh = 'MS0014' "
         query += "ORDER BY t1.sort_seq "
-        
+
         queryset = ms_ans.objects.raw(query)
         
 
@@ -6162,6 +6162,7 @@ class MP0101M_list_all_Serializer(serializers.ModelSerializer):
     statusCode = serializers.SerializerMethodField()
     status_nm  = serializers.SerializerMethodField()
     sup_org_nm = serializers.SerializerMethodField()
+    apl_id = serializers.SerializerMethodField()
     # cert_en = serializers.SerializerMethodField()
     # apl_status = serializers.SerializerMethodField()
     # apl_status_nm = serializers.SerializerMethodField()
@@ -6194,6 +6195,7 @@ class MP0101M_list_all_Serializer(serializers.ModelSerializer):
             'applyFlagNm',
             'sup_org_nm',
             'mgr_nm',
+            'apl_id',
             # 'cert_en',
             # 'apl_status',
             # 'apl_status_nm',
@@ -6226,6 +6228,8 @@ class MP0101M_list_all_Serializer(serializers.ModelSerializer):
     def get_sup_org_nm(self,obj):
         return obj.sup_org_nm
 
+    def get_apl_id(self,obj):
+        return obj.apl_id
 
     # def get_cert_en(self, obj):
     #     return obj.cert_en
