@@ -6163,6 +6163,7 @@ class MP0101M_list_all_Serializer(serializers.ModelSerializer):
     status_nm  = serializers.SerializerMethodField()
     sup_org_nm = serializers.SerializerMethodField()
     apl_id = serializers.SerializerMethodField()
+    apl_no = serializers.SerializerMethodField()
     # cert_en = serializers.SerializerMethodField()
     # apl_status = serializers.SerializerMethodField()
     # apl_status_nm = serializers.SerializerMethodField()
@@ -6196,6 +6197,7 @@ class MP0101M_list_all_Serializer(serializers.ModelSerializer):
             'sup_org_nm',
             'mgr_nm',
             'apl_id',
+            'apl_no',
             # 'cert_en',
             # 'apl_status',
             # 'apl_status_nm',
@@ -6230,6 +6232,9 @@ class MP0101M_list_all_Serializer(serializers.ModelSerializer):
 
     def get_apl_id(self,obj):
         return obj.apl_id
+
+    def get_apl_no(self,obj):
+        return obj.apl_no
 
     # def get_cert_en(self, obj):
     #     return obj.cert_en
@@ -6270,6 +6275,7 @@ class MP0101M_list_all(generics.ListAPIView):
         query += " c1.std_detl_code_nm   AS sup_org_nm, "
         query += "        A.*  "
         query += "      , B.apl_id as apl_id  "
+        query += "      , B.apl_no as apl_no  "
         query += " FROM   service20_mpgm A  "
         query += "        LEFT JOIN service20_mp_mtr B  "
         query += "               ON ( A.mp_id = B.mp_id  "
