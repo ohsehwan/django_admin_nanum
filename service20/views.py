@@ -2480,9 +2480,7 @@ class com_combo_mp_status(generics.ListAPIView):
         
         query = " select '0'id,''std_detl_code,'전체'std_detl_code_nm "
         query += " union  "
-        query += " select id,std_detl_code,std_detl_code_nm from service20_com_cdd where std_grp_code = 'MP0001' "
-        query += " union  "
-        query += " select '','xx','모집완료'  "
+        query += " select id,std_detl_code,std_detl_code_nm from service20_com_cdd where std_grp_code = 'MP0001' and std_detl_code in ('20', '30', '60', '90')"
 
         queryset = com_cdd.objects.raw(query)
 
@@ -11054,6 +11052,7 @@ class MP0102M_mentee_list_Serializer(serializers.ModelSerializer):
 
     mnte_nm = serializers.SerializerMethodField()
     sati_status = serializers.SerializerMethodField()
+    spc_status = serializers.SerializerMethodField()
 
     class Meta:
         model = mp_spc_mte
@@ -11063,6 +11062,8 @@ class MP0102M_mentee_list_Serializer(serializers.ModelSerializer):
         return obj.mnte_nm
     def get_sati_status(self, obj):
         return obj.sati_status
+    def get_spc_status(self, obj):
+        return obj.spc_status
 
 class MP0102M_mentee_list(generics.ListAPIView):
     queryset = mp_spc_mte.objects.all()
@@ -11093,6 +11094,7 @@ class MP0102M_mentee_list(generics.ListAPIView):
                         left join service20_cm_surv_p st3 on (st3.pgm_id = st1.pgm_id)
                         where st3.spc_no = t1.spc_no
                         AND st1.ansr_id = t1.mnte_id) AS sati_status
+                    , t4.status as spc_status
                 FROM service20_mp_spc_mte t1
                 LEFT JOIN service20_mp_mte t2 ON (t2.mp_id = t1.mp_id AND t2.mnte_no = t1.mnte_no)
                 LEFT JOIN service20_com_cdd t3 ON (t3.std_detl_code = "MP0085" AND t3.std_detl_code = t1.status)
