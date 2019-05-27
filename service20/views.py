@@ -10827,6 +10827,7 @@ class MP0102M_list_Serializer(serializers.ModelSerializer):
     # mnte_id = serializers.SerializerMethodField()
     # mnte_nm = serializers.SerializerMethodField()
     spc_no = serializers.SerializerMethodField()
+    spc_status = serializers.SerializerMethodField()
     spc_status_nm = serializers.SerializerMethodField()
     # mte_status = serializers.SerializerMethodField()
     mtr_status = serializers.SerializerMethodField()
@@ -10859,6 +10860,8 @@ class MP0102M_list_Serializer(serializers.ModelSerializer):
     #     return obj.mnte_nm
     def get_spc_no(self, obj):
         return obj.spc_no
+    def get_spc_status(self, obj):
+        return obj.spc_status
     def get_spc_status_nm(self, obj):
         return obj.spc_status_nm
     # def get_mte_status(self, obj):
@@ -11024,7 +11027,7 @@ class MP0102M_list(generics.ListAPIView):
                 LEFT JOIN service20_mp_spc_mtr t2 on (t2.mp_id = t1.mp_id AND t2.spc_no = t1.spc_no)
                 LEFT JOIN service20_mpgm t3 ON (t3.mp_id = t1.mp_id)
                 LEFT JOIN service20_mp_att t4 ON (t4.mp_id = t1.mp_id AND t4.apl_no = t2.apl_no and t4.spc_no = t1.spc_no)
-                LEFT JOIN service20_com_cdd t5 ON (t5.std_grp_code = 'MP0085' AND t5.std_detl_code = t2.status)
+                LEFT JOIN service20_com_cdd t5 ON (t5.std_grp_code = 'MP0084' AND t5.std_detl_code = t1.status)
                 LEFT JOIN service20_com_cdd t6 ON (t6.std_grp_code = 'MP0099' AND t6.std_detl_code = t2.cncl_rsn)
                 WHERE t1.yr = '{l_yr}'
                 AND t1.apl_term = '{l_apl_term}'
@@ -11084,7 +11087,7 @@ class MP0102M_mentee_list(generics.ListAPIView):
                     , t1.spc_apl_no AS spc_apl_no
                     , t1.mnte_no AS mnte_no
                     , t1.status AS status
-                    , t3.std_detl_code_nm as mte_status
+                    , t4.std_detl_code_nm as mte_status
                     , t1.appr_file AS appr_file
                     , t1.appr_dt AS appr_dt
                     , t2.mnte_nm AS mnte_nm
@@ -11094,15 +11097,15 @@ class MP0102M_mentee_list(generics.ListAPIView):
                         left join service20_cm_surv_p st3 on (st3.pgm_id = st1.pgm_id)
                         where st3.spc_no = t1.spc_no
                         AND st1.ansr_id = t1.mnte_id) AS sati_status
-                    , t4.status as spc_status
+                    , t3.status as spc_status
                 FROM service20_mp_spc_mte t1
                 LEFT JOIN service20_mp_mte t2 ON (t2.mp_id = t1.mp_id AND t2.mnte_no = t1.mnte_no)
-                LEFT JOIN service20_com_cdd t3 ON (t3.std_detl_code = "MP0085" AND t3.std_detl_code = t1.status)
-                LEFT JOIN service20_mp_spc t4 ON (t4.mp_id = t1.mp_id AND t4.spc_no = '{l_spc_no}')
+                LEFT JOIN service20_mp_spc t3 ON (t3.mp_id = t1.mp_id AND t3.spc_no = '{l_spc_no}')
+                LEFT JOIN service20_com_cdd t4 ON (t4.std_detl_code = "MP0084" AND t4.std_detl_code = t3.status)
                 WHERE t1.mp_id = '{l_mp_id}'
                 AND t1.spc_no = '{l_spc_no}'
                 AND t1.spc_apl_no = '{l_spc_apl_no}'
-                AND t4.spc_div <> 'B'
+                AND t3.spc_div <> 'B'
         """
 
         print(query)
