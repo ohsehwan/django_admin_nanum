@@ -11096,9 +11096,11 @@ class MP0102M_mentee_list(generics.ListAPIView):
                 FROM service20_mp_spc_mte t1
                 LEFT JOIN service20_mp_mte t2 ON (t2.mp_id = t1.mp_id AND t2.mnte_no = t1.mnte_no)
                 LEFT JOIN service20_com_cdd t3 ON (t3.std_detl_code = "MP0085" AND t3.std_detl_code = t1.status)
+                LEFT JOIN service20_mp_spc t4 ON (t4.mp_id = t1.mp_id AND t4.spc_no = '{l_spc_no}')
                 WHERE t1.mp_id = '{l_mp_id}'
                 AND t1.spc_no = '{l_spc_no}'
                 AND t1.spc_apl_no = '{l_spc_apl_no}'
+                AND t4.spc_div <> 'B'
         """
 
         print(query)
