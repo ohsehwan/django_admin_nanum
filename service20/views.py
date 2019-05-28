@@ -12592,6 +12592,8 @@ class MP01041M_mtr_Serializer(serializers.ModelSerializer):
 
     min_len_mp_att_mtr_desc = serializers.SerializerMethodField()
     max_len_mp_att_mtr_desc = serializers.SerializerMethodField()
+    min_len_mp_att_req_desc = serializers.SerializerMethodField()
+    max_len_mp_att_req_desc = serializers.SerializerMethodField()
     att_val = serializers.SerializerMethodField()
 
     class Meta:
@@ -12602,6 +12604,10 @@ class MP01041M_mtr_Serializer(serializers.ModelSerializer):
         return obj.min_len_mp_att_mtr_desc
     def get_max_len_mp_att_mtr_desc(self,obj):
         return obj.max_len_mp_att_mtr_desc
+    def get_min_len_mp_att_req_desc(self,obj):
+        return obj.min_len_mp_att_req_desc
+    def get_max_len_mp_att_req_desc(self,obj):
+        return obj.max_len_mp_att_req_desc
     def get_att_val(self,obj):
         return obj.att_val
 
@@ -12626,6 +12632,8 @@ class MP01041M_mtr(generics.ListAPIView):
         query += "     , t1.sch_yr as sch_yr"
         query += "     , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0003', 'MS0028', '10') min_len_mp_att_mtr_desc /* 멘토링 내용(보고서)(MTR_DESC) - 프로그램 출석부(멘토)(MP_ATT) */ "
         query += "     , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0003', 'MS0029', '10') max_len_mp_att_mtr_desc /* 멘토링 내용(보고서)(MTR_DESC) - 프로그램 출석부(멘토)(MP_ATT) */ "
+        query += "     , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0018', 'MS0028', '10') min_len_mp_att_req_desc /* 소명 내용(보고서)(MTR_DESC) - 프로그램 출석부(멘토)(MP_ATT) */ "
+        query += "     , fn_mp_sub_att_val_select_01('" + str(l_mp_id) + "', 'CL0018', 'MS0029', '10') max_len_mp_att_req_desc /* 소명 내용(보고서)(MTR_DESC) - 프로그램 출석부(멘토)(MP_ATT) */ "
         query += "     , t2.att_val as att_val"
         query += "  from service20_mp_mtr t1"
         query += "  left join service20_mp_sub t2 on (t2.mp_id = t1.mp_id and t2.att_id = 'MP0094' and t2.att_cdh = 'MP0094' and t2.att_cdd = '1') "
