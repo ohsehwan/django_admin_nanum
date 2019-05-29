@@ -14159,55 +14159,118 @@ class MP0105M_detail(generics.ListAPIView):
         queryset = self.get_queryset()
 
                 # /*보고서 상세*/
-        query = " select t1.id,t1.mp_id                                         /* 멘토링 프로그램id   */ "
-        query += " , t1.rep_div                                       /* 보고서 구분(mp0062) */ "
-        query += " , t1.rep_ttl                                       /* 보고서 제목 : 내용  */ "
-        query += " , c2.std_detl_code_nm               as rep_div_nm    "
-        query += " , concat(t2.apl_id, '/', t2.apl_nm) as apl_m       /* 지원자(멘토,학생) 명*/ "
+        # query = " select t1.id,t1.mp_id                                         /* 멘토링 프로그램id   */ "
+        # query += " , t1.rep_div                                       /* 보고서 구분(mp0062) */ "
+        # query += " , t1.rep_ttl                                       /* 보고서 제목 : 내용  */ "
+        # query += " , c2.std_detl_code_nm               as rep_div_nm    "
+        # query += " , concat(t2.apl_id, '/', t2.apl_nm) as apl_m       /* 지원자(멘토,학생) 명*/ "
         
-        query += " , t1.tchr_id                                       /* 담당멘티id*/ "
-        query += " , t1.tchr_nm                        as teacher     /* 담당멘티명*/ "
-        query += " , t1.mnte_id                                       /* 담당멘티id*/ "
-        query += " , fn_mp_mte_select_01(t1.mp_id, t1.apl_no) mte_nm        /* 담당멘티명*/ "
-        # query += " , t1.mnte_nm                        as mte_nm        /* 담당멘티명*/ "
-        query += " , t1.sch_nm                         as sch_yr        /* 학교명*/ "
-        query += " , t1.mtr_sub                        as obj_sub     /* 지도과목*/ " 
-        query += " , t1.att_desc                       as aaa          /* 출석현황*/ "
+        # query += " , t1.tchr_id                                       /* 담당멘티id*/ "
+        # query += " , t1.tchr_nm                        as teacher     /* 담당멘티명*/ "
+        # query += " , t1.mnte_id                                       /* 담당멘티id*/ "
+        # query += " , fn_mp_mte_select_01(t1.mp_id, t1.apl_no) mte_nm        /* 담당멘티명*/ "
+        # # query += " , t1.mnte_nm                        as mte_nm        /* 담당멘티명*/ "
+        # query += " , t1.sch_nm                         as sch_yr        /* 학교명*/ "
+        # query += " , t1.mtr_sub                        as obj_sub     /* 지도과목*/ " 
 
-        query += " , substring(t1.rep_dt,  1, 10)      as rep_dt      /* 보고서작성일         */ "
-        query += " , substring(t1.req_dt,  1, 10)      as req_dt      /* 승인요청일         */ "
-        query += " , t1.appr_nm                                       /* 승인자명            */ "
-        query += " , substring(t1.appr_dt,  1, 10)     as appr_dt     /* 보호자 승인일시      */ "
-        query += " , t1.mgr_id                         as mgr_id      /* 관리자id            */ "
-        query += " , (select mgr_nm from service20_mpgm where mp_id = t1.mp_id) as mgr_nm "
-        query += " , substring(t1.mgr_dt,  1, 10)      as mgr_dt      /* 관리자 승인일시      */ "
-        query += " , t1.status                                        /* 상태(mp0070)         */ "
-        query += " , c1.std_detl_code_nm               as status_nm    "
-        query += " , t1.mtr_obj                                       /* 학습목표            */ "
-        query += " , t1.mtr_desc                                      /* 학습내용            */ "
-        query += " , t1.coatching                                     /* 학습외 지도(상담)   */ "
-        query += " , t1.spcl_note                                     /* 특이사항            */ "
-        query += " , t1.mtr_revw                                      /* 소감문            */ "
-        query += " , t2.unv_nm                                        /* 지원자 대학교 명      */ "
-        query += " , t2.cllg_nm                                       /* 지원자 대학 명      */ "
-        query += " , t2.dept_nm                                       /* 지원자 학부/학과 명 */       "                                    
-        query += " , t1.apl_no                                        /* 멘토 지원 no         */ "
-        query += " , t1.rep_no                                        /* 보고서 no         */ "
-        query += " , t1.rep_div                                       /* 보고서 구분(mp0062) */ "
-        query += " , t1.rep_ttl                                       /* 보고서 제목         */ "
-        query += " , t1.appr_id                                       /* 승인자id            */ "
-        query += " , (case when date_format(last_day(concat(t1.rep_ym,'01')),'%%Y%%m%%d') > date_format(now(),'%%Y%%m%%d') then 'N' else 'Y' end) as appr_yn "        
-        query += " , last_day(concat(t1.rep_ym,'01')) as last_day "        
-        query += " , fn_mp_att_select_01(t2.mp_id, t2.apl_id, t1.rep_ym ) AS att "
-        query += " from service20_mp_rep t1                              /* 프로그램 보고서      */ "
-        query += " left join service20_mp_mtr t2  on (t2.mp_id   = t1.mp_id and t2.apl_no = t1.apl_no) "
-        query += " left join service20_com_cdd c1 on (c1.std_grp_code  = 'MP0070'  and c1.std_detl_code = t1.status)  "
-        query += " left join service20_com_cdd c2 on (c2.std_grp_code  = 'MP0062'  and c2.std_detl_code = t1.rep_div)  "
-        query += " where 1=1 "
-        query += " and t1.mp_id     = '"+l_mp_id+"'     "
-        query += " and t2.apl_id    =  '"+l_apl_id+"' "
-        query += " and t1.rep_ym    = '"+l_rep_ym+"' "       
+        # query += " , t1.att_desc                       as aaa          /* 출석현황*/ "
 
+        # query += " , substring(t1.rep_dt,  1, 10)      as rep_dt      /* 보고서작성일         */ "
+        # query += " , substring(t1.req_dt,  1, 10)      as req_dt      /* 승인요청일         */ "
+        # query += " , t1.appr_nm                                       /* 승인자명            */ "
+        # query += " , substring(t1.appr_dt,  1, 10)     as appr_dt     /* 보호자 승인일시      */ "
+        # query += " , t1.mgr_id                         as mgr_id      /* 관리자id            */ "
+        # query += " , (select mgr_nm from service20_mpgm where mp_id = t1.mp_id) as mgr_nm "
+        # query += " , substring(t1.mgr_dt,  1, 10)      as mgr_dt      /* 관리자 승인일시      */ "
+        # query += " , t1.status                                        /* 상태(mp0070)         */ "
+        # query += " , c1.std_detl_code_nm               as status_nm    "
+        # query += " , t1.mtr_obj                                       /* 학습목표            */ "
+        # query += " , t1.mtr_desc                                      /* 학습내용            */ "
+        # query += " , t1.coatching                                     /* 학습외 지도(상담)   */ "
+        # query += " , t1.spcl_note                                     /* 특이사항            */ "
+        # query += " , t1.mtr_revw                                      /* 소감문            */ "
+        # query += " , t2.unv_nm                                        /* 지원자 대학교 명      */ "
+        # query += " , t2.cllg_nm                                       /* 지원자 대학 명      */ "
+        # query += " , t2.dept_nm                                       /* 지원자 학부/학과 명 */       "                                    
+        # query += " , t1.apl_no                                        /* 멘토 지원 no         */ "
+        # query += " , t1.rep_no                                        /* 보고서 no         */ "
+        # query += " , t1.rep_div                                       /* 보고서 구분(mp0062) */ "
+        # query += " , t1.rep_ttl                                       /* 보고서 제목         */ "
+        # query += " , t1.appr_id                                       /* 승인자id            */ "
+        # query += " , (case when date_format(last_day(concat(t1.rep_ym,'01')),'%%Y%%m%%d') > date_format(now(),'%%Y%%m%%d') then 'N' else 'Y' end) as appr_yn "        
+        # query += " , last_day(concat(t1.rep_ym,'01')) as last_day "        
+        # query += " , fn_mp_att_select_01(t2.mp_id, t2.apl_id, t1.rep_ym ) AS att "
+        # query += " from service20_mp_rep t1                              /* 프로그램 보고서      */ "
+        # query += " left join service20_mp_mtr t2  on (t2.mp_id   = t1.mp_id and t2.apl_no = t1.apl_no) "
+        # query += " left join service20_com_cdd c1 on (c1.std_grp_code  = 'MP0070'  and c1.std_detl_code = t1.status)  "
+        # query += " left join service20_com_cdd c2 on (c2.std_grp_code  = 'MP0062'  and c2.std_detl_code = t1.rep_div)  "
+        # query += " where 1=1 "
+        # query += " and t1.mp_id     = '"+l_mp_id+"'     "
+        # query += " and t2.apl_id    =  '"+l_apl_id+"' "
+        # query += " and t1.rep_ym    = '"+l_rep_ym+"' "       
+
+        query = f"""
+                SELECT t1.id
+                    , t1.mp_id /* 멘토링 프로그램id   */
+                    , t1.rep_div /* 보고서 구분(mp0062) */
+                    , t1.rep_ttl /* 보고서 제목 : 내용  */
+                    , c2.std_detl_code_nm AS rep_div_nm
+                    , CONCAT(t2.apl_id, '/', t2.apl_nm) AS apl_m /* 지원자(멘토,학생) 명*/
+                    , t1.tchr_id /* 담당멘티id*/
+                    , t1.tchr_nm AS teacher /* 담당멘티명*/
+                    , t1.mnte_id /* 담당멘티id*/
+                    , fn_mp_mte_select_01(t1.mp_id, t1.apl_no) mte_nm /* 담당멘티명*/
+                    , t1.sch_nm AS sch_yr /* 학교명*/
+                    , t1.mtr_sub AS obj_sub /* 지도과목*/
+                    , CASE WHEN t1.rep_div = 'F' THEN (SELECT CONCAT(COUNT(*), '회 ', ifnull(SUM(s1.appr_tm), 0), '시간')
+                                                        FROM service20_mp_att s1 
+                                                        WHERE s1.mp_id = t1.mp_id
+                                                        AND s1.apl_no = t1.apl_no) /*출석현황*/
+                            else (SELECT CONCAT(COUNT(*), '회 ', ifnull(SUM(s1.appr_tm), 0), '시간')
+                                    FROM service20_mp_att s1 
+                                WHERE s1.mp_id = t1.mp_id
+                                    AND s1.apl_no = t1.apl_no
+                                    AND ( s1.att_sdt >= CONCAT(t1.rep_ym, '01') AND s1.att_sdt < CONCAT(DATE_FORMAT(DATE(CONCAT(t1.rep_ym, '01') + INTERVAL 1 MONTH), '%%y%%m'), '01'))) END AS aaa
+                    , t1.att_desc AS aaa2 /* 출석현황*/
+                    , SUBSTRING(t1.rep_dt, 1, 10) AS rep_dt /* 보고서작성일         */
+                    , SUBSTRING(t1.req_dt, 1, 10) AS req_dt /* 승인요청일         */
+                    , t1.appr_nm /* 승인자명            */
+                    , SUBSTRING(t1.appr_dt, 1, 10) AS appr_dt /* 보호자 승인일시      */
+                    , t1.mgr_id AS mgr_id /* 관리자id            */
+                    , ( SELECT mgr_nm
+                        FROM service20_mpgm 
+                        WHERE mp_id = t1.mp_id ) AS mgr_nm
+                    , SUBSTRING(t1.mgr_dt, 1, 10) AS mgr_dt /* 관리자 승인일시      */
+                    , t1.status /* 상태(mp0070)         */
+                    , c1.std_detl_code_nm AS status_nm
+                    , t1.mtr_obj /* 학습목표            */
+                    , t1.mtr_desc /* 학습내용            */
+                    , t1.coatching /* 학습외 지도(상담)   */
+                    , t1.spcl_note /* 특이사항            */
+                    , t1.mtr_revw /* 소감문            */
+                    , t2.unv_nm /* 지원자 대학교 명      */
+                    , t2.cllg_nm /* 지원자 대학 명      */
+                    , t2.dept_nm /* 지원자 학부/학과 명 */
+                    , t1.apl_no /* 멘토 지원 no         */
+                    , t1.rep_no /* 보고서 no         */
+                    , t1.rep_div /* 보고서 구분(mp0062) */
+                    , t1.rep_ttl /* 보고서 제목         */
+                    , t1.appr_id /* 승인자id            */
+                    , (CASE WHEN DATE_FORMAT(last_day(CONCAT(t1.rep_ym, '01')), '%%Y%%m%%d') > DATE_FORMAT(NOW(), '%%Y%%m%%d') THEN 'N'
+                            ELSE 'Y' END) AS appr_yn
+                    , last_day(CONCAT(t1.rep_ym, '01')) AS last_day
+                    , fn_mp_att_select_01(t2.mp_id, t2.apl_id, t1.rep_ym) AS att
+                FROM service20_mp_rep t1 /* 프로그램 보고서      */
+                LEFT JOIN service20_mp_mtr t2 ON (t2.mp_id = t1.mp_id AND t2.apl_no = t1.apl_no)
+                LEFT JOIN service20_com_cdd c1 ON (c1.std_grp_code = 'MP0070' AND c1.std_detl_code = t1.status)
+                LEFT JOIN service20_com_cdd c2 ON (c2.std_grp_code = 'MP0062' AND c2.std_detl_code = t1.rep_div)
+                WHERE 1 = 1
+                AND t1.mp_id = '{l_mp_id}'
+                AND t2.apl_id = '{l_apl_id}'
+                AND t1.rep_ym = '{l_rep_ym}';
+        """
+
+        print(query)
         queryset = mp_rep.objects.raw(query)
 
         serializer_class = self.get_serializer_class()
@@ -14347,107 +14410,186 @@ class MP0105M_detail_2(generics.ListAPIView):
         queryset = self.get_queryset()
 
         # /*보고서 상세*/
-        query = "select t2.id,t1.mp_id       /* 멘토링 프로그램id   */ "
-        query += "     , t2.rep_div     /* 보고서 구분(mp0062) */"
-        query += "     , t2.rep_ttl     /* 보고서 제목 : 내용  */"
-        query += "     , (select std_detl_code_nm "
-        query += "          from service20_com_cdd "
-        query += "         where std_grp_code  = 'mp0062' "
-        query += "           and std_detl_code = t2.rep_div)   as rep_div_nm     "
-        query += "     , concat(t1.apl_id, '/', t1.apl_nm)     as apl_m       /* 지원자(멘토,학생) 명*/ "
-        query += "     , t3.tchr_id     /* 지도교사 id */"
-        query += "     , t3.tchr_nm  as teacher   /* 지도교사 명 */     "
-        query += "     , t3.mnte_id     /* 멘티id */ "
-        query += "     , t3.mnte_nm  as mte_nm"
-        query += "     , t3.sch_yr      /* 학교명/학년 */ "
-        query += "     , t3.mtr_sub  as obj_sub   /* 지도과목 */ "
-        query += "     , (select concat(count(*), '회 ', ifnull(sum(s1.appr_tm), 0), '시간') "
-        query += "         from service20_mp_att s1 "
-        query += "        where s1.mp_id = t1.mp_id "
-        query += "          and s1.apl_no = t1.apl_no "
-        query += "          and "
-        query += "              ("
-        query += "                  s1.att_sdt >= concat(t2.rep_ym, '01') "
-        query += "              and s1.att_sdt  < concat(date_format(date(concat(t2.rep_ym, '01') + interval 1 month), '%%y%%m'), '01')"
-        query += "              ) "
-        query += "       ) as aaa   /*출석현황*/  "
-        query += "     , null as rep_dt "
-        query += "     , null as req_dt              "
-        query += "     , t3.mp_plc "
-        query += "     , case when t3.mp_plc = 'b' then t3.grd_id else t3.tchr_id end as appr_id /*장소가 멘티가정이면 승인자는 보호자, 그렇지 않으면 교사*/";
-        query += "     , case when t3.mp_plc = 'b' then t3.grd_nm else t3.tchr_nm end as appr_nm";
-        query += "     , null       as appr_dt "
-        query += "     , t4.mgr_id  as mgr_id "
-        query += "     , t4.mgr_nm  as mgr_nm "
-        query += "     , null       as mgr_dt"
-        query += "     , t2.status "
-        query += "     , c1.std_detl_code_nm as status_nm     "
-        query += "     , t2.mtr_obj "
-        query += "     , t2.mtr_desc as mtr_desc ";
-        query += "     , t2.coatching as coatching "
-        query += "     , t2.spcl_note as spcl_note "
-        query += "     , t2.mtr_revw as mtr_revw    "
-        query += "     , fn_mp_att_select_01(t1.mp_id, t1.apl_id, t2.rep_ym ) AS att "
-        query += "     , t1.apl_no "
-        query += "     , t1.apl_id "
-        query += "     , t2.rep_no "
-        query += "     , t2.rep_ym "
-        query += "     , t3.grd_id    /*주보호자id*/";
-        query += "     , t3.grd_nm    /*보호자명*/";
-        query += "     , (case when date_format(last_day(concat(t2.rep_ym,'01')),'%%Y%%m%%d') > date_format(now(),'%%Y%%m%%d') then 'N' else 'Y' end) as appr_yn "
-        query += "     , last_day(concat(t2.rep_ym,'01')) as last_day "
-        query += "  from service20_mp_mtr t1 "
-        query += "   left join service20_mp_rep t2 "
-        query += "       on ("
-        query += "           t2.mp_id = t1.mp_id "
-        query += "       and t2.apl_no = t1.apl_no"
-        query += "       ) "
-        query += "   left join service20_mpgm t4 "
-        query += "       on ("
-        query += "           t4.mp_id = t1.mp_id"
-        query += "       ) "
-        query += "   left join "
-        query += "       (select distinct s2.tchr_id  "
-        query += "            , s2.tchr_nm  "
-        query += "            , s2.mnte_id  "
-        query += "            , s2.mnte_nm "
-        query += "            , concat(s2.sch_nm, '/', s2.sch_yr, '학년') as sch_yr /* 학교명/학년 */ "
-        query += "            , s3.mtr_sub /* 지도과목 */"
-        query += "            , truncate(rand()*7 + 1, 0) as att_desc  "
-        query += "            , s3.mtr_obj "
-        query += "            , s1.mp_id "
-        query += "            , s1.apl_no "
-        query += "            , s1.apl_id "
-        query += "            , s2.grd_id "
-        query += "            , s2.grd_nm "
-        query += "            , s2.mp_plc "
-        query += "         from service20_mp_mtr s1 "
-        query += "          left join service20_mp_mte s2 "
-        query += "              on ("
-        query += "                  s2.mp_id = s1.mp_id "
-        query += "              and s2.apl_no = s1.apl_no"
-        query += "              ) "
-        query += "          left join service20_mp_plnh s3 "
-        query += "              on ("
-        query += "                  s3.mp_id = s1.mp_id "
-        query += "              and s3.apl_no = s1.apl_no"
-        query += "              ) "
-        query += "       ) t3 "
-        query += "       on ("
-        query += "           t3.mp_id = t1.mp_id "
-        query += "       and t3.apl_no = t1.apl_no"
-        query += "       ) "
-        query += "   left join service20_com_cdd c1 "
-        query += "       on ("
-        query += "           c1.std_grp_code = 'mp0070'  "
-        query += "       and c1.std_detl_code = t2.status"
-        query += "       ) "
-        query += " where t1.mp_id = '"+str(mp_id)+"' "
-        query += "   and t1.apl_id = '"+str(apl_id)+"' "
-        # query += "   and t2.status = '00' "
-        query += "   and t2.rep_ym = '"+str(rep_ym)+"'"
+        # query = "select t2.id,t1.mp_id       /* 멘토링 프로그램id   */ "
+        # query += "     , t2.rep_div     /* 보고서 구분(mp0062) */"
+        # query += "     , t2.rep_ttl     /* 보고서 제목 : 내용  */"
+        # query += "     , (select std_detl_code_nm "
+        # query += "          from service20_com_cdd "
+        # query += "         where std_grp_code  = 'mp0062' "
+        # query += "           and std_detl_code = t2.rep_div)   as rep_div_nm     "
+        # query += "     , concat(t1.apl_id, '/', t1.apl_nm)     as apl_m       /* 지원자(멘토,학생) 명*/ "
+        # query += "     , t3.tchr_id     /* 지도교사 id */"
+        # query += "     , t3.tchr_nm  as teacher   /* 지도교사 명 */     "
+        # query += "     , t3.mnte_id     /* 멘티id */ "
+        # query += "     , t3.mnte_nm  as mte_nm"
+        # query += "     , t3.sch_yr      /* 학교명/학년 */ "
+        # query += "     , t3.mtr_sub  as obj_sub   /* 지도과목 */ "
+        # query += "     , (select concat(count(*), '회 ', ifnull(sum(s1.appr_tm), 0), '시간') "
+        # query += "         from service20_mp_att s1 "
+        # query += "        where s1.mp_id = t1.mp_id "
+        # query += "          and s1.apl_no = t1.apl_no "
+        # query += "          and "
+        # query += "              ("
+        # query += "                  s1.att_sdt >= concat(t2.rep_ym, '01') "
+        # query += "              and s1.att_sdt  < concat(date_format(date(concat(t2.rep_ym, '01') + interval 1 month), '%%y%%m'), '01')"
+        # query += "              ) "
+        # query += "       ) as aaa   /*출석현황*/  "
+        # query += "     , null as rep_dt "
+        # query += "     , null as req_dt              "
+        # query += "     , t3.mp_plc "
+        # query += "     , case when t3.mp_plc = 'b' then t3.grd_id else t3.tchr_id end as appr_id /*장소가 멘티가정이면 승인자는 보호자, 그렇지 않으면 교사*/";
+        # query += "     , case when t3.mp_plc = 'b' then t3.grd_nm else t3.tchr_nm end as appr_nm";
+        # query += "     , null       as appr_dt "
+        # query += "     , t4.mgr_id  as mgr_id "
+        # query += "     , t4.mgr_nm  as mgr_nm "
+        # query += "     , null       as mgr_dt"
+        # query += "     , t2.status "
+        # query += "     , c1.std_detl_code_nm as status_nm     "
+        # query += "     , t2.mtr_obj "
+        # query += "     , t2.mtr_desc as mtr_desc ";
+        # query += "     , t2.coatching as coatching "
+        # query += "     , t2.spcl_note as spcl_note "
+        # query += "     , t2.mtr_revw as mtr_revw    "
+        # query += "     , fn_mp_att_select_01(t1.mp_id, t1.apl_id, t2.rep_ym ) AS att "
+        # query += "     , t1.apl_no "
+        # query += "     , t1.apl_id "
+        # query += "     , t2.rep_no "
+        # query += "     , t2.rep_ym "
+        # query += "     , t3.grd_id    /*주보호자id*/";
+        # query += "     , t3.grd_nm    /*보호자명*/";
+        # query += "     , (case when date_format(last_day(concat(t2.rep_ym,'01')),'%%Y%%m%%d') > date_format(now(),'%%Y%%m%%d') then 'N' else 'Y' end) as appr_yn "
+        # query += "     , last_day(concat(t2.rep_ym,'01')) as last_day "
+        # query += "  from service20_mp_mtr t1 "
+        # query += "   left join service20_mp_rep t2 "
+        # query += "       on ("
+        # query += "           t2.mp_id = t1.mp_id "
+        # query += "       and t2.apl_no = t1.apl_no"
+        # query += "       ) "
+        # query += "   left join service20_mpgm t4 "
+        # query += "       on ("
+        # query += "           t4.mp_id = t1.mp_id"
+        # query += "       ) "
+        # query += "   left join "
+        # query += "       (select distinct s2.tchr_id  "
+        # query += "            , s2.tchr_nm  "
+        # query += "            , s2.mnte_id  "
+        # query += "            , s2.mnte_nm "
+        # query += "            , concat(s2.sch_nm, '/', s2.sch_yr, '학년') as sch_yr /* 학교명/학년 */ "
+        # query += "            , s3.mtr_sub /* 지도과목 */"
+        # query += "            , truncate(rand()*7 + 1, 0) as att_desc  "
+        # query += "            , s3.mtr_obj "
+        # query += "            , s1.mp_id "
+        # query += "            , s1.apl_no "
+        # query += "            , s1.apl_id "
+        # query += "            , s2.grd_id "
+        # query += "            , s2.grd_nm "
+        # query += "            , s2.mp_plc "
+        # query += "         from service20_mp_mtr s1 "
+        # query += "          left join service20_mp_mte s2 "
+        # query += "              on ("
+        # query += "                  s2.mp_id = s1.mp_id "
+        # query += "              and s2.apl_no = s1.apl_no"
+        # query += "              ) "
+        # query += "          left join service20_mp_plnh s3 "
+        # query += "              on ("
+        # query += "                  s3.mp_id = s1.mp_id "
+        # query += "              and s3.apl_no = s1.apl_no"
+        # query += "              ) "
+        # query += "       ) t3 "
+        # query += "       on ("
+        # query += "           t3.mp_id = t1.mp_id "
+        # query += "       and t3.apl_no = t1.apl_no"
+        # query += "       ) "
+        # query += "   left join service20_com_cdd c1 "
+        # query += "       on ("
+        # query += "           c1.std_grp_code = 'mp0070'  "
+        # query += "       and c1.std_detl_code = t2.status"
+        # query += "       ) "
+        # query += " where t1.mp_id = '"+str(mp_id)+"' "
+        # query += "   and t1.apl_id = '"+str(apl_id)+"' "
+        # # query += "   and t2.status = '00' "
+        # query += "   and t2.rep_ym = '"+str(rep_ym)+"'"
 
-
+        query = f"""
+                SELECT t2.id
+                    , t1.mp_id /* 멘토링 프로그램id   */
+                    , t2.rep_div /* 보고서 구분(mp0062) */
+                    , t2.rep_ttl /* 보고서 제목 : 내용  */
+                    , ( SELECT std_detl_code_nm
+                        FROM service20_com_cdd
+                        WHERE std_grp_code = 'MP0062'
+                            AND std_detl_code = t2.rep_div) AS rep_div_nm
+                    , CONCAT(t1.apl_id, '/', t1.apl_nm) AS apl_m /* 지원자(멘토,학생) 명*/
+                    , t3.tchr_id /* 지도교사 id */
+                    , t3.tchr_nm AS teacher /* 지도교사 명 */
+                    , t3.mnte_id /* 멘티id */
+                    , t3.mnte_nm AS mte_nm
+                    , t3.sch_yr /* 학교명/학년 */
+                    , t3.mtr_sub AS obj_sub /* 지도과목 */
+                    , CASE WHEN t2.rep_div = 'F' THEN (SELECT CONCAT(COUNT(*), '회 ', ifnull(SUM(s1.appr_tm), 0), '시간')
+                                                        FROM service20_mp_att s1 
+                                                        WHERE s1.mp_id = t1.mp_id
+                                                        AND s1.apl_no = t1.apl_no) /*출석현황*/
+                            else (SELECT CONCAT(COUNT(*), '회 ', ifnull(SUM(s1.appr_tm), 0), '시간')
+                                    FROM service20_mp_att s1 
+                                WHERE s1.mp_id = t1.mp_id
+                                    AND s1.apl_no = t1.apl_no
+                                    AND ( s1.att_sdt >= CONCAT(t2.rep_ym, '01') AND s1.att_sdt < CONCAT(DATE_FORMAT(DATE(CONCAT(t2.rep_ym, '01') + INTERVAL 1 MONTH), '%%y%%m'), '01'))) END AS aaa
+                    , NULL AS rep_dt
+                    , NULL AS req_dt
+                    , t3.mp_plc
+                    , CASE WHEN t3.mp_plc = 'b' THEN t3.grd_id
+                            ELSE t3.tchr_id END AS appr_id /*장소가 멘티가정이면 승인자는 보호자, 그렇지 않으면 교사*/
+                    , CASE WHEN t3.mp_plc = 'b' THEN t3.grd_nm
+                            ELSE t3.tchr_nm END AS appr_nm
+                    , NULL AS appr_dt
+                    , t4.mgr_id AS mgr_id
+                    , t4.mgr_nm AS mgr_nm
+                    , NULL AS mgr_dt
+                    , t2.status
+                    , c1.std_detl_code_nm AS status_nm
+                    , t2.mtr_obj
+                    , t2.mtr_desc AS mtr_desc
+                    , t2.coatching AS coatching
+                    , t2.spcl_note AS spcl_note
+                    , t2.mtr_revw AS mtr_revw
+                    , fn_mp_att_select_01(t1.mp_id, t1.apl_id, t2.rep_ym ) AS att
+                    , t1.apl_no
+                    , t1.apl_id
+                    , t2.rep_no
+                    , t2.rep_ym
+                    , t3.grd_id /*주보호자id*/
+                    , t3.grd_nm /*보호자명*/
+                    , (CASE WHEN DATE_FORMAT(last_day(CONCAT(t2.rep_ym, '01')), '%%Y%%m%%d') > DATE_FORMAT(NOW(), '%%Y%%m%%d') THEN 'N'
+                            ELSE 'Y' END) AS appr_yn
+                    , last_day(CONCAT(t2.rep_ym, '01')) AS last_day
+                FROM service20_mp_mtr t1
+                LEFT JOIN service20_mp_rep t2 ON (t2.mp_id = t1.mp_id AND t2.apl_no = t1.apl_no)
+                LEFT JOIN service20_mpgm t4 ON (t4.mp_id = t1.mp_id)
+                LEFT JOIN (   SELECT
+                            DISTINCT s2.tchr_id
+                                    , s2.tchr_nm
+                                    , s2.mnte_id
+                                    , s2.mnte_nm
+                                    , CONCAT(s2.sch_nm, '/', s2.sch_yr, '학년') AS sch_yr /* 학교명/학년 */
+                                    , s3.mtr_sub /* 지도과목 */
+                                    , TRUNCATE (RAND()* 7 + 1, 0) AS att_desc
+                                    , s3.mtr_obj
+                                    , s1.mp_id
+                                    , s1.apl_no
+                                    , s1.apl_id
+                                    , s2.grd_id
+                                    , s2.grd_nm
+                                    , s2.mp_plc
+                                FROM service20_mp_mtr s1
+                                LEFT JOIN service20_mp_mte s2 ON (s2.mp_id = s1.mp_id AND s2.apl_no = s1.apl_no)
+                                LEFT JOIN service20_mp_plnh s3 ON (s3.mp_id = s1.mp_id AND s3.apl_no = s1.apl_no) ) t3 ON (t3.mp_id = t1.mp_id AND t3.apl_no = t1.apl_no)
+                LEFT JOIN service20_com_cdd c1 ON (c1.std_grp_code = 'MP0070' AND c1.std_detl_code = t2.status )
+                WHERE t1.mp_id = '{mp_id}'
+                AND t1.apl_id = '{apl_id}'
+                AND t2.rep_ym = '{rep_ym}'
+        """
+        print(query)
         queryset = mp_rep.objects.raw(query)
 
         serializer_class = self.get_serializer_class()
