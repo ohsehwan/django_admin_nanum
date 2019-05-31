@@ -701,6 +701,18 @@ def login_login(request):
                                 query_result = cursor2.execute(insert_query)    
                                 # insert
 
+                                # update (mp_mtr)
+                                update_query = ""
+                                update_query += "update mp_mtr set "
+                                update_query += " , bank_acct   /* 은행계좌번호 */   = CASE WHEN '"+str(row[28])+"' =  'None' THEN NULL ELSE '"+str(row[28])+"' END"
+                                update_query += " , bank_cd     /* 은행코드 */      = CASE WHEN '"+str(row[29])+"' =  'None' THEN NULL ELSE '"+str(row[29])+"' END"
+                                update_query += " , bank_nm     /* 은행명 */        = CASE WHEN '"+str(row[30])+"' =  'None' THEN NULL ELSE '"+str(row[30])+"' END"
+                                update_query += " , bank_dpsr   /* 예금주 */        = CASE WHEN '"+str(row[31])+"' =  'None' THEN NULL ELSE '"+str(row[31])+"' END"
+                                update_query += " where apl_id = '"+str(row[0])+"' and status < '90'"
+                                cursor.execute(update_query)
+                                # update (mp_mtr)
+
+
                                 mentor_query = " select mntr_id from service20_mentor where apl_id = '"+str(row[0])+"'"
                                 mentor_cursor = connection.cursor()
                                 query_result = mentor_cursor.execute(mentor_query)    
