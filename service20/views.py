@@ -703,7 +703,7 @@ def login_login(request):
 
                                 # update (mp_mtr)
                                 update_query = ""
-                                update_query += "update mp_mtr set "
+                                update_query += "update service20_mp_mtr set "
                                 update_query += " , bank_acct   /* 은행계좌번호 */   = CASE WHEN '"+str(row[28])+"' =  'None' THEN NULL ELSE '"+str(row[28])+"' END"
                                 update_query += " , bank_cd     /* 은행코드 */      = CASE WHEN '"+str(row[29])+"' =  'None' THEN NULL ELSE '"+str(row[29])+"' END"
                                 update_query += " , bank_nm     /* 은행명 */        = CASE WHEN '"+str(row[30])+"' =  'None' THEN NULL ELSE '"+str(row[30])+"' END"
