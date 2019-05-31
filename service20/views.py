@@ -709,7 +709,8 @@ def login_login(request):
                                 update_query += " , bank_nm     /* 은행명 */        = CASE WHEN '"+str(row[30])+"' =  'None' THEN NULL ELSE '"+str(row[30])+"' END"
                                 update_query += " , bank_dpsr   /* 예금주 */        = CASE WHEN '"+str(row[31])+"' =  'None' THEN NULL ELSE '"+str(row[31])+"' END"
                                 update_query += " where apl_id = '"+str(row[0])+"' and status < '90'"
-                                cursor.execute(update_query)
+                                cursor_update = connection.cursor()
+                                cursor_update.execute(update_query)
                                 # update (mp_mtr)
 
 
