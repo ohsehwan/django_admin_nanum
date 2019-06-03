@@ -10447,6 +10447,7 @@ class popupTeam_list(generics.ListAPIView):
         query += "     , t2.apl_nm as apl_nm "
         query += "     , t3.ldr_id as ldr_id "
         query += "     , t2.apl_no as apl_no "
+        query += "     , t2.score3 as score3 "
         query += "  from service20_mp_team_mem t1 "
         query += "  left join service20_mp_mtr t2 on (t2.mp_id = t1.mp_id and t2.apl_no = t1.apl_no and t2.team_id = t1.team_id) "
         query += "  left join service20_mp_team t3 on (t3.mp_id = t1.mp_id and t3.team_id = t1.team_id) "
