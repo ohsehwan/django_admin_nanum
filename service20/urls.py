@@ -423,10 +423,18 @@ urlpatterns = [
     path('MP01041M/insert/', MP01041M_Insert, name='MP01041M_Insert'),
     # 출석 소명
     path('MP01041M/req/', MP01041M_req, name='MP01041M_req'),
+    # 출석 수정
+    path('MP01041M/upd/', MP01041M_upd, name='MP01041M_upd'),
     # insert 후 max att_no, req_no 가져오기
     path('MP01041M/att/max/', MP01041M_att_max.as_view(), name='MP01041M_att_max'),
-    # 출석 파일 업로드
+    # 출석(소명) 파일 업로드
     path('MP01041M/upload/', MP01041M_upload, name='MP01041M_upload'),
+    # 출석(수정) 파일 업로드
+    path('MP01041M/upload/upd/', MP01041M_upload_upd, name='MP01041M_upload_upd'),
+    # 학습외 출석 여부
+    path('MP01041M/att/cnt/', MP01041M_att_cnt.as_view(), name='MP01041M_att_cnt'),
+    # 학습외 보고서 추가
+    path('MP01041M/att/insert/', MP01041M_att_insert, name='MP01041M_att_insert'),
     ########################################################################################
     # 출석 변경 소명(MP01041M - END )
     #
