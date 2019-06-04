@@ -7525,7 +7525,7 @@ class MP0101M_adm_list(generics.ListAPIView):
         # 팀 리더
         query += " (select ldr_id from service20_mp_team where mp_id = A.mp_id and team_id = A.team_id) ldr_id, "
 
-        query += " C.mp_name,B.pr_yr,ifnull(B.pr_sch_yr,'0') as pr_sch_yr, ifnull(B.pr_term_div,'0') as pr_term_div, ifnull(A.score1,'0') as score1, ifnull(A.score2,'0') as score2, ifnull(A.score3,'0') as score3, ifnull(A.score4,'') as score4,A.* from service20_mp_mtr A left join service20_vw_nanum_stdt B on (A.apl_id = B.apl_id),service20_mpgm C where A.mp_id = C.mp_id and A.mp_id = '"+mp_ida+"' and A.apl_id='"+ida+"'"
+        query += " C.mp_name,B.pr_yr,ifnull(B.pr_sch_yr,'0') as pr_sch_yr, ifnull(B.pr_term_div,'0') as pr_term_div, ifnull(A.score1,'0') as score1, ifnull(A.score2,'0') as score2, ifnull(A.score3,'0') as score3, ifnull(A.score4,'0') as score4,A.* from service20_mp_mtr A left join service20_vw_nanum_stdt B on (A.apl_id = B.apl_id),service20_mpgm C where A.mp_id = C.mp_id and A.mp_id = '"+mp_ida+"' and A.apl_id='"+ida+"'"
         queryset = mp_mtr.objects.raw(query)
         print(query)
         serializer_class = self.get_serializer_class()
