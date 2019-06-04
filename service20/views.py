@@ -11053,7 +11053,7 @@ class MP0102M_list(generics.ListAPIView):
                 FROM service20_mp_spc t1
                 LEFT JOIN service20_mp_spc_mtr t2 on (t2.mp_id = t1.mp_id AND t2.spc_no = t1.spc_no)
                 LEFT JOIN service20_mpgm t3 ON (t3.mp_id = t1.mp_id)
-                LEFT JOIN service20_mp_att t4 ON (t4.mp_id = t1.mp_id AND t4.apl_no = t2.apl_no and t4.spc_no = t1.spc_no)
+                LEFT JOIN service20_mp_att t4 ON (t4.mp_id = t1.mp_id AND t4.apl_no = t2.apl_no and t4.spc_no = '1')
                 LEFT JOIN service20_com_cdd t5 ON (t5.std_grp_code = 'MP0084' AND t5.std_detl_code = t1.status)
                 LEFT JOIN service20_com_cdd t6 ON (t6.std_grp_code = 'MP0099' AND t6.std_detl_code = t2.cncl_rsn)
                 WHERE t1.yr = '{l_yr}'
@@ -13782,7 +13782,8 @@ def MP01041M_req(request):
     # 출석 원본 수정
     query = "/* 출석 원본 수정 */"
     query += " update service20_mp_att"
-    query += "   set att_sdt = concat('" + str(l_att_sdt) + "', ' " + str(l_att_stm_h) + "', ':', '" + str(l_att_stm_m) + "', ':00')"
+    query += "   set mp_div = '" + str(l_mp_div) + "' "
+    query += "     , att_sdt = concat('" + str(l_att_sdt) + "', ' " + str(l_att_stm_h) + "', ':', '" + str(l_att_stm_m) + "', ':00')"
     query += "     , att_edt = concat('" + str(l_att_edt) + "', ' " + str(l_att_etm_h) + "', ':', '" + str(l_att_etm_m) + "', ':00')"
     query += "     , elap_tm = concat('" + str(l_elap_tm) + "', ':00')"
     query += "     , appr_tm = '" + str(l_appr_tm) + "'"
@@ -13793,6 +13794,70 @@ def MP01041M_req(request):
     # else:
     #     query += "     , mtr_pic = '" + str(l_mtr_pic[i]) + "'"
     query += "     , expl_yn = 'Y'"
+    query += " where mp_id = '" + str(l_mp_id) + "'"
+    query += "   and apl_no = '" + str(l_apl_no) + "'"
+    query += "   and att_no = '" + str(l_att_no) + "'"
+
+    print(query)
+    cursor = connection.cursor()
+    query_result = cursor.execute(query)
+    mp_att.objects.filter(mp_id=str(l_mp_id),apl_no=str(l_apl_no),att_no=str(l_att_no)).update(mtr_desc=str(l_mtr_desc))
+
+    context = {'message': 'Ok'}
+
+    return JsonResponse(context,json_dumps_params={'ensure_ascii': True})
+
+# 출석 수정 ###################################################
+@csrf_exempt
+def MP01041M_upd(request):
+    l_mp_id = request.POST.get('u_mp_id', "")
+    l_apl_no = request.POST.get('u_apl_no', "")
+    l_req_no = request.POST.get('u_req_no', "")
+    l_att_no = request.POST.get('u_att_no', "")
+    l_mp_div = request.POST.get('u_mp_div', "")
+    l_att_div = request.POST.get('u_att_div', "")
+    l_mtr_desc = request.POST.get('u_mtr_desc', "")
+    # l_mtr_pic[i] = request.POST.get('u_mtr_pic' + str(i), "")
+    l_att_saddr = request.POST.get('u_att_saddr', "")
+    l_att_eaddr = request.POST.get('u_att_eaddr', "")
+    l_att_sdt = request.POST.get('u_att_sdt', "")
+    l_att_stm_h = request.POST.get('u_att_stm_h', "")
+    l_att_stm_m = request.POST.get('u_att_stm_m', "")
+    l_att_edt = request.POST.get('u_att_edt', "")
+    l_att_etm_h = request.POST.get('u_att_etm_h', "")
+    l_att_etm_m = request.POST.get('u_att_etm_m', "")
+    l_elap_tm = request.POST.get('u_elap_tm', "")
+    l_appr_tm = request.POST.get('u_appr_tm', "")
+    l_exp_amt = request.POST.get('u_exp_amt', "")
+    l_appr_nm = request.POST.get('u_appr_nm', "")
+    l_mgr_nm = request.POST.get('u_mgr_nm', "")
+    l_req_desc = request.POST.get('u_req_desc', "")
+
+    ins_id = request.POST.get('ins_id', "")
+    ins_ip = request.POST.get('ins_ip', "")
+    ins_dt = request.POST.get('ins_dt', "")
+    ins_pgm = request.POST.get('ins_pgm', "")
+    upd_id = request.POST.get('upd_id', "")
+    upd_ip = request.POST.get('upd_ip', "")
+    upd_dt = request.POST.get('upd_dt', "")
+    upd_pgm = request.POST.get('upd_pgm', "")
+
+    client_ip = request.META['REMOTE_ADDR']
+
+    # 출석 원본 수정
+    query = "/* 출석 원본 수정 */"
+    query += " update service20_mp_att"
+    query += "   set mp_div = '" + str(l_mp_div) + "' "
+    query += "     , att_sdt = concat('" + str(l_att_sdt) + "', ' " + str(l_att_stm_h) + "', ':', '" + str(l_att_stm_m) + "', ':00')"
+    query += "     , att_edt = concat('" + str(l_att_edt) + "', ' " + str(l_att_etm_h) + "', ':', '" + str(l_att_etm_m) + "', ':00')"
+    query += "     , elap_tm = concat('" + str(l_elap_tm) + "', ':00')"
+    query += "     , appr_tm = '" + str(l_appr_tm) + "'"
+    # query += "     , mtr_desc = '" + str(l_mtr_desc) + "'"
+    # if i > 0:
+    #     if not l_mtr_pic[i]:
+    #         query += "     , mtr_pic = '" + str(i+1) + str(l_mtr_pic[i]) + "'"
+    # else:
+    #     query += "     , mtr_pic = '" + str(l_mtr_pic[i]) + "'"
     query += " where mp_id = '" + str(l_mp_id) + "'"
     query += "   and apl_no = '" + str(l_apl_no) + "'"
     query += "   and att_no = '" + str(l_att_no) + "'"
@@ -13849,7 +13914,7 @@ class MP01041M_att_max(generics.ListAPIView):
 
         return Response(serializer.data)
 
-# 멘토링 사진 업로드 ###################################################
+# 출석 파일 업로드 ###################################################
 @csrf_exempt
 def MP01041M_upload(request):
     req = request
@@ -13931,6 +13996,252 @@ def MP01041M_upload(request):
         
         return HttpResponse('File Uploaded')
 
+# 출석(수정) 파일 업로드 ###################################################
+@csrf_exempt
+def MP01041M_upload_upd(request):
+    req = request
+    DIR = os.getcwd()
+    UPLOAD_DIR = str(DIR) + '/media/MP01041M/'
+    UPLOAD_DIR = '/NANUM/www/img/mp_attend/'
+    # UPLOAD_DIR = 'img'
+    
+    if request.method == 'POST':
+        l_mp_id = request.POST.get("u_mp_id")
+        l_apl_no = request.POST.get("u_apl_no")
+        l_att_no = request.POST.get("u_att_no")
+        l_req_no = request.POST.get("u_req_no")
+        l_user_id = request.POST.get("user_id")
+        
+        l_req_no_yn = 'Y'
+        if not l_req_no:
+            l_req_no_yn = 'N'
+
+        print(l_mp_id)
+        print(l_apl_no)
+        print(l_att_no)
+        print(l_user_id)
+
+        pic_num = 0
+        for i in range(0,5):
+            try:
+                file = request.FILES['mtr_pic' + str(i)]
+            except MultiValueDictKeyError:
+                file = False
+
+            if file != False:
+                print(file)
+                filename = file._name
+                n_filename = str(l_user_id) + str(l_mp_id) + str(l_apl_no) + str(l_att_no) + str(l_req_no) + str((i+1)) + os.path.splitext(filename)[1]
+                print(n_filename)
+                print (UPLOAD_DIR)
+                
+                fp = open('%s/%s' % (UPLOAD_DIR, n_filename) , 'wb')
+
+                for chunk in file.chunks():
+                    fp.write(chunk)
+                fp.close()
+
+                cursor = connection.cursor()
+                fullFile = str(UPLOAD_DIR) + str(n_filename)
+                fullFile = "/img/mp_attend/"+ str(n_filename)
+
+                if i == 0:
+                    pic_num = ""
+                else:
+                    pic_num = (i+1)
+
+                query = " update service20_mp_att"
+                query += "   set mtr_pic" + str(pic_num) + " = '" + str(fullFile) + "'"
+                query += " where mp_id = '" + str(l_mp_id) + "'"
+                query += "   and apl_no = '" + str(l_apl_no) + "'"
+                query += "   and att_no = '" + str(l_att_no) + "'"
+
+                print(query)
+                cursor.execute(query)
+        
+        return HttpResponse('File Uploaded')
+
+# 학습외 출석 여부 ###################################################
+class MP01041M_att_cnt_Serializer(serializers.ModelSerializer):
+    id = serializers.SerializerMethodField()
+
+    class Meta:
+        model = mp_att
+        fields = '__all__'
+
+    def get_id(self,obj):
+        return obj.id
+
+class MP01041M_att_cnt(generics.ListAPIView):
+    queryset = mp_att.objects.all()
+    serializer_class = MP01041M_att_cnt_Serializer
+
+    def list(self, request):
+        l_mp_id = request.GET.get('mp_id', "")
+        l_apl_no = request.GET.get('apl_no', "")
+        l_mp_div = request.GET.get('mp_div', "")
+
+        queryset = self.get_queryset()
+
+        query = f"""
+                SELECT id, att_no
+                FROM service20_mp_att
+                WHERE mp_id = '{l_mp_id}'
+                AND apl_no = '{l_apl_no}'
+                AND spc_no = '1'
+                AND mp_div = '{l_mp_div}'
+        """
+
+        print(query)
+        queryset = mp_att.objects.raw(query)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(serializer.data)
+
+
+# 출석 추가 ###################################################
+@csrf_exempt
+def MP01041M_att_insert(request):
+    l_mp_id = request.POST.get('u_mp_id', "")
+    l_apl_no = request.POST.get('u_apl_no', "")
+    l_att_no = request.POST.get('u_att_no', "")
+    l_mp_div = request.POST.get('u_mp_div', "")
+    l_att_div = request.POST.get('u_att_div', "")
+    l_mtr_desc = request.POST.get('u_mtr_desc', "")
+    l_mtr_pic = request.POST.get('u_mtr_pic', "")
+    l_att_saddr = request.POST.get('u_att_saddr', "")
+    l_att_eaddr = request.POST.get('u_att_eaddr', "")
+    l_att_sdt = request.POST.get('u_att_sdt', "")
+    l_att_stm_h = request.POST.get('u_att_stm_h', "")
+    l_att_stm_m = request.POST.get('u_att_stm_m', "")
+    l_att_edt = request.POST.get('u_att_edt', "")
+    l_att_etm_h = request.POST.get('u_att_etm_h', "")
+    l_att_etm_m = request.POST.get('u_att_etm_m', "")
+    l_elap_tm = request.POST.get('u_elap_tm', "")
+    l_appr_tm = request.POST.get('u_appr_tm', "")
+    l_exp_amt = request.POST.get('u_exp_amt', "")
+    l_appr_nm = request.POST.get('u_appr_nm', "")
+    l_mgr_nm = request.POST.get('u_mgr_nm', "")
+    l_req_desc = request.POST.get('u_req_desc', "")
+
+    ins_id = request.POST.get('ins_id', "")
+    ins_ip = request.POST.get('ins_ip', "")
+    ins_dt = request.POST.get('ins_dt', "")
+    ins_pgm = request.POST.get('ins_pgm', "")
+    upd_id = request.POST.get('upd_id', "")
+    upd_ip = request.POST.get('upd_ip', "")
+    upd_dt = request.POST.get('upd_dt', "")
+    upd_pgm = request.POST.get('upd_pgm', "")
+
+    client_ip = request.META['REMOTE_ADDR']
+    
+    att_query = "select ifnull(max(att_no), 0) + 1 as att_no from service20_mp_att t1 where t1.mp_id = '" + str(l_mp_id) + "' and t1.apl_no = '" + str(l_apl_no) + "'"
+    cursor = connection.cursor()
+    cursor.execute(att_query)    
+    results = namedtuplefetchall(cursor)    
+    att_no = int(results[0].att_no)
+
+    query = f"""
+            /* 출석 추가 */
+            insert into service20_mp_att (
+               mp_id
+               , apl_no
+               , att_no
+               , mp_div
+               , spc_no
+               , att_div
+               , att_sts
+               , att_sdt
+               , att_saddr
+               , att_slat
+               , att_slon
+               , att_sdist
+               , att_edt
+               , att_eaddr
+               , att_elat
+               , att_elon
+               , att_edist
+               , elap_tm
+               , appr_tm
+               /*, mtr_desc*/
+               , mtr_pic
+               , appr_id
+               , appr_nm
+               , appr_dt
+               , mgr_id
+               , mgr_dt
+               , expl_yn
+               , rep_no
+               , exp_div
+               , exp_no
+               , exp_dt
+               , exp_amt
+               , ins_id
+               , ins_ip
+               , ins_dt
+               , ins_pgm
+               , upd_id
+               , upd_ip
+               , upd_dt
+               , upd_pgm
+            ) values (
+               '{l_mp_id}'
+               , '{l_apl_no}'
+               , {att_no}
+               , '{l_mp_div}'
+               , 1
+               , '{l_att_div}'
+               , 'B'
+               , concat('{l_att_sdt}', ' {l_att_stm_h}', ':', '{l_att_stm_m}', ':00')
+               , '{l_att_saddr}'
+               , null
+               , null
+               , null
+               , concat('{l_att_edt}', ' {l_att_etm_h}', ':', '{l_att_etm_m}', ':00')
+               , '{l_att_eaddr}'
+               , null
+               , null
+               , null
+               , concat('{l_elap_tm}', ':00')
+               , '{l_appr_tm}'
+               /*, '{l_mtr_desc}'*/
+               , '{l_mtr_pic}'
+               , null
+               , null
+               , null
+               , null
+               , null
+               , 'N'
+               , null
+               , 'N'
+               , (select exp_no from service20_mp_exp where mp_id = '{l_mp_id}' and apl_no = '{l_apl_no}' and exp_mon = substring(replace('{l_att_sdt}', '-', ''), 1, 6))
+               , null
+               , null
+               , '{ins_id}'
+               , '{client_ip}'
+               , now()
+               , '{ins_pgm}'
+               , '{upd_id}'
+               , '{client_ip}'
+               , now()
+               , '{upd_pgm}'
+            );
+    """
+    print(query)
+    cursor = connection.cursor()
+    query_result = cursor.execute(query)
+    mp_att.objects.filter(mp_id=str(l_mp_id),apl_no=str(l_apl_no),att_no=str(att_no)).update(mtr_desc=str(l_mtr_desc))    
+    
+    context = {'att_no': str(att_no)}
+
+    return JsonResponse(context,json_dumps_params={'ensure_ascii': True})
 
 #####################################################################################
 # MP01041M - END
