@@ -4748,7 +4748,7 @@ class MS0101M_adm_list(generics.ListAPIView):
         query += " and use_indc = 'y'  "
         query += " and std_detl_code = C.status)) as status_nm,  "
 
-        query += " C.ms_name,B.pr_yr,B.pr_sch_yr,B.pr_term_div,A.* from service20_ms_apl A,service20_vw_nanum_stdt B,service20_msch C where A.apl_id=B.apl_id and A.ms_id = C.ms_id and A.yr='"+l_yr+"' and A.ms_id = '"+ms_ida+"' and A.apl_id='"+ida+"'"
+        query += " C.ms_name,B.pr_yr,ifnull(B.pr_sch_yr,'1') as pr_sch_yr, ifnull(B.pr_term_div,'1') as pr_term_div,A.* from service20_ms_apl A,service20_vw_nanum_stdt B,service20_msch C where A.apl_id=B.apl_id and A.ms_id = C.ms_id and A.yr='"+l_yr+"' and A.ms_id = '"+ms_ida+"' and A.apl_id='"+ida+"'"
         
         queryset = ms_apl.objects.raw(query)
 
@@ -7404,7 +7404,7 @@ def MP0101M_detail(request):
                 p_pr_sch_yr = '0'
             if p_pr_term_div is None:
                 p_pr_term_div = '0'
-                
+
             context = {'message': message,
                         'applyYn' : applyYn,
                         'apl_nm' : rows.apl_nm,
@@ -7525,7 +7525,7 @@ class MP0101M_adm_list(generics.ListAPIView):
         # 팀 리더
         query += " (select ldr_id from service20_mp_team where mp_id = A.mp_id and team_id = A.team_id) ldr_id, "
 
-        query += " C.mp_name,B.pr_yr,B.pr_sch_yr,B.pr_term_div,A.* from service20_mp_mtr A left join service20_vw_nanum_stdt B on (A.apl_id = B.apl_id),service20_mpgm C where A.mp_id = C.mp_id and A.mp_id = '"+mp_ida+"' and A.apl_id='"+ida+"'"
+        query += " C.mp_name,B.pr_yr,ifnull(B.pr_sch_yr,'1') as pr_sch_yr, ifnull(B.pr_term_div,'1') as pr_term_div,A.* from service20_mp_mtr A left join service20_vw_nanum_stdt B on (A.apl_id = B.apl_id),service20_mpgm C where A.mp_id = C.mp_id and A.mp_id = '"+mp_ida+"' and A.apl_id='"+ida+"'"
         queryset = mp_mtr.objects.raw(query)
         print(query)
         serializer_class = self.get_serializer_class()
