@@ -4642,7 +4642,7 @@ def MS0101M_detail(request):
                 p_pr_sch_yr = '0'
             if p_pr_term_div is None:
                 p_pr_term_div = '0'
-                
+
             context = {'message': message,
                         'applyYn' : applyYn,
                         'apl_nm' : rows.apl_nm,
@@ -7398,7 +7398,13 @@ def MP0101M_detail(request):
                 key1 = val.att_id
                 #key2 = val.att_cdd
 
-
+            p_pr_sch_yr = rows.pr_sch_yr
+            p_pr_term_div = rows.pr_term_div
+            if p_pr_sch_yr is None:
+                p_pr_sch_yr = '0'
+            if p_pr_term_div is None:
+                p_pr_term_div = '0'
+                
             context = {'message': message,
                         'applyYn' : applyYn,
                         'apl_nm' : rows.apl_nm,
@@ -7432,8 +7438,8 @@ def MP0101M_detail(request):
                         'bank_nm' : rows.bank_nm,
                         'bank_dpsr' : rows.bank_dpsr,
                         'pr_yr' : rows.pr_yr,
-                        'pr_sch_yr' : rows.pr_sch_yr,
-                        'pr_term_div' : rows.pr_term_div,
+                        'pr_sch_yr' : p_pr_sch_yr,
+                        'pr_term_div' : p_pr_term_div,
                         'score01' : rows.score01,
                         'score02' : rows.score02,
                         'score03' : rows.score03,
