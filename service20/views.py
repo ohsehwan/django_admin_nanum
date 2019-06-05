@@ -13171,7 +13171,12 @@ def MP01041M_Insert(request):
                , 'N'
                , (select exp_no from service20_mp_exp where mp_id = '{l_mp_id}' and apl_no = '{l_apl_no}' and exp_mon = substring(replace('{l_att_sdt}', '-', ''), 1, 6))
                , null
-               , null
+               , {l_appr_tm} * (SELECT s1.att_val
+                                FROM service20_mp_sub s1
+                                WHERE s1.mp_id   = '{l_mp_id}'
+                                AND s1.att_id  = 'MP0032'
+                                AND s1.att_cdh = 'MP0032'
+                                AND s1.att_cdd = '00')
                , '{ins_id}'
                , '{client_ip}'
                , now()
@@ -13332,239 +13337,6 @@ def MP01041M_Insert(request):
     query_result = cursor.execute(query)
     mp_att_req.objects.filter(mp_id=str(l_mp_id),apl_no=str(l_apl_no),req_no=str(req_no),att_no=str(att_no)).update(f_mtr_desc=str(l_mtr_desc),t_mtr_desc=str(l_mtr_desc),t_req_desc=str(l_req_desc))
     
-    # 출석 추가
-    # query = "/* 출석 추가 */"
-    # query += " insert into service20_mp_att ("
-    # query += "    mp_id"
-    # query += "    , apl_no"
-    # query += "    , att_no"
-    # query += "    , mp_div"
-    # query += "    , spc_no"
-    # query += "    , att_div"
-    # query += "    , att_sts"
-    # query += "    , att_sdt"
-    # query += "    , att_saddr"
-    # query += "    , att_slat"
-    # query += "    , att_slon"
-    # query += "    , att_sdist"
-    # query += "    , att_edt"
-    # query += "    , att_eaddr"
-    # query += "    , att_elat"
-    # query += "    , att_elon"
-    # query += "    , att_edist"
-    # query += "    , elap_tm"
-    # query += "    , appr_tm"
-    # query += "    , mtr_desc"
-    # query += "    , mtr_pic"
-    # query += "    , appr_id"
-    # query += "    , appr_nm"
-    # query += "    , appr_dt"
-    # query += "    , mgr_id"
-    # query += "    , mgr_dt"
-    # query += "    , expl_yn"
-    # query += "    , rep_no"
-    # query += "    , exp_div"
-    # query += "    , exp_no"
-    # query += "    , exp_dt"
-    # query += "    , exp_amt"
-    # query += "    , ins_id"
-    # query += "    , ins_ip"
-    # query += "    , ins_dt"
-    # query += "    , ins_pgm"
-    # query += "    , upd_id"
-    # query += "    , upd_ip"
-    # query += "    , upd_dt"
-    # query += "    , upd_pgm"
-    # query += " ) values ("
-    # query += "    '" + str(l_mp_id) + "'"
-    # query += "    , '" + str(l_apl_no) + "'"
-    # # query += "    , (select ifnull(max(att_no), 0) + 1 from service20_mp_att t1 where t1.mp_id = '" + str(l_mp_id) + "' and t1.apl_no = '" + str(l_apl_no) + "')"
-    # query += "    , " + att_no
-    # query += "    , '" + str(l_mp_div) + "'"
-    # query += "    , 0"
-    # query += "    , '" + str(l_att_div) + "'"
-    # query += "    , 'B'"
-    # query += "    , concat('" + str(l_att_sdt) + "', ' " + str(l_att_stm_h) + "', ':', '" + str(l_att_stm_m) + "', ':00')"
-    # query += "    , '" + l_att_saddr + "'"
-    # query += "    , null"
-    # query += "    , null"
-    # query += "    , null"
-    # query += "    , concat('" + str(l_att_edt) + "', ' " + str(l_att_etm_h) + "', ':', '" + str(l_att_etm_m) + "', ':00')"
-    # query += "    , '" + l_att_eaddr + "'"
-    # query += "    , null"
-    # query += "    , null"
-    # query += "    , null"
-    # query += "    , concat('" + str(l_elap_tm) + "', ':00')"
-    # query += "    , '" + str(l_appr_tm) + "'"
-    # query += "    , '" + str(l_mtr_desc) + "'"
-    # query += "    , '" + str(l_mtr_pic) + "'"
-    # query += "    , null"
-    # query += "    , null"
-    # query += "    , null"
-    # query += "    , null"
-    # query += "    , null"
-    # query += "    , 'N'"
-    # query += "    , null"
-    # query += "    , 'Y'"
-    # query += "    , (select exp_no from service20_mp_exp where mp_id = '" + str(l_mp_id) + "' and apl_no = '" + str(l_apl_no) + "' and exp_mon = substring(replace('" + str(l_att_sdt) + "', '-', ''), 1, 6))"
-    # query += "    , null"
-    # query += "    , null"
-    # query += "    , '" + str(ins_id) + "'"
-    # query += "    , '" + str(client_ip) + "'"
-    # query += "    , now()"
-    # query += "    , '" + str(ins_pgm) + "'"
-    # query += "    , '" + str(upd_id) + "'"
-    # query += "    , '" + str(client_ip) + "'"
-    # query += "    , now()"
-    # query += "    , '" + str(upd_pgm) + "'"
-    # query += " )"
-
-    # cursor = connection.cursor()
-    # query_result = cursor.execute(query)
-
-    # # 소명 최초 추가
-    # query = "/* 소명 추가 */"
-    # query += " insert into service20_mp_att_req ("
-    # query += "    mp_id"
-    # query += "    , apl_no"
-    # query += "    , req_no"
-    # query += "    , att_no"
-    # query += "    , mp_div"
-    # query += "    , spc_no"
-    # query += "    , f_att_div"
-    # query += "    , f_att_sts"
-    # query += "    , f_att_sdt"
-    # query += "    , f_att_saddr"
-    # query += "    , f_att_slat"
-    # query += "    , f_att_slon"
-    # query += "    , f_att_sdist"
-    # query += "    , f_att_edt"
-    # query += "    , f_att_eaddr"
-    # query += "    , f_att_elat"
-    # query += "    , f_att_elon"
-    # query += "    , f_att_edist"
-    # query += "    , f_elap_tm"
-    # query += "    , f_appr_tm"
-    # query += "    , f_mtr_desc"
-    # query += "    , f_mtr_pic"
-    # query += "    , f_mtr_pic2"
-    # query += "    , f_mtr_pic3"
-    # query += "    , f_mtr_pic4"
-    # query += "    , f_mtr_pic5"
-    # query += "    , f_appr_id"
-    # query += "    , f_appr_nm"
-    # query += "    , f_appr_dt"
-    # query += "    , f_mgr_id"
-    # query += "    , f_mgr_dt"
-    # query += "    , t_req_desc"
-    # query += "    , t_att_div"
-    # query += "    , t_att_sts"
-    # query += "    , t_att_sdt"
-    # query += "    , t_att_saddr"
-    # query += "    , t_att_slat"
-    # query += "    , t_att_slon"
-    # query += "    , t_att_sdist"
-    # query += "    , t_att_edt"
-    # query += "    , t_att_eaddr"
-    # query += "    , t_att_elat"
-    # query += "    , t_att_elon"
-    # query += "    , t_att_edist"
-    # query += "    , t_elap_tm"
-    # query += "    , t_appr_tm"
-    # query += "    , t_mtr_desc"
-    # query += "    , t_mtr_pic"
-    # query += "    , t_mtr_pic2"
-    # query += "    , t_mtr_pic3"
-    # query += "    , t_mtr_pic4"
-    # query += "    , t_mtr_pic5"
-    # query += "    , t_appr_id"
-    # query += "    , t_appr_nm"
-    # query += "    , t_appr_dt"
-    # query += "    , t_mgr_id"
-    # query += "    , t_mgr_dt"
-    # query += "    , ins_id"
-    # query += "    , ins_ip"
-    # query += "    , ins_dt"
-    # query += "    , ins_pgm"
-    # query += "    , upd_id"
-    # query += "    , upd_ip"
-    # query += "    , upd_dt"
-    # query += "    , upd_pgm"
-    # query += " )"
-    # query += " select mp_id as mp_id"
-    # query += "     , apl_no as apl_no"
-    # query += "     , (select ifnull(max(req_no), 0) + 1 from service20_mp_att_req t1 where t1.mp_id = '" + str(l_mp_id) + "' and t1.apl_no = '" + str(l_apl_no) + "') as req_no"
-    # query += "     , att_no as att_no"
-    # query += "     , '" + str(l_mp_div) + "' as mp_div"
-    # query += "     , 0 as spc_no "
-    # query += "     , '" + l_att_div + "' as f_att_div "
-    # query += "     , 'B' as f_att_sts"
-    # query += "     , concat('" + str(l_att_sdt) + "', ' " + str(l_att_stm_h) + "', ':', '" + str(l_att_stm_m) + "', ':00') as f_att_sdt"
-    # query += "     , att_saddr as f_att_saddr"
-    # query += "     , att_slat as f_att_slat"
-    # query += "     , att_slon as f_att_slon"
-    # query += "     , att_sdist as f_att_sdist"
-    # query += "     , concat('" + str(l_att_edt) + "', ' " + str(l_att_etm_h) + "', ':', '" + str(l_att_etm_m) + "', ':00') as f_att_edt"
-    # query += "     , att_eaddr as f_att_eaddr"
-    # query += "     , att_elat as f_att_elat"
-    # query += "     , att_elon as f_att_elon"
-    # query += "     , att_edist as f_att_edist"
-    # query += "     , '" + l_elap_tm + "' as f_elap_tm"
-    # query += "     , '" + l_appr_tm + "' as f_appr_tm"
-    # query += "     , '" + l_mtr_desc + "' as f_mtr_desc"
-    # query += "     , mtr_pic as f_mtr_pic"
-    # query += "     , mtr_pic2 as f_mtr_pic2"
-    # query += "     , mtr_pic3 as f_mtr_pic3"
-    # query += "     , mtr_pic4 as f_mtr_pic4"
-    # query += "     , mtr_pic5 as f_mtr_pic5"
-    # query += "     , null as f_appr_id"
-    # query += "     , null as f_appr_nm"
-    # query += "     , null as f_appr_dt"
-    # query += "     , null as f_mgr_id"
-    # query += "     , null as f_mgr_dt"
-    # query += "     , '" + l_req_desc + "' as t_req_desc"
-    # query += "     , '" + l_att_div + "' as t_att_div "
-    # query += "     , 'B' as t_att_sts"
-    # query += "     , concat('" + str(l_att_sdt) + "', ' " + str(l_att_stm_h) + "', ':', '" + str(l_att_stm_m) + "', ':00') as t_att_sdt"
-    # query += "     , att_saddr as t_att_saddr"
-    # query += "     , att_slat as t_att_slat"
-    # query += "     , att_slon as t_att_slon"
-    # query += "     , att_sdist as t_att_sdist"
-    # query += "     , concat('" + str(l_att_edt) + "', ' " + str(l_att_etm_h) + "', ':', '" + str(l_att_etm_m) + "', ':00') as t_att_edt"
-    # query += "     , att_eaddr as t_att_eaddr"
-    # query += "     , att_elat as t_att_elat"
-    # query += "     , att_elon as t_att_elon"
-    # query += "     , att_edist as t_att_edist"
-    # query += "     , '" + l_elap_tm + "' as t_elap_tm"
-    # query += "     , '" + l_appr_tm + "' as t_appr_tm"
-    # query += "     , '" + l_mtr_desc + "' as t_mtr_desc"
-    # query += "     , null as t_mtr_pic"
-    # query += "     , null as t_mtr_pic2"
-    # query += "     , null as t_mtr_pic3"
-    # query += "     , null as t_mtr_pic4"
-    # query += "     , null as t_mtr_pic5"
-    # query += "     , null as t_appr_id"
-    # query += "     , null as t_appr_nm"
-    # query += "     , null as t_appr_dt"
-    # query += "     , null as t_mgr_id"
-    # query += "     , null as t_mgr_dt"
-    # query += "     , '" + str(ins_id) + "' as ins_id"
-    # query += "     , '" + str(client_ip) + "' as ins_ip"
-    # query += "     , now() as ins_dt"
-    # query += "     , '" + str(ins_pgm) + "' as ins_pgm"
-    # query += "     , '" + str(upd_id) + "' as upd_id"
-    # query += "     , '" + str(client_ip) + "' as upd_ip"
-    # query += "     , now() as upd_dt"
-    # query += "     , '" + str(upd_pgm) + "' as upd_pgm"
-    # query += "  from service20_mp_att"
-    # query += " where mp_id = '" + str(l_mp_id) + "'"
-    # query += "   and apl_no = '" + str(l_apl_no) + "'"
-    # query += "   and att_no = (select max(att_no) from service20_mp_att where mp_id = '" + str(l_mp_id) + "' and apl_no = '" + str(l_apl_no) + "')"
-    # query += "   and att_no in (select max(att_no) from service20_mp_att where mp_id = '" + str(l_mp_id) + "' and apl_no = '" + str(l_apl_no) + "')"
-
-    # print(query)
-    # cursor = connection.cursor()
-    # query_result = cursor.execute(query)    
 
     context = {'att_no': str(att_no), 'req_no': str(req_no)}
 
@@ -13759,32 +13531,6 @@ def MP01041M_req(request):
     query_result = cursor.execute(query)    
     mp_att_req.objects.filter(mp_id=str(l_mp_id),apl_no=str(l_apl_no),req_no=str(req_no),att_no=str(l_att_no)).update(f_mtr_desc=str(l_mtr_desc),t_mtr_desc=str(l_mtr_desc),t_req_desc=str(l_req_desc))
 
-    # 출석 소명 수정
-    # query = "/* 출석 소명 수정 */"
-    # query += " update service20_mp_att_req"
-    # query += "   set t_req_desc = '" + str(l_req_desc) + "'"
-    # query += "     , t_att_sdt = concat('" + str(l_att_sdt) + "', ' " + str(l_att_stm_h) + "', ':', '" + str(l_att_stm_m) + "', ':00')"
-    # query += "     , t_att_edt = concat('" + str(l_att_edt) + "', ' " + str(l_att_etm_h) + "', ':', '" + str(l_att_etm_m) + "', ':00')"
-    # query += "     , t_elap_tm = concat('" + str(l_elap_tm) + "', ':00')"
-    # query += "     , t_appr_tm = '" + str(l_appr_tm) + "'"
-    # query += "     , t_mtr_desc = '" + str(l_mtr_desc) + "'"
-    # # if i > 0:
-    # #     if not l_mtr_pic[i]:
-    # #         query += "     , t_mtr_pic = '" + str(i+1) + str(l_mtr_pic[i]) + "'"
-    # # else:
-    # #     query += "     , t_mtr_pic = '" + str(l_mtr_pic[i]) + "'"
-    # query += "     , upd_id = '" + str(upd_id) + "'"
-    # query += "     , upd_ip = '" + str(client_ip) + "'"
-    # query += "     , upd_dt = now()"
-    # query += "     , upd_pgm = '" + str(upd_pgm) + "'"
-    # query += " where mp_id = '" + str(l_mp_id) + "'"
-    # query += "   and apl_no = '" + str(l_apl_no) + "'"
-    # query += "   and req_no = '" + str(l_req_no) + "'"
-
-    # print(query)
-    # cursor = connection.cursor()
-    # query_result = cursor.execute(query)
-
     # 출석 원본 수정
     query = "/* 출석 원본 수정 */"
     query += " update service20_mp_att"
@@ -13793,6 +13539,8 @@ def MP01041M_req(request):
     query += "     , att_edt = concat('" + str(l_att_edt) + "', ' " + str(l_att_etm_h) + "', ':', '" + str(l_att_etm_m) + "', ':00')"
     query += "     , elap_tm = concat('" + str(l_elap_tm) + "', ':00')"
     query += "     , appr_tm = '" + str(l_appr_tm) + "'"
+    query += "     , exp_amt = " + str(l_appr_tm) + " * (SELECT s1.att_val FROM service20_mp_sub s1 WHERE s1.mp_id   = '" + str(l_mp_id) + "' AND s1.att_id  = 'MP0032' AND s1.att_cdh = 'MP0032' AND s1.att_cdd = '00')"
+    # query += "     , appr_tm = '" + str(l_appr_tm) + "'"
     # query += "     , mtr_desc = '" + str(l_mtr_desc) + "'"
     # if i > 0:
     #     if not l_mtr_pic[i]:
@@ -13858,6 +13606,8 @@ def MP01041M_upd(request):
     query += "     , att_edt = concat('" + str(l_att_edt) + "', ' " + str(l_att_etm_h) + "', ':', '" + str(l_att_etm_m) + "', ':00')"
     query += "     , elap_tm = concat('" + str(l_elap_tm) + "', ':00')"
     query += "     , appr_tm = '" + str(l_appr_tm) + "'"
+    query += "     , exp_amt = " + str(l_appr_tm) + " * (SELECT s1.att_val FROM service20_mp_sub s1 WHERE s1.mp_id   = '" + str(l_mp_id) + "' AND s1.att_id  = 'MP0032' AND s1.att_cdh = 'MP0032' AND s1.att_cdd = '00')"
+    # query += "     , appr_tm = '" + str(l_appr_tm) + "'"
     # query += "     , mtr_desc = '" + str(l_mtr_desc) + "'"
     # if i > 0:
     #     if not l_mtr_pic[i]:
@@ -14229,7 +13979,12 @@ def MP01041M_att_insert(request):
                , 'N'
                , (select exp_no from service20_mp_exp where mp_id = '{l_mp_id}' and apl_no = '{l_apl_no}' and exp_mon = substring(replace('{l_att_sdt}', '-', ''), 1, 6))
                , null
-               , null
+               , {l_appr_tm} * (SELECT s1.att_val
+                                FROM service20_mp_sub s1
+                                WHERE s1.mp_id   = '{l_mp_id}'
+                                AND s1.att_id  = 'MP0032'
+                                AND s1.att_cdh = 'MP0032'
+                                AND s1.att_cdd = '00')
                , '{ins_id}'
                , '{client_ip}'
                , now()
