@@ -13221,7 +13221,7 @@ def MP01041M_Insert(request):
                 , upd_dt
                 , upd_pgm
                 ) values (
-                '{mp_id}'
+                '{l_mp_id}'
                 , {results[i].mnte_no}
                 , {l_apl_no}
                 , {att_no}
