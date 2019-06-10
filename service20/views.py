@@ -12985,10 +12985,10 @@ class MP01041M_att(generics.ListAPIView):
         # query += "   and t1.att_no = '" + l_att_no + "'"
 
         query = "/* 출석 상세 그리드 */"
-        query += " select t1.id as id"
+        query += " select distinct t1.id as id"
         query += "     , t1.mp_id as mp_id"
         query += "     , t1.apl_no as apl_no"
-        query += "     , t2.req_no as req_no"
+        # query += "     , t2.req_no as req_no"
         query += "     , t1.att_no as att_no"
         query += "     , t3.mp_name as mp_name"
         query += "     , t1.mp_div as mp_div"
@@ -13090,12 +13090,6 @@ def MP01041M_Insert(request):
     results = namedtuplefetchall(cursor)    
     att_no = int(results[0].att_no)
 
-    req_query = "select ifnull(max(req_no), 0) + 1 as req_no from service20_mp_att_req t1 where t1.mp_id = '" + str(l_mp_id) + "' and t1.apl_no = '" + str(l_apl_no) + "'"
-    cursor = connection.cursor()
-    cursor.execute(req_query)    
-    results = namedtuplefetchall(cursor)    
-    req_no = int(results[0].req_no)
-
     query = f"""
             /* 출석 추가 */
             insert into service20_mp_att (
@@ -13166,7 +13160,7 @@ def MP01041M_Insert(request):
                , null
                , null
                , null
-               , 'N'
+               , 'Y'
                , null
                , 'N'
                , (select exp_no from service20_mp_exp where mp_id = '{l_mp_id}' and apl_no = '{l_apl_no}' and exp_mon = substring(replace('{l_att_sdt}', '-', ''), 1, 6))
@@ -13191,6 +13185,76 @@ def MP01041M_Insert(request):
     cursor = connection.cursor()
     query_result = cursor.execute(query)
     mp_att.objects.filter(mp_id=str(l_mp_id),apl_no=str(l_apl_no),att_no=str(att_no)).update(mtr_desc=str(l_mtr_desc))    
+
+    mte_query = "select mnte_no, count(0) as cnt from service20_mp_mte where mp_id = '" + str(l_mp_id) +  "' and apl_no = '" + str(l_apl_no) + "'"
+    cursor = connection.cursor()
+    cursor.execute(mte_query)    
+    results = namedtuplefetchall(cursor)    
+    mte_cnt = int(results[0].cnt)
+
+    i = 0
+    for i in range(0,int(mte_cnt)):
+        query = f"""
+                /* 멘티 출석 추가 */
+                insert into service20_mp_att_mte (
+                mp_id
+                , mnte_no
+                , apl_no
+                , att_no
+                , att_div
+                , att_sdt
+                , att_edt
+                , elap_tm
+                , appr_tm
+                , mtr_thght
+                , appr_id
+                , appr_nm
+                , appr_dt
+                , mgr_id
+                , mgr_dt
+                , ins_id
+                , ins_ip
+                , ins_dt
+                , ins_pgm
+                , upd_id
+                , upd_ip
+                , upd_dt
+                , upd_pgm
+                ) values (
+                '{mp_id}'
+                , {results[i].mnte_no}
+                , {l_apl_no}
+                , {att_no}
+                , '{l_att_div}'
+                , concat('{l_att_sdt}', ' {l_att_stm_h}', ':', '{l_att_stm_m}', ':00')
+                , concat('{l_att_edt}', ' {l_att_etm_h}', ':', '{l_att_etm_m}', ':00')
+                , concat('{l_elap_tm}', ':00')
+                , '{l_appr_tm}'
+                , null
+                , null
+                , null
+                , null
+                , null
+                , null
+                , '{ins_id}'
+                , '{client_ip}'
+                , now()
+                , '{ins_pgm}'
+                , '{ins_id}'
+                , '{client_ip}'
+                , now()
+                , '{ins_pgm}'
+                );
+        """
+        print(query)
+        cursor = connection.cursor()
+        query_result = cursor.execute(query)
+
+    req_query = "select ifnull(max(req_no), 0) + 1 as req_no from service20_mp_att_req t1 where t1.mp_id = '" + str(l_mp_id) + "' and t1.apl_no = '" + str(l_apl_no) + "'"
+    cursor = connection.cursor()
+    cursor.execute(req_query)    
+    results = namedtuplefetchall(cursor)    
+    req_no = int(results[0].req_no)
 
     query = f"""
             /* 소명 추가 */
@@ -14634,7 +14698,7 @@ class MP0105M_detail_2(generics.ListAPIView):
                                 WHERE s1.mp_id = t1.mp_id
                                     AND s1.apl_no = t1.apl_no
                                     AND ( s1.att_sdt >= CONCAT(t2.rep_ym, '01') AND s1.att_sdt < CONCAT(DATE_FORMAT(DATE(CONCAT(t2.rep_ym, '01') + INTERVAL 1 MONTH), '%%y%%m'), '01'))) END AS aaa
-                    , NULL AS rep_dt
+                    , SUBSTRING(t2.rep_dt, 1, 10) AS rep_dt
                     , NULL AS req_dt
                     , t3.mp_plc
                     , CASE WHEN t3.mp_plc = 'b' THEN t3.grd_id
