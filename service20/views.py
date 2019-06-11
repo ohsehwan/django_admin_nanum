@@ -14686,7 +14686,8 @@ class MP0105M_detail_2(generics.ListAPIView):
                     , t3.tchr_id /* 지도교사 id */
                     , t3.tchr_nm AS teacher /* 지도교사 명 */
                     , t3.mnte_id /* 멘티id */
-                    , t3.mnte_nm AS mte_nm
+                    , fn_mp_mte_select_01(t2.mp_id, t2.apl_no) mte_nm /* 담당멘티명*/
+                    /*, t3.mnte_nm AS mte_nm*/
                     , t3.sch_yr /* 학교명/학년 */
                     , t3.mtr_sub AS obj_sub /* 지도과목 */
                     , CASE WHEN t2.rep_div = 'F' THEN (SELECT CONCAT(COUNT(*), '회 ', ifnull(SUM(s1.appr_tm), 0), '시간')
@@ -14734,7 +14735,7 @@ class MP0105M_detail_2(generics.ListAPIView):
                                     , s2.tchr_nm
                                     , s2.mnte_id
                                     , s2.mnte_nm
-                                    , CONCAT(s2.sch_nm, '/', s2.sch_yr, '학년') AS sch_yr /* 학교명/학년 */
+                                    , s2.sch_nm AS sch_yr /* 학교명/학년 */
                                     , s3.mtr_sub /* 지도과목 */
                                     , TRUNCATE (RAND()* 7 + 1, 0) AS att_desc
                                     , s3.mtr_obj
