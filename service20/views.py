@@ -16151,10 +16151,22 @@ def TE0202_Approval(request):
     
     client_ip = request.META['REMOTE_ADDR']
 
+    att_sts_query = f"""
+                select att_sts
+                from service20_mp_att
+                where mp_id = '{l_mp_id}'
+                and apl_no = '{l_apl_no}'
+                and att_no = '{l_att_no}'
+    """
+    cursor = connection.cursor()
+    cursor.execute(att_sts_query)    
+    results = namedtuplefetchall(cursor)    
+    att_sts = str(results[0].att_sts)
+
     query = " update service20_mp_att t1"
-    query += "   set t1.appr_dt = case when '" + l_status + "' = 'B' then now() else null end"
-    query += "     , t1.appr_id = case when '" + l_status + "' = 'B' then '" + l_user_id + "' else null end"
-    query += "     , t1.appr_nm = case when '" + l_status + "' = 'B' then (select tchr_nm from service20_teacher where tchr_id = '" + l_user_id + "')"
+    query += "   set t1.appr_dt = case when '" + att_sts + "' = 'B' then now() else null end"
+    query += "     , t1.appr_id = case when '" + att_sts + "' = 'B' then '" + l_user_id + "' else null end"
+    query += "     , t1.appr_nm = case when '" + att_sts + "' = 'B' then (select tchr_nm from service20_teacher where tchr_id = '" + l_user_id + "')"
     query += "                         else null end"
     query += "     , t1.appr_div = 'Y'"
     query += "     , t1.att_sts = 'C'"
