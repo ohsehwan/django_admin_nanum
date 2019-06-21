@@ -12906,7 +12906,7 @@ class MP01041M_combo_mpgm_att(generics.ListAPIView):
 
 # 출석 상세 ###################################################
 class MP01041M_att_Serializer(serializers.ModelSerializer):
-    req_no = serializers.SerializerMethodField()
+    # req_no = serializers.SerializerMethodField()
     mp_name = serializers.SerializerMethodField()
     mgr_nm = serializers.SerializerMethodField()
     att_stm = serializers.SerializerMethodField()
@@ -12920,8 +12920,8 @@ class MP01041M_att_Serializer(serializers.ModelSerializer):
         model = mp_att
         fields = '__all__'
 
-    def get_req_no(self,obj):
-        return obj.req_no
+    # def get_req_no(self,obj):
+        # return obj.req_no
     def get_mgr_nm(self,obj):
         return obj.mgr_nm
     def get_mp_name(self,obj):
