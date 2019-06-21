@@ -69,7 +69,7 @@ def login_login(request):
             v_login_gubun = str(results[0].std_detl_code_nm)
             v_user_div =  str(results[0].user_div)
         
-        if v_user_div == "M" or v_user_div == "S" or v_user_div == '' or v_user_div == None:
+        if v_user_div == "M" or v_user_div == "S" or v_user_div == "O" or v_user_div == '' or v_user_div == None:
 
 
             # 로그인할 유저정보를 넣어주자 (모두 문자열)
