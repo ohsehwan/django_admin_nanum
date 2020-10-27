@@ -8,7 +8,7 @@ colorama==0.3.7
 command-not-found==0.3
 configobj==5.0.6
 constantly==15.1.0
-cryptography==2.1.4
+cryptography==3.2
 distro-info==0.18
 Django==2.1.5
 django-admin-tools==0.8.1
